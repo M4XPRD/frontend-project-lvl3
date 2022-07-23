@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable no-useless-escape */
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
@@ -10,8 +8,8 @@ const config = {
   mode: process.env.NODE_ENV || 'development',
   entry: './src/index.js',
   output: {
+    filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    filename: 'main.js',
   },
   module: {
     rules: [
