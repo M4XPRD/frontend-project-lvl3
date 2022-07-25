@@ -10,5 +10,5 @@ test-watch:
 	NODE_OPTIONS=--experimental-vm-modules  npx jest --watch
 test:
 	NODE_OPTIONS=--experimental-vm-modules  npx jest
-webpack:
-	npm run webpack
+start:
+	npm run start
