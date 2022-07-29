@@ -3,8 +3,6 @@ import onChange from 'on-change';
 
 const schema = yup.string().url().required();
 
-const validate = (url) => schema.validateSync(url);
-
 const messages = {
   feedback: {
     valid: {
@@ -24,6 +22,10 @@ const elements = {
   input: document.querySelector('#url-input'),
 };
 
+const addRedFrame = (input) => input.classList.add('is-invalid');
+
+const validate = (url) => schema.validateSync(url);
+
 const rssCheck = (url) => (String(url).indexOf('rss') !== -1);
 
 export default async () => {
@@ -38,7 +40,7 @@ export default async () => {
     const url = data.get('url');
     switch (true) {
       case (validate(url) === 'Nonvalid'):
-        elements.input.classList.add('is-invalid');
+        addRedFrame(elements.input);
         elements.feedback.textContent = messages.feedback.invalid.nonvalidURL;
         return;
       case (validate(url) === 'Valid' && rssCheck(url) === false):
@@ -47,6 +49,7 @@ export default async () => {
         elements.feedback.classList.replace('text-success', 'text-danger');
         return;
       case (validate(url) === 'Valid' && rssCheck(url) === true && state.feed.includes(url)):
+        addRedFrame(elements.input);
         elements.feedback.textContent = messages.feedback.invalid.duplicate;
         elements.input.classList.remove('is-invalid');
         elements.feedback.classList.replace('text-danger', 'text-success');
