@@ -33,7 +33,7 @@ const elements = {
   input: document.querySelector('#url-input'),
 };
 
-const rssCheck = (url) => (String(url).indexOf('rss') !== -1);
+// const rssCheck = (url) => (String(url).indexOf('rss') !== -1);
 
 export default async () => {
   const state = {
@@ -50,12 +50,12 @@ export default async () => {
         elements.input.classList.add('is-invalid');
         elements.feedback.textContent = messages.feedback.invalid.nonvalidURL;
         return;
-      case (validateURL(url) === 'Valid' && rssCheck(url) === false):
+      case (validateURL(url) === 'Valid'):
         elements.feedback.textContent = messages.feedback.invalid.noRSS;
         elements.input.classList.remove('is-invalid');
         elements.feedback.classList.replace('text-success', 'text-danger');
         return;
-      case (validateURL(url) === 'Valid' && rssCheck(url) === true && state.feed.includes(url)):
+      case (validateURL(url) === 'Valid' && state.feed.includes(url)):
         elements.feedback.textContent = messages.feedback.invalid.duplicate;
         elements.input.classList.add('is-invalid');
         elements.feedback.classList.replace('text-success', 'text-danger');
