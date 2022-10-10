@@ -1,18 +1,20 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable max-len */
 import * as yup from 'yup';
 import onChange from 'on-change';
 // import { isEmpty } from 'lodash';
+import _ from 'lodash';
 import {
-  renderInputFrame,
   renderFeed,
 } from './view.js';
 
 const validateURL = (url, watchedState) => {
-  const schema = yup.string('Такой ты крендель!').url('Мдааа').required();
+  const schema = yup.string().url().required();
   try {
     schema.notOneOf(watchedState.rssFeed).validateSync(url);
     return true;
   } catch (error) {
+    watchedState.errors = error.name;
     return false;
   }
 };
@@ -27,21 +29,21 @@ export default () => {
 
   const state = {
     valid: true,
-    fields: {
+    field: {
       url: '',
     },
     rssFeed: [],
-    errors: [],
+    errors: '',
   };
 
-  const watchedState = onChange(state, (path, value) => {
+  const watchedState = onChange(state, (path) => {
     switch (path) {
       case 'rssFeed':
-        renderFeed(elements);
+        renderFeed(elements, watchedState);
         break;
-      case 'valid':
-        renderInputFrame(elements, value);
-        break;
+      // case 'valid':
+      //   renderInputFrame(elements, watchedState);
+      //   break;
       default:
         break;
     }
@@ -51,14 +53,13 @@ export default () => {
     e.preventDefault();
     const data = new FormData(e.target);
     const currentUrl = data.get('url').trim();
-    console.log('test');
-    watchedState.fields.url = currentUrl;
+    watchedState.field.url = currentUrl;
     if (validateURL(currentUrl, watchedState)) {
       watchedState.rssFeed.push(currentUrl);
       watchedState.valid = true;
     } else {
-      watchedState.errors.push('Error');
-      watchedState.valid = false;
+      watchedState.valid = _.isEmpty(watchedState.errors);
+      renderFeed(elements, watchedState);
     }
   });
 
@@ -82,4 +83,11 @@ export default () => {
 1. Производить валидацию и подсвечивать красным рамку вокруг инпута, если адрес невалидный.
 2. Нужно валидировать дубли. Если урл уже есть в списке фидов, то он не проходит валидацию.
 3. После того как поток добавлен, форма принимает первоначальный вид (очищается инпут, устанавливается фокус).
+
+Проверка:
+
+1. Даётся невалидная ссылка // +
+2. Валидная ссылка уже есть в фиде //
+3. Даётся валидная ссылка, которой нет в фиде // +
+
 */
