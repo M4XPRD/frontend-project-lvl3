@@ -1,5 +1,5 @@
 import * as yup from 'yup';
-import onChange from 'on-change';
+// import onChange from 'on-change';
 
 const schema = yup.string().url().required();
 
@@ -12,7 +12,7 @@ const validateURL = (url) => {
   }
 };
 
-const validateTwo = (url) => schema.validateSync(url);
+// const validateTwo = (url) => schema.validateSync(url);
 
 const messages = {
   feedback: {
