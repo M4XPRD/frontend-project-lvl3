@@ -10,3 +10,5 @@ webpack:
 	npm run webpack
 start:
 	npm run start
+watch:
+	npm run watch
