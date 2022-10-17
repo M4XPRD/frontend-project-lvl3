@@ -1,22 +1,38 @@
 import * as yup from 'yup';
 import onChange from 'on-change';
 import _ from 'lodash';
-import {
-  renderFeed,
-} from './view.js';
+import i18next from 'i18next';
+import { renderFeed } from './view.js';
+import resources from './locales/ru.js';
 
-const validateURL = (url, watchedState) => {
-  const schema = yup.string().url().required();
-  try {
-    schema.notOneOf(watchedState.rssFeed).validateSync(url, { abortEarly: false });
-    return true;
-  } catch (error) {
-    watchedState.errors.push(error.name);
-    return false;
-  }
-};
+export default async () => {
+  const i18nextInstance = i18next.createInstance();
+  await i18nextInstance.init({
+    lng: 'ru',
+    debug: false,
+    resources,
+  });
 
-export default () => {
+  // yup.setLocale({
+  //   mixed: {
+  //     default: i18nextInstance.t('invalid.nonvalidURL'),
+  //   },
+  //   default: {
+
+  //   },
+  // });
+
+  const validateURL = (url, watchedState) => {
+    const schema = yup.string().url().required();
+    try {
+      schema.notOneOf(watchedState.rssFeed).validateSync(url, { abortEarly: false });
+      return true;
+    } catch (error) {
+      watchedState.errors.push(error.name);
+      return false;
+    }
+  };
+
   const elements = {
     form: document.querySelector('.rss-form'),
     input: document.querySelector('#url-input'),
@@ -36,7 +52,7 @@ export default () => {
   const watchedState = onChange(state, (path) => {
     switch (path) {
       case 'rssFeed':
-        renderFeed(elements, watchedState);
+        renderFeed(elements, watchedState, i18nextInstance);
         break;
       default:
         break;
@@ -50,10 +66,10 @@ export default () => {
     watchedState.field.url = currentUrl;
     if (validateURL(currentUrl, watchedState)) {
       watchedState.valid = true;
-      renderFeed(elements, watchedState);
+      renderFeed(elements, watchedState, i18nextInstance);
     } else {
       watchedState.valid = _.isEmpty(watchedState.errors);
-      renderFeed(elements, watchedState);
+      renderFeed(elements, watchedState, i18nextInstance);
     }
   });
 };
