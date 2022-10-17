@@ -6,73 +6,72 @@ import { renderFeed } from './view.js';
 import resources from './locales/ru.js';
 
 export default async () => {
-  const i18nextInstance = i18next.createInstance();
-  await i18nextInstance.init({
+  const i18n = i18next.createInstance();
+  i18n.init({
     lng: 'ru',
-    debug: false,
+    debug: true,
     resources,
-  });
+  }).then(() => {
+    yup.setLocale({
+      mixed: {
+        default: i18n.t('invalid.defaultMessage'),
+      },
+      string: {
+        url: i18n.t('invalid.nonvalidURL'),
+      },
+    });
 
-  // yup.setLocale({
-  //   mixed: {
-  //     default: i18nextInstance.t('invalid.nonvalidURL'),
-  //   },
-  //   default: {
+    const validateURL = (url, watchedState) => {
+      const schema = yup.string().url().required();
+      try {
+        schema.notOneOf(watchedState.rssFeed).validateSync(url, { abortEarly: false });
+        return true;
+      } catch (error) {
+        watchedState.errors.push(error.name);
+        return false;
+      }
+    };
 
-  //   },
-  // });
+    const elements = {
+      form: document.querySelector('.rss-form'),
+      input: document.querySelector('#url-input'),
+      feedback: document.querySelector('.feedback'),
+      feed: document.querySelector('.posts'),
+    };
 
-  const validateURL = (url, watchedState) => {
-    const schema = yup.string().url().required();
-    try {
-      schema.notOneOf(watchedState.rssFeed).validateSync(url, { abortEarly: false });
-      return true;
-    } catch (error) {
-      watchedState.errors.push(error.name);
-      return false;
-    }
-  };
+    const state = {
+      valid: true,
+      field: {
+        url: '',
+      },
+      rssFeed: [],
+      errors: [],
+    };
 
-  const elements = {
-    form: document.querySelector('.rss-form'),
-    input: document.querySelector('#url-input'),
-    feedback: document.querySelector('.feedback'),
-    feed: document.querySelector('.posts'),
-  };
+    const watchedState = onChange(state, (path) => {
+      switch (path) {
+        case 'rssFeed':
+          renderFeed(elements, watchedState, i18n);
+          break;
+        // case 'valid':
+        //   renderFeed(elements, watchedState, i18n);
+        //   break;
+        default:
+          break;
+      }
+    });
 
-  const state = {
-    valid: true,
-    field: {
-      url: '',
-    },
-    rssFeed: [],
-    errors: [],
-  };
-
-  const watchedState = onChange(state, (path) => {
-    switch (path) {
-      case 'rssFeed':
-        renderFeed(elements, watchedState, i18nextInstance);
-        break;
-      // case 'valid':
-      //   renderFeed(elements, watchedState, i18nextInstance);
-      //   break;
-      default:
-        break;
-    }
-  });
-
-  elements.form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const data = new FormData(e.target);
-    const currentUrl = data.get('url').trim();
-    watchedState.field.url = currentUrl;
-    if (validateURL(currentUrl, watchedState)) {
-      watchedState.valid = true;
-      renderFeed(elements, watchedState, i18nextInstance);
-    } else {
-      watchedState.valid = _.isEmpty(watchedState.errors);
-      renderFeed(elements, watchedState, i18nextInstance);
-    }
+    elements.form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = new FormData(e.target);
+      const currentUrl = data.get('url').trim();
+      watchedState.field.url = currentUrl;
+      if (validateURL(currentUrl, watchedState)) {
+        watchedState.valid = true;
+      } else {
+        watchedState.valid = _.isEmpty(watchedState.errors);
+      }
+      renderFeed(elements, watchedState, i18n);
+    });
   });
 };
