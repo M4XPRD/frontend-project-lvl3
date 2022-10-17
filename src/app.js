@@ -54,6 +54,9 @@ export default async () => {
       case 'rssFeed':
         renderFeed(elements, watchedState, i18nextInstance);
         break;
+      // case 'valid':
+      //   renderFeed(elements, watchedState, i18nextInstance);
+      //   break;
       default:
         break;
     }
