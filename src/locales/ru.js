@@ -12,6 +12,13 @@ export default {
           duplicate: 'RSS уже существует',
         },
       },
+      interface: {
+        h1: 'RSS-агрегатор',
+        h2: 'Начните читать RSS сегодня! Это легко, это красиво.',
+        placeholder: 'ссылка RSS',
+        example: 'Пример: https://ru.hexlet.io/lessons.rss',
+        button: 'Добавить',
+      },
     },
   },
 };
