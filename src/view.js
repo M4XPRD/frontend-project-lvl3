@@ -11,11 +11,9 @@ const renderFrame = (elements, state) => {
 const renderFeed = (elements, state, i18n) => {
   if (state.rssFeed.includes(state.field.url)) {
     elements.feedback.textContent = i18n.t('validation.invalid.duplicate');
-    state.valid = false;
     renderFrame(elements, state);
   } else if (!state.valid && !state.rssFeed.includes(state.field.url)) {
     elements.feedback.textContent = i18n.t('validation.invalid.nonvalidURL');
-    state.valid = false;
     renderFrame(elements, state);
   } else {
     state.valid = true;
@@ -27,6 +25,17 @@ const renderFeed = (elements, state, i18n) => {
   }
 };
 
-const render = () => {};
+const renderLanguage = (elements, value, previousValue, i18n) => {
+  const currentLangButton = document.querySelector(`[data-lng="${previousValue}"]`);
+  currentLangButton.classList.replace('btn-primary', 'btn-outline-primary');
+  const activeLangButton = document.querySelector(`[data-lng="${value}"]`);
+  activeLangButton.classList.replace('btn-outline-primary', 'btn-primary');
+  elements.interface.title.textContent = i18n.t('interface.title');
+  elements.interface.subtitle.textContent = i18n.t('interface.subtitle');
+  elements.interface.inputPlaceholder.textContent = i18n.t('interface.placeholder');
+  elements.interface.buttonText.textContent = i18n.t('interface.button');
+  elements.interface.example.textContent = i18n.t('interface.example');
+  elements.interface.hexlet.textContent = i18n.t('interface.hexlet');
+};
 
-export { renderFeed, render };
+export { renderFeed, renderLanguage };
