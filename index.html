@@ -25,8 +25,8 @@
   <main class="flex-grow-1">
     <section class="container-fluid bg-dark p-5">
       <div class="btn-group position-absolute top-4 start-93" role="group">
-        <button type="button" class="btn mb-3 btn-primary">EN</button>
-        <button type="button" class="btn mb-3 btn-outline-primary">RU</button>
+        <button type="button" class="btn mb-3 btn-primary" data-lng="ru">RU</button>
+        <button type="button" class="btn mb-3 btn-outline-primary" data-lng="en">EN</button>
     </div>
       <div class="row">
         <div class="col-md-10 col-lg-8 mx-auto text-white">
@@ -37,13 +37,13 @@
               <div class="col">
                 <div class="form-floating"><input id="url-input" autofocus required name="url" aria-label="url"
                     class="form-control w-100" placeholder="ссылка RSS" autocomplete="off"> <label
-                    for="url-input">Ссылка RSS</label></div>
+                    for="url-input" data-label="rss">Ссылка RSS</label></div>
               </div>
               <div class="col-auto"><button type="submit" aria-label="add"
-                  class="h-100 btn btn-lg btn-primary px-sm-5">Добавить</button></div>
+                  class="h-100 btn btn-lg btn-primary px-sm-5" data-button="button">Добавить</button></div>
             </div>
           </form>
-          <p class="mt-2 mb-0 text-muted">Пример: https://ru.hexlet.io/lessons.rss</p>
+          <p class="mt-2 mb-0 text-muted" data-example="example">Пример: https://ru.hexlet.io/lessons.rss</p>
           <p class="feedback m-0 position-absolute small text-danger"></p>
         </div>
       </div>
@@ -57,7 +57,7 @@
   </main>
   <footer class="footer border-top py-3 mt-5 bg-light">
     <div class="container-xl">
-      <div class="text-center">created by <a href="https://ru.hexlet.io/professions/frontend/projects/11"
+      <div class="text-center"><span data-hexlet="hexlet">created by</span> <a href="https://ru.hexlet.io/professions/frontend/projects/11"
           target="_blank">Hexlet</a></div>
     </div>
   </footer>
