@@ -1,27 +1,26 @@
-/* eslint-disable no-template-curly-in-string */
-// import * as yup from 'yup';
+import * as yup from 'yup';
 
-// import { setLocale } from 'yup';
+import { setLocale } from 'yup';
 
-// setLocale({
+setLocale({
 
-//   string: {
-//     min: 'Wtf dude lol 2',
-//   },
-// });
+  string: {
+    min: 'Wtf dude lol 2',
+  },
+});
 
-// // now use Yup schemas AFTER you defined your custom dictionary
-// const schema = yup.object().shape({
-//   name: yup.string().required().min(20),
-//   age: yup.number().min(18),
-// });
+// now use Yup schemas AFTER you defined your custom dictionary
+const schema = yup.object().shape({
+  name: yup.string().required().min(20),
+  age: yup.number().min(18),
+});
 
-// try {
-//   schema.validateSync({ name: 'ww', age: 11 });
-// } catch (err) {
-//   console.log(err.name); // => 'ValidationError'
-//   console.log(err.errors); // => ['Deve ser maior que 18']
-// }
+try {
+  schema.validateSync({ name: 'ww', age: 19 });
+} catch (err) {
+  console.log(err.name); // => 'ValidationError'
+  console.log(...err.errors); // => ['Deve ser maior que 18']
+}
 
 // const array = ['i', 'https://ya.ru/'];
 
