@@ -2,13 +2,14 @@ import * as yup from 'yup';
 import onChange from 'on-change';
 import _ from 'lodash';
 import i18next from 'i18next';
-import { renderFeed } from './view.js';
-import resources from './locales/ru.js';
+import { renderFeed, renderLanguage } from './view.js';
+import resources from './locales/index.js';
 
 export default async () => {
+  const defaultLanguage = 'ru';
   const i18n = i18next.createInstance();
   i18n.init({
-    lng: 'ru',
+    lng: defaultLanguage,
     debug: true,
     resources,
   }).then(() => {
@@ -37,9 +38,19 @@ export default async () => {
       input: document.querySelector('#url-input'),
       feedback: document.querySelector('.feedback'),
       feed: document.querySelector('.posts'),
+      languageButtons: document.querySelectorAll('[data-lng]'),
+      interface: {
+        title: document.querySelector('h1'),
+        subtitle: document.querySelector('.lead'),
+        inputPlaceholder: document.querySelector('[data-label]'),
+        buttonText: document.querySelector('[data-button]'),
+        example: document.querySelector('[data-example]'),
+        hexlet: document.querySelector('[data-hexlet'),
+      },
     };
 
     const state = {
+      lng: defaultLanguage,
       valid: true,
       field: {
         url: '',
@@ -48,10 +59,14 @@ export default async () => {
       errors: [],
     };
 
-    const watchedState = onChange(state, (path) => {
+    const watchedState = onChange(state, (path, value, previousValue) => {
       switch (path) {
         case 'valid':
           // renderFeed(elements, watchedState, i18n);
+          break;
+        case 'lng':
+          i18n.changeLanguage(value);
+          renderLanguage(elements, value, previousValue, i18n);
           break;
         default:
           break;
@@ -69,6 +84,11 @@ export default async () => {
         watchedState.valid = _.isEmpty(watchedState.errors);
       }
       renderFeed(elements, watchedState, i18n);
+    });
+    elements.languageButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        watchedState.lng = button.dataset.lng;
+      });
     });
   });
 };
