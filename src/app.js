@@ -50,12 +50,9 @@ export default async () => {
 
     const watchedState = onChange(state, (path) => {
       switch (path) {
-        case 'rssFeed':
-          renderFeed(elements, watchedState, i18n);
+        case 'valid':
+          // renderFeed(elements, watchedState, i18n);
           break;
-        // case 'valid':
-        //   renderFeed(elements, watchedState, i18n);
-        //   break;
         default:
           break;
       }
