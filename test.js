@@ -4,46 +4,51 @@ import * as yup from 'yup';
 import _ from 'lodash';
 import onChange from 'on-change';
 
-const render = (state) => state.test += 1;
+// const render = (state) => state.test += 1;
 
-const state = {
-  valid: true,
-  test: 0,
-};
-
-const watchedState = onChange(state, (path) => {
-  if (path === 'valid') {
-    render(state);
-  }
-});
-
-watchedState.valid = false;
-watchedState.valid = true;
-console.log(state);
-
-// yup.setLocale({
-//   mixed: {
-//     default: 'default',
-//   },
-//   string: {
-//     url: 'invalid link',
-//   },
-// });
-
-// const errors = [];
-
-// const validateURL = (url) => {
-//   const schema = yup.string().url().required();
-//   try {
-//     schema.validateSync(url, { abortEarly: false });
-//     return true;
-//   } catch (error) {
-//     errors.push(...error.errors);
-//     return false;
-//   }
+// const state = {
+//   valid: true,
+//   test: 0,
 // };
 
-// validateURL(1);
+// const watchedState = onChange(state, (path) => {
+//   if (path === 'valid') {
+//     render(state);
+//   }
+// });
+
+// watchedState.valid = false;
+// watchedState.valid = true;
+// console.log(state);
+
+yup.setLocale({
+  mixed: {
+    default: 'default',
+  },
+  string: {
+    url: 'invalid link',
+  },
+});
+
+const errors = [];
+
+const validateURL = (url) => {
+  const schema = yup.string().url().required();
+  try {
+    schema.notOneOf(['https://ya.ru/']).validateSync(url, { abortEarly: false });
+    console.log('success');
+    return true;
+  } catch (error) {
+    console.log(error.errors);
+    return false;
+  }
+};
+
+validateURL('htt');
+
+validateURL('https://ya.ru/');
+
+validateURL('https://ya.rssssu/');
 
 // console.log(errors);
 
