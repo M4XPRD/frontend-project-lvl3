@@ -1,27 +1,75 @@
+/* eslint-disable no-return-assign */
+/* eslint-disable no-unused-vars */
 import * as yup from 'yup';
+import _ from 'lodash';
+import onChange from 'on-change';
 
-import { setLocale } from 'yup';
+const render = (state) => state.test += 1;
 
-setLocale({
+const state = {
+  valid: true,
+  test: 0,
+};
 
-  string: {
-    min: 'Wtf dude lol 2',
-  },
+const watchedState = onChange(state, (path) => {
+  if (path === 'valid') {
+    render(state);
+  }
 });
 
-// now use Yup schemas AFTER you defined your custom dictionary
-const schema = yup.object().shape({
-  name: yup.string().required().min(20),
-  age: yup.number().min(18),
-});
+watchedState.valid = false;
+watchedState.valid = true;
+console.log(state);
 
-try {
-  schema.validateSync({ name: 'ww', age: 19 });
-} catch (err) {
-  console.log(err.name); // => 'ValidationError'
-  console.log(...err.errors); // => ['Deve ser maior que 18']
-}
+// yup.setLocale({
+//   mixed: {
+//     default: 'default',
+//   },
+//   string: {
+//     url: 'invalid link',
+//   },
+// });
 
+// const errors = [];
+
+// const validateURL = (url) => {
+//   const schema = yup.string().url().required();
+//   try {
+//     schema.validateSync(url, { abortEarly: false });
+//     return true;
+//   } catch (error) {
+//     errors.push(...error.errors);
+//     return false;
+//   }
+// };
+
+// validateURL(1);
+
+// console.log(errors);
+
+// setLocale({
+
+//   string: {
+//     min: 'Wtf dude lol 2',
+//   },
+// });
+
+// // now use Yup schemas AFTER you defined your custom dictionary
+// const schema = yup.object().shape({
+//   name: yup.string().required().min(20),
+//   age: yup.number().min(18),
+// });
+
+// const test = [];
+
+// try {
+//   schema.validateSync({ name: 'wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww', age: 19 });
+// } catch (err) {
+//   console.log(err.name); // => 'ValidationError'
+//   test.push(...err.errors); // => ['Deve ser maior que 18']
+// }
+
+// console.log(_.isEmpty(test));
 // const array = ['i', 'https://ya.ru/'];
 
 // const validateURL = (url) => {
