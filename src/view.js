@@ -13,6 +13,8 @@ const renderFeed = (elements, state, i18n) => {
     elements.feedback.textContent = i18n.t('validation.invalid.duplicate');
     renderFrame(elements, state);
   } else if (!state.valid && !state.rssFeed.includes(state.field.url)) {
+    // const [error] = state.errors;
+    // elements.feedback.textContent = error;
     elements.feedback.textContent = i18n.t('validation.invalid.nonvalidURL');
     renderFrame(elements, state);
   } else {
