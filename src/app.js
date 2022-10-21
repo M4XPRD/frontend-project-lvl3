@@ -15,10 +15,10 @@ export default async () => {
   }).then(() => {
     yup.setLocale({
       mixed: {
-        default: i18n.t('invalid.defaultMessage'),
+        default: i18n.t('validation.invalid.defaultMessage'),
       },
       string: {
-        url: i18n.t('invalid.nonvalidURL'),
+        url: i18n.t('validation.invalid.nonvalidURL'),
       },
     });
 
@@ -28,7 +28,7 @@ export default async () => {
         schema.notOneOf(watchedState.rssFeed).validateSync(url, { abortEarly: false });
         return true;
       } catch (error) {
-        watchedState.errors.push(error.name);
+        watchedState.errors.push(error.errors);
         return false;
       }
     };
@@ -78,11 +78,8 @@ export default async () => {
       const data = new FormData(e.target);
       const currentUrl = data.get('url').trim();
       watchedState.field.url = currentUrl;
-      if (validateURL(currentUrl, watchedState)) {
-        watchedState.valid = true;
-      } else {
-        watchedState.valid = _.isEmpty(watchedState.errors);
-      }
+      const validateLink = validateURL(currentUrl, watchedState);
+      watchedState.valid = validateLink ? true : _.isEmpty(watchedState.errors);
       renderFeed(elements, watchedState, i18n);
     });
     elements.languageButtons.forEach((button) => {
