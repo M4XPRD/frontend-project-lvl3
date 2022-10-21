@@ -15,10 +15,10 @@ export default async () => {
   }).then(() => {
     yup.setLocale({
       mixed: {
-        default: i18n.t('validation.invalid.defaultMessage'),
+        default: 'validation.invalid.defaultMessage',
       },
       string: {
-        url: i18n.t('validation.invalid.nonvalidURL'),
+        url: 'validation.invalid.nonvalidURL',
       },
     });
 
@@ -28,7 +28,7 @@ export default async () => {
         schema.notOneOf(watchedState.rssFeed).validateSync(url, { abortEarly: false });
         return true;
       } catch (error) {
-        watchedState.errors.push(error.errors);
+        watchedState.errors = error.errors;
         return false;
       }
     };
@@ -51,18 +51,18 @@ export default async () => {
 
     const state = {
       lng: defaultLanguage,
-      valid: true,
+      valid: '',
       field: {
         url: '',
       },
       rssFeed: [],
-      errors: [],
+      errors: '',
     };
 
     const watchedState = onChange(state, (path, value, previousValue) => {
       switch (path) {
         case 'valid':
-          // renderFeed(elements, watchedState, i18n);
+          renderFeed(elements, watchedState, i18n);
           break;
         case 'lng':
           i18n.changeLanguage(value);
@@ -80,7 +80,6 @@ export default async () => {
       watchedState.field.url = currentUrl;
       const validateLink = validateURL(currentUrl, watchedState);
       watchedState.valid = validateLink ? true : _.isEmpty(watchedState.errors);
-      renderFeed(elements, watchedState, i18n);
     });
     elements.languageButtons.forEach((button) => {
       button.addEventListener('click', () => {

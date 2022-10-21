@@ -10,15 +10,22 @@ const renderFrame = (elements, state) => {
 
 const renderFeed = (elements, state, i18n) => {
   if (state.rssFeed.includes(state.field.url)) {
+    console.log(`duplicate: state.errors: ${state.errors}`);
+    console.log(`duplicate: state.valid: ${state.valid}`);
+    console.log(`duplicate: if feed has url: ${state.rssFeed.includes(state.field.url)}`);
     elements.feedback.textContent = i18n.t('validation.invalid.duplicate');
     renderFrame(elements, state);
   } else if (!state.valid && !state.rssFeed.includes(state.field.url)) {
-    // const [error] = state.errors;
-    // elements.feedback.textContent = error;
-    elements.feedback.textContent = i18n.t('validation.invalid.nonvalidURL');
+    console.log(`invalid: state.errors: ${state.errors}`);
+    console.log(`invalid: state.valid: ${state.valid}`);
+    console.log(`invalid: if feed has url: ${state.rssFeed.includes(state.field.url)}`);
+    elements.feedback.textContent = i18n.t(`${state.errors}`);
     renderFrame(elements, state);
   } else {
-    state.valid = true;
+    console.log(`valid: state.errors: ${state.errors}`);
+    console.log(`valid: state.valid: ${state.valid}`);
+    console.log(`valid: if feed has url: ${state.rssFeed.includes(state.field.url)}`);
+    state.errors = '';
     state.rssFeed.push(state.field.url);
     elements.feedback.textContent = i18n.t('validation.valid.success');
     renderFrame(elements, state);
@@ -26,6 +33,25 @@ const renderFeed = (elements, state, i18n) => {
     elements.input.focus();
   }
 };
+
+// const renderFeed = (elements, state, i18n) => {
+//   if (state.rssFeed.includes(state.field.url)) {
+//     elements.feedback.textContent = i18n.t('validation.invalid.duplicate');
+//     renderFrame(elements, state);
+//   } else if (!state.valid && !state.rssFeed.includes(state.field.url)) {
+//     // const [error] = state.errors;
+//     // elements.feedback.textContent = error;
+//     elements.feedback.textContent = i18n.t('validation.invalid.nonvalidURL');
+//     renderFrame(elements, state);
+//   } else {
+//     state.valid = true;
+//     state.rssFeed.push(state.field.url);
+//     elements.feedback.textContent = i18n.t('validation.valid.success');
+//     renderFrame(elements, state);
+//     elements.form.reset();
+//     elements.input.focus();
+//   }
+// };
 
 const renderLanguage = (elements, value, previousValue, i18n) => {
   const currentLangButton = document.querySelector(`[data-lng="${previousValue}"]`);
