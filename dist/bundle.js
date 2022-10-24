@@ -26874,6 +26874,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             };
             var state = {
               lng: defaultLanguage,
+              processState: '',
               valid: '',
               field: {
                 url: ''
@@ -26883,7 +26884,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             };
             var watchedState = (0,on_change__WEBPACK_IMPORTED_MODULE_1__["default"])(state, function (path, value, previousValue) {
               switch (path) {
-                case 'valid':
+                case 'processState':
                   (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderFeed)(elements, watchedState, i18n);
                   break;
 
@@ -26903,6 +26904,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               watchedState.field.url = currentUrl;
               var validateLink = validateURL(currentUrl, watchedState);
               watchedState.valid = validateLink ? true : lodash__WEBPACK_IMPORTED_MODULE_2__.isEmpty(watchedState.errors);
+              watchedState.processState = 'checking link';
             });
             elements.languageButtons.forEach(function (button) {
               button.addEventListener('click', function () {
@@ -27044,15 +27046,13 @@ var renderFeed = function renderFeed(elements, state, i18n) {
     case !state.valid && !state.rssFeed.includes(state.field.url):
       elements.feedback.textContent = i18n.t("".concat(state.errors));
       renderFrame(elements, state);
-      console.log("INCORRECT: ".concat(state.valid));
-      console.log("INCORRECT URL: ".concat(state.field.url));
+      state.processState = 'invalid link error';
       break;
 
     case !state.valid && state.rssFeed.includes(state.field.url):
       elements.feedback.textContent = i18n.t('validation.invalid.duplicate');
       renderFrame(elements, state);
-      console.log("DUPLICATE: ".concat(state.valid));
-      console.log("DUPLICATE URL: ".concat(state.field.url));
+      state.processState = 'duplication error';
       break;
 
     default:
@@ -27060,56 +27060,12 @@ var renderFeed = function renderFeed(elements, state, i18n) {
       state.rssFeed.push(state.field.url);
       elements.feedback.textContent = i18n.t('validation.valid.success');
       renderFrame(elements, state);
-      console.log("SUCCESS: ".concat(state.valid));
-      console.log("SUCCESS URL: ".concat(state.field.url));
+      state.processState = 'success';
       elements.form.reset();
       elements.input.focus();
       break;
   }
-}; // const renderFeed = (elements, state, i18n) => {
-//   if (!state.valid && state.rssFeed.includes(state.field.url)) {
-//     console.log(`duplicate: state.errors: ${state.errors}`);
-//     console.log(`duplicate: state.valid: ${state.valid}`);
-//     console.log(`duplicate: if feed has url: ${state.rssFeed.includes(state.field.url)}`);
-//     elements.feedback.textContent = i18n.t('validation.invalid.duplicate');
-//     renderFrame(elements, state);
-//   } else if (!state.valid && !state.rssFeed.includes(state.field.url)) {
-//     console.log(`invalid: state.errors: ${state.errors}`);
-//     console.log(`invalid: state.valid: ${state.valid}`);
-//     console.log(`invalid: if feed has url: ${state.rssFeed.includes(state.field.url)}`);
-//     elements.feedback.textContent = i18n.t(`${state.errors}`);
-//     renderFrame(elements, state);
-//   } else {
-//     console.log(`valid: state.errors: ${state.errors}`);
-//     console.log(`valid: state.valid: ${state.valid}`);
-//     console.log(`valid: if feed has url: ${state.rssFeed.includes(state.field.url)}`);
-//     state.errors = '';
-//     state.rssFeed.push(state.field.url);
-//     elements.feedback.textContent = i18n.t('validation.valid.success');
-//     renderFrame(elements, state);
-//     elements.form.reset();
-//     elements.input.focus();
-//   }
-// };
-// const renderFeed = (elements, state, i18n) => {
-//   if (state.rssFeed.includes(state.field.url)) {
-//     elements.feedback.textContent = i18n.t('validation.invalid.duplicate');
-//     renderFrame(elements, state);
-//   } else if (!state.valid && !state.rssFeed.includes(state.field.url)) {
-//     // const [error] = state.errors;
-//     // elements.feedback.textContent = error;
-//     elements.feedback.textContent = i18n.t('validation.invalid.nonvalidURL');
-//     renderFrame(elements, state);
-//   } else {
-//     state.valid = true;
-//     state.rssFeed.push(state.field.url);
-//     elements.feedback.textContent = i18n.t('validation.valid.success');
-//     renderFrame(elements, state);
-//     elements.form.reset();
-//     elements.input.focus();
-//   }
-// };
-
+};
 
 var renderLanguage = function renderLanguage(elements, value, previousValue, i18n) {
   var currentLangButton = document.querySelector("[data-lng=\"".concat(previousValue, "\"]"));
