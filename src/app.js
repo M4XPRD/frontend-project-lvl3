@@ -51,6 +51,7 @@ export default async () => {
 
     const state = {
       lng: defaultLanguage,
+      processState: '',
       valid: '',
       field: {
         url: '',
@@ -61,7 +62,7 @@ export default async () => {
 
     const watchedState = onChange(state, (path, value, previousValue) => {
       switch (path) {
-        case 'valid':
+        case 'processState':
           renderFeed(elements, watchedState, i18n);
           break;
         case 'lng':
@@ -80,6 +81,7 @@ export default async () => {
       watchedState.field.url = currentUrl;
       const validateLink = validateURL(currentUrl, watchedState);
       watchedState.valid = validateLink ? true : _.isEmpty(watchedState.errors);
+      watchedState.processState = 'checking link';
     });
     elements.languageButtons.forEach((button) => {
       button.addEventListener('click', () => {
