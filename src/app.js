@@ -2,7 +2,7 @@ import * as yup from 'yup';
 import onChange from 'on-change';
 import _ from 'lodash';
 import i18next from 'i18next';
-import { renderFeed, renderLanguage } from './view.js';
+import { renderInput, renderLanguage } from './view.js';
 import resources from './locales/index.js';
 
 export default async () => {
@@ -63,7 +63,7 @@ export default async () => {
     const watchedState = onChange(state, (path, value, previousValue) => {
       switch (path) {
         case 'processState':
-          renderFeed(elements, watchedState, i18n);
+          renderInput(elements, watchedState, i18n);
           break;
         case 'lng':
           i18n.changeLanguage(value);
