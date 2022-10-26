@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const parse = async (url) => {
+const parseURL = async (url) => {
   axios.get(`https://allorigins.hexlet.app/get?url=${encodeURIComponent(url)}`)
     .then((responce) => responce.data)
     .catch((err) => {
@@ -10,4 +10,4 @@ const parse = async (url) => {
 
 const render = () => {};
 
-export { parse, render };
+export { parseURL, render };
