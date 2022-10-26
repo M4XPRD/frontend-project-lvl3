@@ -1,8 +1,8 @@
 import * as yup from 'yup';
 import onChange from 'on-change';
-import _ from 'lodash';
 import i18next from 'i18next';
 import { renderInput, renderLanguage } from './view.js';
+// import { parseURL } from './parser.js';
 import resources from './locales/index.js';
 
 export default async () => {
@@ -22,15 +22,16 @@ export default async () => {
       },
     });
 
-    const validateURL = (url, watchedState) => {
+    const validateURL = async (url, watchedState) => {
       const schema = yup.string().url().required();
-      try {
-        schema.notOneOf(watchedState.rssFeed).validateSync(url, { abortEarly: false });
-        return true;
-      } catch (error) {
-        watchedState.errors = error.errors;
-        return false;
-      }
+      return schema.notOneOf(watchedState.rssFeed).validate(url)
+        .then(() => {
+          watchedState.valid = true;
+        })
+        .catch((error) => {
+          watchedState.errors = error.errors;
+          watchedState.valid = false;
+        });
     };
 
     const elements = {
@@ -69,6 +70,9 @@ export default async () => {
           i18n.changeLanguage(value);
           renderLanguage(elements, value, previousValue, i18n);
           break;
+        // case 'processState' === 'success':
+        //   parseURL(state.field.url);
+        //   break;
         default:
           break;
       }
@@ -79,10 +83,12 @@ export default async () => {
       const data = new FormData(e.target);
       const currentUrl = data.get('url').trim();
       watchedState.field.url = currentUrl;
-      const validateLink = validateURL(currentUrl, watchedState);
-      watchedState.valid = validateLink ? true : _.isEmpty(watchedState.errors);
-      watchedState.processState = 'checking link';
+      validateURL(currentUrl, watchedState)
+        .then(() => {
+          watchedState.processState = 'checking link';
+        });
     });
+
     elements.languageButtons.forEach((button) => {
       button.addEventListener('click', () => {
         watchedState.lng = button.dataset.lng;
