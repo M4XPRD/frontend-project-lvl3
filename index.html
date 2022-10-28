@@ -24,10 +24,14 @@
   </div>
   <main class="flex-grow-1">
     <section class="container-fluid bg-dark p-5">
-      <div class="btn-group position-absolute top-4 start-93" role="group">
+      <div class="btn-group position-absolute top-0 end-0" role="group">
         <button type="button" class="btn mb-3 btn-primary" data-lng="ru">RU</button>
         <button type="button" class="btn mb-3 btn-outline-primary" data-lng="en">EN</button>
-    </div>
+      </div>
+      <!-- <div class="btn-group position-sticky top-4 start-93" role="group">
+        <button type="button" class="btn mb-3 btn-primary" data-lng="ru">RU</button>
+        <button type="button" class="btn mb-3 btn-outline-primary" data-lng="en">EN</button>
+    </div> -->
       <div class="row">
         <div class="col-md-10 col-lg-8 mx-auto text-white">
           <h1 class="display-3 mb-0">RSS-агрегатор</h1>
@@ -44,7 +48,7 @@
             </div>
           </form>
           <p class="mt-2 mb-0 text-muted" data-example="example">Пример: https://ru.hexlet.io/lessons.rss</p>
-          <p class="feedback m-0 position-absolute small text-danger"></p>
+          <p class="feedback m-0 position-absolute small text-danger" data-link-message=""></p>
         </div>
       </div>
     </section>
