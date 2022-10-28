@@ -36,12 +36,13 @@ const renderInput = (elements, state, i18n) => {
 };
 
 const renderLanguage = (elements, value, previousValue, i18n) => {
-  const currentLangButton = document.querySelector(`[data-lng="${previousValue}"]`);
-  currentLangButton.classList.replace('btn-primary', 'btn-outline-primary');
+  const previousLangButton = document.querySelector(`[data-lng="${previousValue}"]`);
+  previousLangButton.classList.replace('btn-primary', 'btn-outline-primary');
   const activeLangButton = document.querySelector(`[data-lng="${value}"]`);
+  activeLangButton.classList.replace('btn-outline-primary', 'btn-primary');
+
   const feedbackMessage = document.querySelector('[data-link-message]');
   const feedbackMessageDataset = feedbackMessage.dataset.linkMessage;
-  activeLangButton.classList.replace('btn-outline-primary', 'btn-primary');
   elements.interface.title.textContent = i18n.t('interface.title');
   elements.interface.subtitle.textContent = i18n.t('interface.subtitle');
   elements.interface.inputPlaceholder.textContent = i18n.t('interface.placeholder');
