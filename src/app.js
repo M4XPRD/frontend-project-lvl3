@@ -2,7 +2,7 @@ import * as yup from 'yup';
 import onChange from 'on-change';
 import i18next from 'i18next';
 import { renderInput, renderLanguage } from './view.js';
-// import { parseURL } from './parser.js';
+import { parseRSS } from './parser.js';
 import resources from './locales/index.js';
 
 export default async () => {
@@ -65,14 +65,15 @@ export default async () => {
       switch (path) {
         case 'processState':
           renderInput(elements, watchedState, i18n);
+          if (value === 'success') {
+            parseRSS(watchedState.field.url);
+            break;
+          }
           break;
         case 'lng':
           i18n.changeLanguage(value);
           renderLanguage(elements, value, previousValue, i18n);
           break;
-        // case 'processState' === 'success':
-        //   parseURL(state.field.url);
-        //   break;
         default:
           break;
       }
