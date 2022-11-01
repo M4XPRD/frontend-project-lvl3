@@ -1,3 +1,5 @@
+// import { parseRSS } from './parser.js';
+
 const renderFrame = (elements, state) => {
   switch (true) {
     case !state.valid:
@@ -48,6 +50,8 @@ const renderInput = (elements, state, i18n) => {
 };
 
 const renderFeed = (elements, state, i18n) => {
+  const [feedsTitle, feedsDescription] = state.feeds;
+
   const feedsCard = document.createElement('div');
   feedsCard.classList.add('card', 'border-0');
   const feedsCardBody = document.querySelector('.feeds > .card > .card-body') ?? document.createElement('div');
@@ -65,10 +69,10 @@ const renderFeed = (elements, state, i18n) => {
   feedsListGroupItem.classList.add('list-group-item', 'border-0', 'border-end-0');
   const feedsListGroupItemTitle = document.createElement('h3');
   feedsListGroupItemTitle.classList.add('h6', 'm-0');
-  feedsListGroupItemTitle.textContent = state.feeds.shift().textContent;
+  feedsListGroupItemTitle.textContent = feedsTitle.textContent;
   const feedsListGroupItemDescription = document.createElement('p');
   feedsListGroupItemDescription.classList.add('m-0', 'small', 'text-black-50');
-  feedsListGroupItemDescription.textContent = state.feeds.shift().textContent;
+  feedsListGroupItemDescription.textContent = feedsDescription.textContent;
 
   feedsListGroup.append(feedsListGroupItem);
   feedsCard.append(feedsListGroup);
@@ -124,12 +128,22 @@ const renderPosts = (elements, state, i18n) => {
 
     state.idCounter += 1;
   });
-
+  state.currentPosts.unshift(...state.posts);
   state.posts = Object.assign([]);
 
   postsCard.append(postsListGroup);
   elements.posts.prepend(postsCard);
 };
+
+// const updatePosts = (state) => {
+//   state.rssFeedLinks.forEach((rssLink) => {
+//     parseRSS(rssLink).then(() => {
+
+//     });
+//   });
+// };
+
+const updatePosts = () => {};
 
 const renderModal = () => {};
 
@@ -151,14 +165,16 @@ const renderLanguage = (elements, value, previousValue, i18n) => {
 
   const feeds = document.querySelector('.feeds > .card > .card-body > .card-title');
   const posts = document.querySelector('.posts > .card > .card-body > .card-title');
-  feeds.textContent = i18n.t('interface.feeds');
-  posts.textContent = i18n.t('interface.posts');
-  const modalButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
-  modalButtons.forEach((button) => {
-    button.textContent = i18n.t('interface.view');
-  });
+  if (feeds && posts) {
+    feeds.textContent = i18n.t('interface.feeds');
+    posts.textContent = i18n.t('interface.posts');
+    const modalButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
+    modalButtons.forEach((button) => {
+      button.textContent = i18n.t('interface.view');
+    });
+  }
 };
 
 export {
-  renderInput, renderLanguage, renderFeed, renderPosts, renderModal,
+  renderInput, renderLanguage, renderFeed, renderPosts, renderModal, updatePosts,
 };
