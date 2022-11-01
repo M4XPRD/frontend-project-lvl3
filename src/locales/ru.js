@@ -18,6 +18,9 @@ export default {
       example: 'Пример: https://ru.hexlet.io/lessons.rss',
       button: 'Добавить',
       hexlet: 'создано в ',
+      feeds: 'Фиды',
+      posts: 'Посты',
+      view: 'Просмотр',
     },
   },
 };
