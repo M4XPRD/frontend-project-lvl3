@@ -13543,6 +13543,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               rssFeedLinks: [],
               feeds: [],
               posts: [],
+              currentPosts: [],
               idCounter: 1,
               errors: ''
             };
@@ -13557,10 +13558,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     case 'success':
                       (0,_parser_js__WEBPACK_IMPORTED_MODULE_4__.parseRSS)(watchedState.field.url, watchedState);
                       break;
-                    case 'continue loading':
+                    case 'loading RSS':
                       (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderFeed)(elements, state, i18n);
                       (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderPosts)(elements, state, i18n);
                       (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderModal)();
+                      (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.updatePosts)(state);
                       break;
                     default:
                       break;
@@ -13728,6 +13730,34 @@ var parseURL = function parseURL(url) {
     throw new Error(err);
   });
 };
+
+// const parseRSS = (url, state) => {
+//   parseURL(url).then((data) => {
+//     const parser = new DOMParser();
+//     const doc = parser.parseFromString(data, 'application/xml');
+//     console.log(doc);
+//     const feedsTitle = doc.querySelector('title');
+//     const feedsDescription = doc.querySelector('description');
+//     const loadedFeeds = {
+//       feedsTitle, feedsDescription,
+//     };
+//     const posts = doc.querySelectorAll('item');
+//     const loadedPosts = [...posts].map((item) => {
+//       const postTitle = item.querySelector('title');
+//       const postDescription = item.querySelector('description');
+//       const postLink = item.querySelector('link');
+//       return { postTitle, postDescription, postLink };
+//     });
+//     const isParseError = doc.querySelector('parsererror') ? 'parser error' : 'loading RSS';
+//     state.processState = isParseError;
+
+//     console.log(loadedFeeds);
+//     console.log(loadedPosts);
+
+//     return { loadedFeeds, loadedPosts };
+//   });
+// };
+
 var parseRSS = function parseRSS(url, state) {
   parseURL(url).then(function (data) {
     var parser = new DOMParser();
@@ -13735,8 +13765,8 @@ var parseRSS = function parseRSS(url, state) {
     console.log(doc);
     var feedsTitle = doc.querySelector('title');
     var feedsDescription = doc.querySelector('description');
-    var isParseError = doc.querySelector('parsererror') ? 'parser error' : 'continue loading';
-    state.feeds.push(feedsTitle, feedsDescription);
+    var isParseError = doc.querySelector('parsererror') ? 'parser error' : 'loading RSS';
+    state.feeds.unshift(feedsTitle, feedsDescription);
     var posts = doc.querySelectorAll('item');
     posts.forEach(function (item) {
       state.posts.push(item);
@@ -13761,8 +13791,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "renderInput": () => (/* binding */ renderInput),
 /* harmony export */   "renderLanguage": () => (/* binding */ renderLanguage),
 /* harmony export */   "renderModal": () => (/* binding */ renderModal),
-/* harmony export */   "renderPosts": () => (/* binding */ renderPosts)
+/* harmony export */   "renderPosts": () => (/* binding */ renderPosts),
+/* harmony export */   "updatePosts": () => (/* binding */ updatePosts)
 /* harmony export */ });
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+// import { parseRSS } from './parser.js';
+
 var renderFrame = function renderFrame(elements, state) {
   switch (true) {
     case !state.valid:
@@ -13812,6 +13855,9 @@ var renderInput = function renderInput(elements, state, i18n) {
 };
 var renderFeed = function renderFeed(elements, state, i18n) {
   var _document$querySelect, _document$querySelect2;
+  var _state$feeds = _slicedToArray(state.feeds, 2),
+    feedsTitle = _state$feeds[0],
+    feedsDescription = _state$feeds[1];
   var feedsCard = document.createElement('div');
   feedsCard.classList.add('card', 'border-0');
   var feedsCardBody = (_document$querySelect = document.querySelector('.feeds > .card > .card-body')) !== null && _document$querySelect !== void 0 ? _document$querySelect : document.createElement('div');
@@ -13827,10 +13873,10 @@ var renderFeed = function renderFeed(elements, state, i18n) {
   feedsListGroupItem.classList.add('list-group-item', 'border-0', 'border-end-0');
   var feedsListGroupItemTitle = document.createElement('h3');
   feedsListGroupItemTitle.classList.add('h6', 'm-0');
-  feedsListGroupItemTitle.textContent = state.feeds.shift().textContent;
+  feedsListGroupItemTitle.textContent = feedsTitle.textContent;
   var feedsListGroupItemDescription = document.createElement('p');
   feedsListGroupItemDescription.classList.add('m-0', 'small', 'text-black-50');
-  feedsListGroupItemDescription.textContent = state.feeds.shift().textContent;
+  feedsListGroupItemDescription.textContent = feedsDescription.textContent;
   feedsListGroup.append(feedsListGroupItem);
   feedsCard.append(feedsListGroup);
   feedsListGroupItem.append(feedsListGroupItemTitle);
@@ -13839,7 +13885,7 @@ var renderFeed = function renderFeed(elements, state, i18n) {
   elements.feeds.prepend(feedsCard);
 };
 var renderPosts = function renderPosts(elements, state, i18n) {
-  var _document$querySelect3, _document$querySelect4;
+  var _document$querySelect3, _document$querySelect4, _state$currentPosts;
   var postsCard = document.createElement('div');
   postsCard.classList.add('card', 'border-0');
   var postsCardBody = (_document$querySelect3 = document.querySelector('.posts > .card > .card-body')) !== null && _document$querySelect3 !== void 0 ? _document$querySelect3 : document.createElement('div');
@@ -13876,10 +13922,21 @@ var renderPosts = function renderPosts(elements, state, i18n) {
     postsListGroup.append(li);
     state.idCounter += 1;
   });
+  (_state$currentPosts = state.currentPosts).unshift.apply(_state$currentPosts, _toConsumableArray(state.posts));
   state.posts = Object.assign([]);
   postsCard.append(postsListGroup);
   elements.posts.prepend(postsCard);
 };
+
+// const updatePosts = (state) => {
+//   state.rssFeedLinks.forEach((rssLink) => {
+//     parseRSS(rssLink).then(() => {
+
+//     });
+//   });
+// };
+
+var updatePosts = function updatePosts() {};
 var renderModal = function renderModal() {};
 var renderLanguage = function renderLanguage(elements, value, previousValue, i18n) {
   var previousLangButton = document.querySelector("[data-lng=\"".concat(previousValue, "\"]"));
@@ -13897,12 +13954,14 @@ var renderLanguage = function renderLanguage(elements, value, previousValue, i18
   elements.feedback.textContent = i18n.t(feedbackMessageDataset);
   var feeds = document.querySelector('.feeds > .card > .card-body > .card-title');
   var posts = document.querySelector('.posts > .card > .card-body > .card-title');
-  feeds.textContent = i18n.t('interface.feeds');
-  posts.textContent = i18n.t('interface.posts');
-  var modalButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
-  modalButtons.forEach(function (button) {
-    button.textContent = i18n.t('interface.view');
-  });
+  if (feeds && posts) {
+    feeds.textContent = i18n.t('interface.feeds');
+    posts.textContent = i18n.t('interface.posts');
+    var modalButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
+    modalButtons.forEach(function (button) {
+      button.textContent = i18n.t('interface.view');
+    });
+  }
 };
 
 
