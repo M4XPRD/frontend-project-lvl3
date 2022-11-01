@@ -7,6 +7,33 @@ const parseURL = (url) => axios
     throw new Error(err);
   });
 
+// const parseRSS = (url, state) => {
+//   parseURL(url).then((data) => {
+//     const parser = new DOMParser();
+//     const doc = parser.parseFromString(data, 'application/xml');
+//     console.log(doc);
+//     const feedsTitle = doc.querySelector('title');
+//     const feedsDescription = doc.querySelector('description');
+//     const loadedFeeds = {
+//       feedsTitle, feedsDescription,
+//     };
+//     const posts = doc.querySelectorAll('item');
+//     const loadedPosts = [...posts].map((item) => {
+//       const postTitle = item.querySelector('title');
+//       const postDescription = item.querySelector('description');
+//       const postLink = item.querySelector('link');
+//       return { postTitle, postDescription, postLink };
+//     });
+//     const isParseError = doc.querySelector('parsererror') ? 'parser error' : 'loading RSS';
+//     state.processState = isParseError;
+
+//     console.log(loadedFeeds);
+//     console.log(loadedPosts);
+
+//     return { loadedFeeds, loadedPosts };
+//   });
+// };
+
 const parseRSS = (url, state) => {
   parseURL(url).then((data) => {
     const parser = new DOMParser();
@@ -14,8 +41,8 @@ const parseRSS = (url, state) => {
     console.log(doc);
     const feedsTitle = doc.querySelector('title');
     const feedsDescription = doc.querySelector('description');
-    const isParseError = doc.querySelector('parsererror') ? 'parser error' : 'continue loading';
-    state.feeds.push(feedsTitle, feedsDescription);
+    const isParseError = doc.querySelector('parsererror') ? 'parser error' : 'loading RSS';
+    state.feeds.unshift(feedsTitle, feedsDescription);
     const posts = doc.querySelectorAll('item');
     posts.forEach((item) => {
       state.posts.push(item);
