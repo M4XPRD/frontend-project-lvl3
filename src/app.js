@@ -2,7 +2,7 @@ import * as yup from 'yup';
 import onChange from 'on-change';
 import i18next from 'i18next';
 import {
-  renderFeed, renderPosts, renderInput, renderLanguage, renderModal,
+  renderFeed, renderPosts, renderInput, renderLanguage, renderModal, updatePosts,
 } from './view.js';
 import { parseRSS } from './parser.js';
 import resources from './locales/index.js';
@@ -64,6 +64,7 @@ export default async () => {
       rssFeedLinks: [],
       feeds: [],
       posts: [],
+      currentPosts: [],
       idCounter: 1,
       errors: '',
     };
@@ -79,10 +80,11 @@ export default async () => {
             case 'success':
               parseRSS(watchedState.field.url, watchedState);
               break;
-            case 'continue loading':
+            case 'loading RSS':
               renderFeed(elements, state, i18n);
               renderPosts(elements, state, i18n);
               renderModal();
+              updatePosts(state);
               break;
             default:
               break;
