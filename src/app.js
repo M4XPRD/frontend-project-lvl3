@@ -1,7 +1,9 @@
 import * as yup from 'yup';
 import onChange from 'on-change';
 import i18next from 'i18next';
-import { renderInput, renderLanguage } from './view.js';
+import {
+  renderFeed, renderPosts, renderInput, renderLanguage, renderModal,
+} from './view.js';
 import { parseRSS } from './parser.js';
 import resources from './locales/index.js';
 
@@ -24,7 +26,7 @@ export default async () => {
 
     const validateURL = async (url, watchedState) => {
       const schema = yup.string().url().required();
-      return schema.notOneOf(watchedState.rssFeed).validate(url)
+      return schema.notOneOf(watchedState.rssFeedLinks).validate(url)
         .then(() => {
           watchedState.valid = true;
         })
@@ -38,8 +40,10 @@ export default async () => {
       form: document.querySelector('.rss-form'),
       input: document.querySelector('#url-input'),
       feedback: document.querySelector('.feedback'),
-      feed: document.querySelector('.posts'),
+      posts: document.querySelector('.posts'),
+      feeds: document.querySelector('.feeds'),
       languageButtons: document.querySelectorAll('[data-lng]'),
+      modalButtons: document.querySelectorAll('[data-bs-toggle="modal"]'),
       interface: {
         title: document.querySelector('h1'),
         subtitle: document.querySelector('.lead'),
@@ -57,17 +61,31 @@ export default async () => {
       field: {
         url: '',
       },
-      rssFeed: [],
+      rssFeedLinks: [],
+      feeds: [],
+      posts: [],
+      idCounter: 1,
       errors: '',
     };
 
     const watchedState = onChange(state, (path, value, previousValue) => {
       switch (path) {
         case 'processState':
-          renderInput(elements, watchedState, i18n);
-          if (value === 'success') {
-            parseRSS(watchedState.field.url);
-            break;
+          switch (value) {
+            case 'checking link':
+            case 'parser error':
+              renderInput(elements, watchedState, i18n);
+              break;
+            case 'success':
+              parseRSS(watchedState.field.url, watchedState);
+              break;
+            case 'continue loading':
+              renderFeed(elements, state, i18n);
+              renderPosts(elements, state, i18n);
+              renderModal();
+              break;
+            default:
+              break;
           }
           break;
         case 'lng':
@@ -95,5 +113,11 @@ export default async () => {
         watchedState.lng = button.dataset.lng;
       });
     });
+
+    // elements.modalButtons.forEach((modalButton) => {
+    //   modalButton.addEventListener('click', () => {
+
+    //   });
+    // });
   });
 };
