@@ -1,4 +1,5 @@
-// import { parseRSS } from './parser.js';
+/* eslint-disable max-len */
+import { parseRSS, parseURL } from './parser.js';
 
 const renderFrame = (elements, state) => {
   switch (true) {
@@ -18,122 +19,136 @@ const renderFrame = (elements, state) => {
 };
 
 const renderInput = (elements, state, i18n) => {
-  switch (true) {
-    case (state.valid && state.processState === 'parser error'):
-      elements.feedback.textContent = i18n.t('validation.invalid.noRSS');
-      elements.feedback.setAttribute('data-link-message', 'validation.invalid.noRSS');
-      renderFrame(elements, state);
-      break;
-    case (!state.valid && !state.rssFeedLinks.includes(state.field.url)):
-      elements.feedback.textContent = i18n.t(`${state.errors}`);
-      elements.feedback.setAttribute('data-link-message', `${state.errors}`);
-      renderFrame(elements, state);
-      state.processState = 'invalid link error';
-      break;
-    case (!state.valid && state.rssFeedLinks.includes(state.field.url)):
-      elements.feedback.textContent = i18n.t('validation.invalid.duplicate');
-      elements.feedback.setAttribute('data-link-message', 'validation.invalid.duplicate');
-      renderFrame(elements, state);
-      state.processState = 'duplication error';
-      break;
-    default:
-      state.errors = '';
-      state.rssFeedLinks.push(state.field.url);
-      elements.feedback.textContent = i18n.t('validation.valid.success');
-      elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
-      renderFrame(elements, state);
-      elements.form.reset();
-      elements.input.focus();
-      state.processState = 'success';
-      break;
-  }
+  parseURL(state.field.url).then((responce) => {
+    state.processState = parseRSS(responce).isParseError;
+    switch (true) {
+      case (state.valid && state.processState === 'parser error'):
+        elements.feedback.textContent = i18n.t('validation.invalid.noRSS');
+        elements.feedback.setAttribute('data-link-message', 'validation.invalid.noRSS');
+        renderFrame(elements, state);
+        break;
+      case (!state.valid && !state.rssFeedLinks.includes(state.field.url)):
+        elements.feedback.textContent = i18n.t(`${state.errors}`);
+        elements.feedback.setAttribute('data-link-message', `${state.errors}`);
+        renderFrame(elements, state);
+        state.processState = 'invalid link error';
+        break;
+      case (!state.valid && state.rssFeedLinks.includes(state.field.url)):
+        elements.feedback.textContent = i18n.t('validation.invalid.duplicate');
+        elements.feedback.setAttribute('data-link-message', 'validation.invalid.duplicate');
+        renderFrame(elements, state);
+        state.processState = 'duplication error';
+        break;
+      default:
+        state.errors = '';
+        state.rssFeedLinks.push(state.field.url);
+        elements.feedback.textContent = i18n.t('validation.valid.success');
+        elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
+        renderFrame(elements, state);
+        elements.form.reset();
+        elements.input.focus();
+        state.processState = 'success';
+        break;
+    }
+  });
 };
 
 const renderFeed = (elements, state, i18n) => {
-  const [feedsTitle, feedsDescription] = state.feeds;
+  parseURL(state.field.url).then((responce) => {
+    const { feedsTitle, feedsDescription } = parseRSS(responce).loadedFeeds;
+    console.log(feedsTitle);
 
-  const feedsCard = document.createElement('div');
-  feedsCard.classList.add('card', 'border-0');
-  const feedsCardBody = document.querySelector('.feeds > .card > .card-body') ?? document.createElement('div');
-  feedsCardBody.classList.add('card-body');
-  const feedsCardTitle = document.querySelector('.feeds > .card > .card-body > .card-title') ?? document.createElement('h2');
-  feedsCardTitle.classList.add('card-title', 'h4');
-  feedsCardTitle.textContent = i18n.t('interface.feeds');
+    const feedsCard = document.createElement('div');
+    feedsCard.classList.add('card', 'border-0');
+    const feedsCardBody = document.querySelector('.feeds > .card > .card-body') ?? document.createElement('div');
+    feedsCardBody.classList.add('card-body');
+    const feedsCardTitle = document.querySelector('.feeds > .card > .card-body > .card-title') ?? document.createElement('h2');
+    feedsCardTitle.classList.add('card-title', 'h4');
+    feedsCardTitle.textContent = i18n.t('interface.feeds');
 
-  feedsCardBody.append(feedsCardTitle);
-  feedsCard.append(feedsCardBody);
+    feedsCardBody.append(feedsCardTitle);
+    feedsCard.append(feedsCardBody);
 
-  const feedsListGroup = document.createElement('ul');
-  feedsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
-  const feedsListGroupItem = document.createElement('li');
-  feedsListGroupItem.classList.add('list-group-item', 'border-0', 'border-end-0');
-  const feedsListGroupItemTitle = document.createElement('h3');
-  feedsListGroupItemTitle.classList.add('h6', 'm-0');
-  feedsListGroupItemTitle.textContent = feedsTitle.textContent;
-  const feedsListGroupItemDescription = document.createElement('p');
-  feedsListGroupItemDescription.classList.add('m-0', 'small', 'text-black-50');
-  feedsListGroupItemDescription.textContent = feedsDescription.textContent;
+    const feedsListGroup = document.createElement('ul');
+    feedsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
+    const feedsListGroupItem = document.createElement('li');
+    feedsListGroupItem.classList.add('list-group-item', 'border-0', 'border-end-0');
+    const feedsListGroupItemTitle = document.createElement('h3');
+    feedsListGroupItemTitle.classList.add('h6', 'm-0');
+    feedsListGroupItemTitle.textContent = feedsTitle.textContent;
+    const feedsListGroupItemDescription = document.createElement('p');
+    feedsListGroupItemDescription.classList.add('m-0', 'small', 'text-black-50');
+    feedsListGroupItemDescription.textContent = feedsDescription.textContent;
 
-  feedsListGroup.append(feedsListGroupItem);
-  feedsCard.append(feedsListGroup);
-  feedsListGroupItem.append(feedsListGroupItemTitle);
-  feedsListGroupItem.append(feedsListGroupItemDescription);
+    feedsListGroup.append(feedsListGroupItem);
+    feedsCard.append(feedsListGroup);
+    feedsListGroupItem.append(feedsListGroupItemTitle);
+    feedsListGroupItem.append(feedsListGroupItemDescription);
 
-  feedsCard.append(feedsListGroup);
+    feedsCard.append(feedsListGroup);
 
-  elements.feeds.prepend(feedsCard);
+    elements.feeds.prepend(feedsCard);
+  });
 };
 
 const renderPosts = (elements, state, i18n) => {
-  const postsCard = document.createElement('div');
-  postsCard.classList.add('card', 'border-0');
-  const postsCardBody = document.querySelector('.posts > .card > .card-body') ?? document.createElement('div');
-  postsCardBody.classList.add('card-body');
-  const postsCardTitle = document.querySelector('.posts > .card > .card-body > .card-title') ?? document.createElement('h2');
-  postsCardTitle.classList.add('card-title', 'h4');
-  postsCardTitle.textContent = i18n.t('interface.posts');
+  parseURL(state.field.url).then((responce) => {
+    const posts = parseRSS(responce).loadedPosts;
+    console.log(posts);
+    const postsCard = document.createElement('div');
+    postsCard.classList.add('card', 'border-0');
+    const postsCardBody = document.querySelector('.posts > .card > .card-body') ?? document.createElement('div');
+    postsCardBody.classList.add('card-body');
+    const postsCardTitle = document.querySelector('.posts > .card > .card-body > .card-title') ?? document.createElement('h2');
+    postsCardTitle.classList.add('card-title', 'h4');
+    postsCardTitle.textContent = i18n.t('interface.posts');
 
-  postsCardBody.append(postsCardTitle);
-  postsCard.append(postsCardBody);
+    postsCardBody.append(postsCardTitle);
+    postsCard.append(postsCardBody);
 
-  const postsListGroup = document.createElement('ul');
-  postsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
+    const postsListGroup = document.createElement('ul');
+    postsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
 
-  state.posts.forEach((item) => {
-    const itemTitle = item.querySelector('title').textContent;
-    const itemLink = item.querySelector('link').textContent;
+    posts.forEach((item) => {
+      const itemTitle = item.postTitle.textContent;
+      const itemLink = item.postLink.textContent;
 
-    const li = document.createElement('li');
-    li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
-    const a = document.createElement('a');
-    console.log(item);
-    a.setAttribute('href', itemLink);
-    a.classList.add('fw-bold');
-    a.setAttribute('data-id', state.idCounter);
-    a.setAttribute('target', '_blank');
-    a.setAttribute('rel', 'noopener noreferrer');
-    a.textContent = itemTitle;
+      const li = document.createElement('li');
+      li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+      const a = document.createElement('a');
+      console.log(item);
+      a.setAttribute('href', itemLink);
+      a.classList.add('fw-bold');
+      a.setAttribute('data-id', state.idCounter);
+      a.setAttribute('target', '_blank');
+      a.setAttribute('rel', 'noopener noreferrer');
+      a.textContent = itemTitle;
 
-    const modalButton = document.createElement('button');
-    modalButton.setAttribute('type', 'button');
-    modalButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-    modalButton.setAttribute('data-id', state.idCounter);
-    modalButton.setAttribute('data-bs-toggle', 'modal');
-    modalButton.setAttribute('data-bs-target', '#modal');
-    modalButton.textContent = i18n.t('interface.view');
+      const modalButton = document.createElement('button');
+      modalButton.setAttribute('type', 'button');
+      modalButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+      modalButton.setAttribute('data-id', state.idCounter);
+      modalButton.setAttribute('data-bs-toggle', 'modal');
+      modalButton.setAttribute('data-bs-target', '#modal');
+      modalButton.textContent = i18n.t('interface.view');
 
-    li.append(a);
-    li.append(modalButton);
-    postsListGroup.append(li);
+      li.append(a);
+      li.append(modalButton);
+      postsListGroup.append(li);
 
-    state.idCounter += 1;
+      state.idCounter += 1;
+    });
+    state.currentPosts.unshift(...state.posts);
+    state.posts = Object.assign([]);
+
+    postsCard.append(postsListGroup);
+    elements.posts.prepend(postsCard);
   });
-  state.currentPosts.unshift(...state.posts);
-  state.posts = Object.assign([]);
-
-  postsCard.append(postsListGroup);
-  elements.posts.prepend(postsCard);
 };
+
+const updatePosts = () => {};
+
+const renderModals = () => {};
 
 // const updatePosts = (state) => {
 //   state.rssFeedLinks.forEach((rssLink) => {
@@ -142,10 +157,6 @@ const renderPosts = (elements, state, i18n) => {
 //     });
 //   });
 // };
-
-const updatePosts = () => {};
-
-const renderModal = () => {};
 
 const renderLanguage = (elements, value, previousValue, i18n) => {
   const previousLangButton = document.querySelector(`[data-lng="${previousValue}"]`);
@@ -176,5 +187,5 @@ const renderLanguage = (elements, value, previousValue, i18n) => {
 };
 
 export {
-  renderInput, renderLanguage, renderFeed, renderPosts, renderModal, updatePosts,
+  renderInput, renderLanguage, renderFeed, renderPosts, renderModals, updatePosts,
 };
