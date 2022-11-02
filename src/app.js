@@ -2,9 +2,8 @@ import * as yup from 'yup';
 import onChange from 'on-change';
 import i18next from 'i18next';
 import {
-  renderFeed, renderPosts, renderInput, renderLanguage, renderModal, updatePosts,
+  renderFeed, renderPosts, renderInput, renderLanguage, renderModals, updatePosts,
 } from './view.js';
-import { parseRSS } from './parser.js';
 import resources from './locales/index.js';
 
 export default async () => {
@@ -74,17 +73,13 @@ export default async () => {
         case 'processState':
           switch (value) {
             case 'checking link':
-            case 'parser error':
               renderInput(elements, watchedState, i18n);
               break;
             case 'success':
-              parseRSS(watchedState.field.url, watchedState);
-              break;
-            case 'loading RSS':
               renderFeed(elements, state, i18n);
               renderPosts(elements, state, i18n);
-              renderModal();
-              updatePosts(state);
+              renderModals();
+              updatePosts();
               break;
             default:
               break;
