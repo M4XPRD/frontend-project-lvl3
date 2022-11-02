@@ -2,7 +2,7 @@ import * as yup from 'yup';
 import onChange from 'on-change';
 import i18next from 'i18next';
 import {
-  renderFeed, renderPosts, renderInput, renderLanguage, renderModals, updatePosts,
+  renderPage, renderInput, renderLanguage, renderModals, updatePosts,
 } from './view.js';
 import resources from './locales/index.js';
 
@@ -76,10 +76,9 @@ export default async () => {
               renderInput(elements, watchedState, i18n);
               break;
             case 'success':
-              renderFeed(elements, state, i18n);
-              renderPosts(elements, state, i18n);
-              renderModals();
+              renderPage(elements, state, i18n);
               updatePosts();
+              renderModals();
               break;
             default:
               break;
