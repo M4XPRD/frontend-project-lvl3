@@ -13553,8 +13553,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                       (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderInput)(elements, watchedState, i18n);
                       break;
                     case 'success':
-                      (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderFeed)(elements, state, i18n);
-                      (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderPosts)(elements, state, i18n);
+                      (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderPage)(elements, state, i18n);
                       (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderModals)();
                       (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.updatePosts)();
                       break;
@@ -13771,11 +13770,10 @@ var parseRSS = function parseRSS(data) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "renderFeed": () => (/* binding */ renderFeed),
 /* harmony export */   "renderInput": () => (/* binding */ renderInput),
 /* harmony export */   "renderLanguage": () => (/* binding */ renderLanguage),
 /* harmony export */   "renderModals": () => (/* binding */ renderModals),
-/* harmony export */   "renderPosts": () => (/* binding */ renderPosts),
+/* harmony export */   "renderPage": () => (/* binding */ renderPage),
 /* harmony export */   "updatePosts": () => (/* binding */ updatePosts)
 /* harmony export */ });
 /* harmony import */ var _parser_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./parser.js */ "./src/parser.js");
@@ -13837,85 +13835,85 @@ var renderInput = function renderInput(elements, state, i18n) {
     }
   });
 };
-var renderFeed = function renderFeed(elements, state, i18n) {
-  (0,_parser_js__WEBPACK_IMPORTED_MODULE_0__.parseURL)(state.field.url).then(function (responce) {
-    var _document$querySelect, _document$querySelect2;
-    var _parseRSS$loadedFeeds = (0,_parser_js__WEBPACK_IMPORTED_MODULE_0__.parseRSS)(responce).loadedFeeds,
-      feedsTitle = _parseRSS$loadedFeeds.feedsTitle,
-      feedsDescription = _parseRSS$loadedFeeds.feedsDescription;
-    console.log(feedsTitle);
-    var feedsCard = document.createElement('div');
-    feedsCard.classList.add('card', 'border-0');
-    var feedsCardBody = (_document$querySelect = document.querySelector('.feeds > .card > .card-body')) !== null && _document$querySelect !== void 0 ? _document$querySelect : document.createElement('div');
-    feedsCardBody.classList.add('card-body');
-    var feedsCardTitle = (_document$querySelect2 = document.querySelector('.feeds > .card > .card-body > .card-title')) !== null && _document$querySelect2 !== void 0 ? _document$querySelect2 : document.createElement('h2');
-    feedsCardTitle.classList.add('card-title', 'h4');
-    feedsCardTitle.textContent = i18n.t('interface.feeds');
-    feedsCardBody.append(feedsCardTitle);
-    feedsCard.append(feedsCardBody);
-    var feedsListGroup = document.createElement('ul');
-    feedsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
-    var feedsListGroupItem = document.createElement('li');
-    feedsListGroupItem.classList.add('list-group-item', 'border-0', 'border-end-0');
-    var feedsListGroupItemTitle = document.createElement('h3');
-    feedsListGroupItemTitle.classList.add('h6', 'm-0');
-    feedsListGroupItemTitle.textContent = feedsTitle.textContent;
-    var feedsListGroupItemDescription = document.createElement('p');
-    feedsListGroupItemDescription.classList.add('m-0', 'small', 'text-black-50');
-    feedsListGroupItemDescription.textContent = feedsDescription.textContent;
-    feedsListGroup.append(feedsListGroupItem);
-    feedsCard.append(feedsListGroup);
-    feedsListGroupItem.append(feedsListGroupItemTitle);
-    feedsListGroupItem.append(feedsListGroupItemDescription);
-    feedsCard.append(feedsListGroup);
-    elements.feeds.prepend(feedsCard);
-  });
+var renderFeed = function renderFeed(elements, i18n, feedsTitle, feedsDescription) {
+  var _document$querySelect, _document$querySelect2;
+  var feedsCard = document.createElement('div');
+  feedsCard.classList.add('card', 'border-0');
+  var feedsCardBody = (_document$querySelect = document.querySelector('.feeds > .card > .card-body')) !== null && _document$querySelect !== void 0 ? _document$querySelect : document.createElement('div');
+  feedsCardBody.classList.add('card-body');
+  var feedsCardTitle = (_document$querySelect2 = document.querySelector('.feeds > .card > .card-body > .card-title')) !== null && _document$querySelect2 !== void 0 ? _document$querySelect2 : document.createElement('h2');
+  feedsCardTitle.classList.add('card-title', 'h4');
+  feedsCardTitle.textContent = i18n.t('interface.feeds');
+  feedsCardBody.append(feedsCardTitle);
+  feedsCard.append(feedsCardBody);
+  var feedsListGroup = document.createElement('ul');
+  feedsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
+  var feedsListGroupItem = document.createElement('li');
+  feedsListGroupItem.classList.add('list-group-item', 'border-0', 'border-end-0');
+  var feedsListGroupItemTitle = document.createElement('h3');
+  feedsListGroupItemTitle.classList.add('h6', 'm-0');
+  feedsListGroupItemTitle.textContent = feedsTitle.textContent;
+  var feedsListGroupItemDescription = document.createElement('p');
+  feedsListGroupItemDescription.classList.add('m-0', 'small', 'text-black-50');
+  feedsListGroupItemDescription.textContent = feedsDescription.textContent;
+  feedsListGroup.append(feedsListGroupItem);
+  feedsCard.append(feedsListGroup);
+  feedsListGroupItem.append(feedsListGroupItemTitle);
+  feedsListGroupItem.append(feedsListGroupItemDescription);
+  feedsCard.append(feedsListGroup);
+  elements.feeds.prepend(feedsCard);
 };
-var renderPosts = function renderPosts(elements, state, i18n) {
+var renderPosts = function renderPosts(elements, state, i18n, posts) {
+  var _document$querySelect3, _document$querySelect4, _state$currentPosts;
+  var postsCard = document.createElement('div');
+  postsCard.classList.add('card', 'border-0');
+  var postsCardBody = (_document$querySelect3 = document.querySelector('.posts > .card > .card-body')) !== null && _document$querySelect3 !== void 0 ? _document$querySelect3 : document.createElement('div');
+  postsCardBody.classList.add('card-body');
+  var postsCardTitle = (_document$querySelect4 = document.querySelector('.posts > .card > .card-body > .card-title')) !== null && _document$querySelect4 !== void 0 ? _document$querySelect4 : document.createElement('h2');
+  postsCardTitle.classList.add('card-title', 'h4');
+  postsCardTitle.textContent = i18n.t('interface.posts');
+  postsCardBody.append(postsCardTitle);
+  postsCard.append(postsCardBody);
+  var postsListGroup = document.createElement('ul');
+  postsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
+  posts.forEach(function (item) {
+    var itemTitle = item.postTitle.textContent;
+    var itemLink = item.postLink.textContent;
+    var li = document.createElement('li');
+    li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+    var a = document.createElement('a');
+    console.log(item);
+    a.setAttribute('href', itemLink);
+    a.classList.add('fw-bold');
+    a.setAttribute('data-id', state.idCounter);
+    a.setAttribute('target', '_blank');
+    a.setAttribute('rel', 'noopener noreferrer');
+    a.textContent = itemTitle;
+    var modalButton = document.createElement('button');
+    modalButton.setAttribute('type', 'button');
+    modalButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+    modalButton.setAttribute('data-id', state.idCounter);
+    modalButton.setAttribute('data-bs-toggle', 'modal');
+    modalButton.setAttribute('data-bs-target', '#modal');
+    modalButton.textContent = i18n.t('interface.view');
+    li.append(a);
+    li.append(modalButton);
+    postsListGroup.append(li);
+    state.idCounter += 1;
+  });
+  (_state$currentPosts = state.currentPosts).unshift.apply(_state$currentPosts, _toConsumableArray(state.posts));
+  state.posts = Object.assign([]);
+  postsCard.append(postsListGroup);
+  elements.posts.prepend(postsCard);
+};
+var renderPage = function renderPage(elements, state, i18n) {
   (0,_parser_js__WEBPACK_IMPORTED_MODULE_0__.parseURL)(state.field.url).then(function (responce) {
-    var _document$querySelect3, _document$querySelect4, _state$currentPosts;
+    var feeds = (0,_parser_js__WEBPACK_IMPORTED_MODULE_0__.parseRSS)(responce).loadedFeeds;
     var posts = (0,_parser_js__WEBPACK_IMPORTED_MODULE_0__.parseRSS)(responce).loadedPosts;
-    console.log(posts);
-    var postsCard = document.createElement('div');
-    postsCard.classList.add('card', 'border-0');
-    var postsCardBody = (_document$querySelect3 = document.querySelector('.posts > .card > .card-body')) !== null && _document$querySelect3 !== void 0 ? _document$querySelect3 : document.createElement('div');
-    postsCardBody.classList.add('card-body');
-    var postsCardTitle = (_document$querySelect4 = document.querySelector('.posts > .card > .card-body > .card-title')) !== null && _document$querySelect4 !== void 0 ? _document$querySelect4 : document.createElement('h2');
-    postsCardTitle.classList.add('card-title', 'h4');
-    postsCardTitle.textContent = i18n.t('interface.posts');
-    postsCardBody.append(postsCardTitle);
-    postsCard.append(postsCardBody);
-    var postsListGroup = document.createElement('ul');
-    postsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
-    posts.forEach(function (item) {
-      var itemTitle = item.postTitle.textContent;
-      var itemLink = item.postLink.textContent;
-      var li = document.createElement('li');
-      li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
-      var a = document.createElement('a');
-      console.log(item);
-      a.setAttribute('href', itemLink);
-      a.classList.add('fw-bold');
-      a.setAttribute('data-id', state.idCounter);
-      a.setAttribute('target', '_blank');
-      a.setAttribute('rel', 'noopener noreferrer');
-      a.textContent = itemTitle;
-      var modalButton = document.createElement('button');
-      modalButton.setAttribute('type', 'button');
-      modalButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-      modalButton.setAttribute('data-id', state.idCounter);
-      modalButton.setAttribute('data-bs-toggle', 'modal');
-      modalButton.setAttribute('data-bs-target', '#modal');
-      modalButton.textContent = i18n.t('interface.view');
-      li.append(a);
-      li.append(modalButton);
-      postsListGroup.append(li);
-      state.idCounter += 1;
-    });
-    (_state$currentPosts = state.currentPosts).unshift.apply(_state$currentPosts, _toConsumableArray(state.posts));
-    state.posts = Object.assign([]);
-    postsCard.append(postsListGroup);
-    elements.posts.prepend(postsCard);
+    var feedsTitle = feeds.feedsTitle,
+      feedsDescription = feeds.feedsDescription;
+    renderFeed(elements, i18n, feedsTitle, feedsDescription);
+    renderPosts(elements, state, i18n, posts);
   });
 };
 var updatePosts = function updatePosts() {};
