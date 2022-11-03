@@ -13554,8 +13554,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                       break;
                     case 'success':
                       (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderPage)(elements, state, i18n);
+                      (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.updatePosts)(elements, state);
                       (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderModals)();
-                      (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.updatePosts)();
                       break;
                     default:
                       break;
@@ -13740,6 +13740,7 @@ var parseRSS = function parseRSS(data) {
     feedsDescription: feedsDescription
   };
   var posts = doc.querySelectorAll('item');
+  var arrayOfPosts = _toConsumableArray(posts);
   var loadedPosts = _toConsumableArray(posts).map(function (item) {
     var postTitle = item.querySelector('title');
     var postDescription = item.querySelector('description');
@@ -13750,11 +13751,12 @@ var parseRSS = function parseRSS(data) {
       postLink: postLink
     };
   });
-  var isParseError = doc.querySelector('parsererror') ? 'parser error' : 'loading RSS';
+  var isParseError = doc.querySelector('parsererror') ? 'parser error' : 'start to render';
   return {
     loadedFeeds: loadedFeeds,
     loadedPosts: loadedPosts,
-    isParseError: isParseError
+    isParseError: isParseError,
+    arrayOfPosts: arrayOfPosts
   };
 };
 
@@ -13777,14 +13779,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "updatePosts": () => (/* binding */ updatePosts)
 /* harmony export */ });
 /* harmony import */ var _parser_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./parser.js */ "./src/parser.js");
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 /* eslint-disable max-len */
 
+var parsedLinkData = function parsedLinkData(state) {
+  (0,_parser_js__WEBPACK_IMPORTED_MODULE_0__.parseURL)(state.field.url).then(function (responce) {
+    var isRSSError = (0,_parser_js__WEBPACK_IMPORTED_MODULE_0__.parseRSS)(responce).isParseError;
+    var feeds = (0,_parser_js__WEBPACK_IMPORTED_MODULE_0__.parseRSS)(responce).loadedFeeds;
+    var posts = (0,_parser_js__WEBPACK_IMPORTED_MODULE_0__.parseRSS)(responce).loadedPosts;
+    var postsNodes = (0,_parser_js__WEBPACK_IMPORTED_MODULE_0__.parseRSS)(responce).arrayOfPosts;
+    return {
+      isRSSError: isRSSError,
+      feeds: feeds,
+      posts: posts,
+      postsNodes: postsNodes
+    };
+  });
+};
 var renderFrame = function renderFrame(elements, state) {
   switch (true) {
     case !state.valid:
@@ -13802,39 +13812,73 @@ var renderFrame = function renderFrame(elements, state) {
   }
 };
 var renderInput = function renderInput(elements, state, i18n) {
-  (0,_parser_js__WEBPACK_IMPORTED_MODULE_0__.parseURL)(state.field.url).then(function (responce) {
-    state.processState = (0,_parser_js__WEBPACK_IMPORTED_MODULE_0__.parseRSS)(responce).isParseError;
-    switch (true) {
-      case state.valid && state.processState === 'parser error':
-        elements.feedback.textContent = i18n.t('validation.invalid.noRSS');
-        elements.feedback.setAttribute('data-link-message', 'validation.invalid.noRSS');
-        renderFrame(elements, state);
-        break;
-      case !state.valid && !state.rssFeedLinks.includes(state.field.url):
-        elements.feedback.textContent = i18n.t("".concat(state.errors));
-        elements.feedback.setAttribute('data-link-message', "".concat(state.errors));
-        renderFrame(elements, state);
-        state.processState = 'invalid link error';
-        break;
-      case !state.valid && state.rssFeedLinks.includes(state.field.url):
-        elements.feedback.textContent = i18n.t('validation.invalid.duplicate');
-        elements.feedback.setAttribute('data-link-message', 'validation.invalid.duplicate');
-        renderFrame(elements, state);
-        state.processState = 'duplication error';
-        break;
-      default:
-        state.errors = '';
-        state.rssFeedLinks.push(state.field.url);
-        elements.feedback.textContent = i18n.t('validation.valid.success');
-        elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
-        renderFrame(elements, state);
-        elements.form.reset();
-        elements.input.focus();
-        state.processState = 'success';
-        break;
-    }
-  });
+  state.processState = parsedLinkData(state).isRSSError; // Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'isRSSError')
+  switch (true) {
+    case state.valid && state.processState === 'parser error':
+      elements.feedback.textContent = i18n.t('validation.invalid.noRSS');
+      elements.feedback.setAttribute('data-link-message', 'validation.invalid.noRSS');
+      renderFrame(elements, state);
+      break;
+    case !state.valid && !state.rssFeedLinks.includes(state.field.url):
+      elements.feedback.textContent = i18n.t("".concat(state.errors));
+      elements.feedback.setAttribute('data-link-message', "".concat(state.errors));
+      renderFrame(elements, state);
+      state.processState = 'invalid link error';
+      break;
+    case !state.valid && state.rssFeedLinks.includes(state.field.url):
+      elements.feedback.textContent = i18n.t('validation.invalid.duplicate');
+      elements.feedback.setAttribute('data-link-message', 'validation.invalid.duplicate');
+      renderFrame(elements, state);
+      state.processState = 'duplication error';
+      break;
+    default:
+      state.errors = '';
+      state.rssFeedLinks.push(state.field.url);
+      elements.feedback.textContent = i18n.t('validation.valid.success');
+      elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
+      renderFrame(elements, state);
+      elements.form.reset();
+      elements.input.focus();
+      state.processState = 'success';
+      break;
+  }
 };
+
+// const renderInput = (elements, state, i18n) => {
+//   parseURL(state.field.url).then((responce) => {
+//     state.processState = parseRSS(responce).isParseError;
+//     switch (true) {
+//       case (state.valid && state.processState === 'parser error'):
+//         elements.feedback.textContent = i18n.t('validation.invalid.noRSS');
+//         elements.feedback.setAttribute('data-link-message', 'validation.invalid.noRSS');
+//         renderFrame(elements, state);
+//         break;
+//       case (!state.valid && !state.rssFeedLinks.includes(state.field.url)):
+//         elements.feedback.textContent = i18n.t(`${state.errors}`);
+//         elements.feedback.setAttribute('data-link-message', `${state.errors}`);
+//         renderFrame(elements, state);
+//         state.processState = 'invalid link error';
+//         break;
+//       case (!state.valid && state.rssFeedLinks.includes(state.field.url)):
+//         elements.feedback.textContent = i18n.t('validation.invalid.duplicate');
+//         elements.feedback.setAttribute('data-link-message', 'validation.invalid.duplicate');
+//         renderFrame(elements, state);
+//         state.processState = 'duplication error';
+//         break;
+//       default:
+//         state.errors = '';
+//         state.rssFeedLinks.push(state.field.url);
+//         elements.feedback.textContent = i18n.t('validation.valid.success');
+//         elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
+//         renderFrame(elements, state);
+//         elements.form.reset();
+//         elements.input.focus();
+//         state.processState = 'success';
+//         break;
+//     }
+//   });
+// };
+
 var renderFeed = function renderFeed(elements, i18n, feedsTitle, feedsDescription) {
   var _document$querySelect, _document$querySelect2;
   var feedsCard = document.createElement('div');
@@ -13863,8 +13907,8 @@ var renderFeed = function renderFeed(elements, i18n, feedsTitle, feedsDescriptio
   feedsCard.append(feedsListGroup);
   elements.feeds.prepend(feedsCard);
 };
-var renderPosts = function renderPosts(elements, state, i18n, posts) {
-  var _document$querySelect3, _document$querySelect4, _state$currentPosts;
+var renderPosts = function renderPosts(elements, state, i18n, loadedPosts) {
+  var _document$querySelect3, _document$querySelect4;
   var postsCard = document.createElement('div');
   postsCard.classList.add('card', 'border-0');
   var postsCardBody = (_document$querySelect3 = document.querySelector('.posts > .card > .card-body')) !== null && _document$querySelect3 !== void 0 ? _document$querySelect3 : document.createElement('div');
@@ -13876,13 +13920,12 @@ var renderPosts = function renderPosts(elements, state, i18n, posts) {
   postsCard.append(postsCardBody);
   var postsListGroup = document.createElement('ul');
   postsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
-  posts.forEach(function (item) {
+  loadedPosts.forEach(function (item) {
     var itemTitle = item.postTitle.textContent;
     var itemLink = item.postLink.textContent;
     var li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
     var a = document.createElement('a');
-    console.log(item);
     a.setAttribute('href', itemLink);
     a.classList.add('fw-bold');
     a.setAttribute('data-id', state.idCounter);
@@ -13901,8 +13944,9 @@ var renderPosts = function renderPosts(elements, state, i18n, posts) {
     postsListGroup.append(li);
     state.idCounter += 1;
   });
-  (_state$currentPosts = state.currentPosts).unshift.apply(_state$currentPosts, _toConsumableArray(state.posts));
-  state.posts = Object.assign([]);
+  // state.currentPosts.unshift(...state.currentPosts, ...state.posts);
+  // state.posts = Object.assign([]);
+
   postsCard.append(postsListGroup);
   elements.posts.prepend(postsCard);
 };
@@ -13910,13 +13954,23 @@ var renderPage = function renderPage(elements, state, i18n) {
   (0,_parser_js__WEBPACK_IMPORTED_MODULE_0__.parseURL)(state.field.url).then(function (responce) {
     var feeds = (0,_parser_js__WEBPACK_IMPORTED_MODULE_0__.parseRSS)(responce).loadedFeeds;
     var posts = (0,_parser_js__WEBPACK_IMPORTED_MODULE_0__.parseRSS)(responce).loadedPosts;
+    var postsNodes = (0,_parser_js__WEBPACK_IMPORTED_MODULE_0__.parseRSS)(responce).arrayOfPosts;
     var feedsTitle = feeds.feedsTitle,
       feedsDescription = feeds.feedsDescription;
+    postsNodes.forEach(function (item) {
+      state.posts.push(item);
+      // state.posts.unshift(item);
+    });
+    // console.log(state.posts[0].querySelector('title'));
     renderFeed(elements, i18n, feedsTitle, feedsDescription);
     renderPosts(elements, state, i18n, posts);
   });
 };
-var updatePosts = function updatePosts() {};
+var updatePosts = function updatePosts(elements, state) {
+  state.rssFeedLinks.forEach(function (rssLink) {
+    (0,_parser_js__WEBPACK_IMPORTED_MODULE_0__.parseURL)(rssLink).then(function (responce) {});
+  });
+};
 var renderModals = function renderModals() {};
 
 // const updatePosts = (state) => {
