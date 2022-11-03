@@ -77,7 +77,7 @@ export default async () => {
               break;
             case 'success':
               renderPage(elements, state, i18n);
-              updatePosts();
+              updatePosts(elements, state);
               renderModals();
               break;
             default:
