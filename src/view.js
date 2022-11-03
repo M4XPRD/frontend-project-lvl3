@@ -1,6 +1,18 @@
 /* eslint-disable max-len */
 import { parseRSS, parseURL } from './parser.js';
 
+const parsedLinkData = (state) => {
+  parseURL(state.field.url).then((responce) => {
+    const isRSSError = parseRSS(responce).isParseError;
+    const feeds = parseRSS(responce).loadedFeeds;
+    const posts = parseRSS(responce).loadedPosts;
+    const postsNodes = parseRSS(responce).arrayOfPosts;
+    return {
+      isRSSError, feeds, posts, postsNodes,
+    };
+  });
+};
+
 const renderFrame = (elements, state) => {
   switch (true) {
     case !state.valid:
@@ -19,39 +31,72 @@ const renderFrame = (elements, state) => {
 };
 
 const renderInput = (elements, state, i18n) => {
-  parseURL(state.field.url).then((responce) => {
-    state.processState = parseRSS(responce).isParseError;
-    switch (true) {
-      case (state.valid && state.processState === 'parser error'):
-        elements.feedback.textContent = i18n.t('validation.invalid.noRSS');
-        elements.feedback.setAttribute('data-link-message', 'validation.invalid.noRSS');
-        renderFrame(elements, state);
-        break;
-      case (!state.valid && !state.rssFeedLinks.includes(state.field.url)):
-        elements.feedback.textContent = i18n.t(`${state.errors}`);
-        elements.feedback.setAttribute('data-link-message', `${state.errors}`);
-        renderFrame(elements, state);
-        state.processState = 'invalid link error';
-        break;
-      case (!state.valid && state.rssFeedLinks.includes(state.field.url)):
-        elements.feedback.textContent = i18n.t('validation.invalid.duplicate');
-        elements.feedback.setAttribute('data-link-message', 'validation.invalid.duplicate');
-        renderFrame(elements, state);
-        state.processState = 'duplication error';
-        break;
-      default:
-        state.errors = '';
-        state.rssFeedLinks.push(state.field.url);
-        elements.feedback.textContent = i18n.t('validation.valid.success');
-        elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
-        renderFrame(elements, state);
-        elements.form.reset();
-        elements.input.focus();
-        state.processState = 'success';
-        break;
-    }
-  });
+  state.processState = parsedLinkData(state).isRSSError; // Uncaught (in promise) TypeError: Cannot read properties of undefined (reading 'isRSSError')
+  switch (true) {
+    case (state.valid && state.processState === 'parser error'):
+      elements.feedback.textContent = i18n.t('validation.invalid.noRSS');
+      elements.feedback.setAttribute('data-link-message', 'validation.invalid.noRSS');
+      renderFrame(elements, state);
+      break;
+    case (!state.valid && !state.rssFeedLinks.includes(state.field.url)):
+      elements.feedback.textContent = i18n.t(`${state.errors}`);
+      elements.feedback.setAttribute('data-link-message', `${state.errors}`);
+      renderFrame(elements, state);
+      state.processState = 'invalid link error';
+      break;
+    case (!state.valid && state.rssFeedLinks.includes(state.field.url)):
+      elements.feedback.textContent = i18n.t('validation.invalid.duplicate');
+      elements.feedback.setAttribute('data-link-message', 'validation.invalid.duplicate');
+      renderFrame(elements, state);
+      state.processState = 'duplication error';
+      break;
+    default:
+      state.errors = '';
+      state.rssFeedLinks.push(state.field.url);
+      elements.feedback.textContent = i18n.t('validation.valid.success');
+      elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
+      renderFrame(elements, state);
+      elements.form.reset();
+      elements.input.focus();
+      state.processState = 'success';
+      break;
+  }
 };
+
+// const renderInput = (elements, state, i18n) => {
+//   parseURL(state.field.url).then((responce) => {
+//     state.processState = parseRSS(responce).isParseError;
+//     switch (true) {
+//       case (state.valid && state.processState === 'parser error'):
+//         elements.feedback.textContent = i18n.t('validation.invalid.noRSS');
+//         elements.feedback.setAttribute('data-link-message', 'validation.invalid.noRSS');
+//         renderFrame(elements, state);
+//         break;
+//       case (!state.valid && !state.rssFeedLinks.includes(state.field.url)):
+//         elements.feedback.textContent = i18n.t(`${state.errors}`);
+//         elements.feedback.setAttribute('data-link-message', `${state.errors}`);
+//         renderFrame(elements, state);
+//         state.processState = 'invalid link error';
+//         break;
+//       case (!state.valid && state.rssFeedLinks.includes(state.field.url)):
+//         elements.feedback.textContent = i18n.t('validation.invalid.duplicate');
+//         elements.feedback.setAttribute('data-link-message', 'validation.invalid.duplicate');
+//         renderFrame(elements, state);
+//         state.processState = 'duplication error';
+//         break;
+//       default:
+//         state.errors = '';
+//         state.rssFeedLinks.push(state.field.url);
+//         elements.feedback.textContent = i18n.t('validation.valid.success');
+//         elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
+//         renderFrame(elements, state);
+//         elements.form.reset();
+//         elements.input.focus();
+//         state.processState = 'success';
+//         break;
+//     }
+//   });
+// };
 
 const renderFeed = (elements, i18n, feedsTitle, feedsDescription) => {
   const feedsCard = document.createElement('div');
@@ -86,7 +131,7 @@ const renderFeed = (elements, i18n, feedsTitle, feedsDescription) => {
   elements.feeds.prepend(feedsCard);
 };
 
-const renderPosts = (elements, state, i18n, posts) => {
+const renderPosts = (elements, state, i18n, loadedPosts) => {
   const postsCard = document.createElement('div');
   postsCard.classList.add('card', 'border-0');
   const postsCardBody = document.querySelector('.posts > .card > .card-body') ?? document.createElement('div');
@@ -101,14 +146,13 @@ const renderPosts = (elements, state, i18n, posts) => {
   const postsListGroup = document.createElement('ul');
   postsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
 
-  posts.forEach((item) => {
+  loadedPosts.forEach((item) => {
     const itemTitle = item.postTitle.textContent;
     const itemLink = item.postLink.textContent;
 
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
     const a = document.createElement('a');
-    console.log(item);
     a.setAttribute('href', itemLink);
     a.classList.add('fw-bold');
     a.setAttribute('data-id', state.idCounter);
@@ -130,8 +174,8 @@ const renderPosts = (elements, state, i18n, posts) => {
 
     state.idCounter += 1;
   });
-  state.currentPosts.unshift(...state.posts);
-  state.posts = Object.assign([]);
+  // state.currentPosts.unshift(...state.currentPosts, ...state.posts);
+  // state.posts = Object.assign([]);
 
   postsCard.append(postsListGroup);
   elements.posts.prepend(postsCard);
@@ -141,13 +185,25 @@ const renderPage = (elements, state, i18n) => {
   parseURL(state.field.url).then((responce) => {
     const feeds = parseRSS(responce).loadedFeeds;
     const posts = parseRSS(responce).loadedPosts;
+    const postsNodes = parseRSS(responce).arrayOfPosts;
     const { feedsTitle, feedsDescription } = feeds;
+    postsNodes.forEach((item) => {
+      state.posts.push(item);
+      // state.posts.unshift(item);
+    });
+    // console.log(state.posts[0].querySelector('title'));
     renderFeed(elements, i18n, feedsTitle, feedsDescription);
     renderPosts(elements, state, i18n, posts);
   });
 };
 
-const updatePosts = () => {};
+const updatePosts = (elements, state) => {
+  state.rssFeedLinks.forEach((rssLink) => {
+    parseURL(rssLink).then((responce) => {
+
+    });
+  });
+};
 
 const renderModals = () => {};
 
