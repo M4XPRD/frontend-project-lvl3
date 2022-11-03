@@ -17,15 +17,18 @@ const parseRSS = (data) => {
     feedsTitle, feedsDescription,
   };
   const posts = doc.querySelectorAll('item');
+  const arrayOfPosts = [...posts];
   const loadedPosts = [...posts].map((item) => {
     const postTitle = item.querySelector('title');
     const postDescription = item.querySelector('description');
     const postLink = item.querySelector('link');
     return { postTitle, postDescription, postLink };
   });
-  const isParseError = doc.querySelector('parsererror') ? 'parser error' : 'loading RSS';
+  const isParseError = doc.querySelector('parsererror') ? 'parser error' : 'start to render';
 
-  return { loadedFeeds, loadedPosts, isParseError };
+  return {
+    loadedFeeds, loadedPosts, isParseError, arrayOfPosts,
+  };
 };
 
 export { parseURL, parseRSS };
