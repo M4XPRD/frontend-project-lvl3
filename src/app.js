@@ -64,6 +64,7 @@ export default async () => {
       rssFeedLinks: [],
       parsedFeeds: [],
       parsedPosts: [],
+      newPosts: [],
       currentFeeds: [],
       currentPosts: [],
       idCounter: 1,
@@ -76,12 +77,15 @@ export default async () => {
           renderInput(elements, state, i18n);
           break;
         case 'parsedFeeds':
-          renderFeed(elements, state, i18n);
+          renderFeed(elements, state, state.parsedFeeds, i18n);
           break;
         case 'parsedPosts':
-          renderPosts(elements, state, i18n);
+          renderPosts(elements, state, state.parsedPosts, i18n);
           updatePosts(elements, state, i18n);
           break;
+        // case 'currentPosts':
+        //   updatePosts(elements, state, i18n);
+        //   break;
         case 'lng':
           i18n.changeLanguage(value);
           renderLanguage(elements, value, previousValue, i18n);
