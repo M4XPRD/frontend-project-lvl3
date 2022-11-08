@@ -30755,6 +30755,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               rssFeedLinks: [],
               parsedFeeds: [],
               parsedPosts: [],
+              newPosts: [],
               currentFeeds: [],
               currentPosts: [],
               idCounter: 1,
@@ -30766,12 +30767,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderInput)(elements, state, i18n);
                   break;
                 case 'parsedFeeds':
-                  (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderFeed)(elements, state, i18n);
+                  (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderFeed)(elements, state, state.parsedFeeds, i18n);
                   break;
                 case 'parsedPosts':
-                  (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderPosts)(elements, state, i18n);
+                  (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderPosts)(elements, state, state.parsedPosts, i18n);
                   (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.updatePosts)(elements, state, i18n);
                   break;
+                // case 'currentPosts':
+                //   updatePosts(elements, state, i18n);
+                //   break;
                 case 'lng':
                   i18n.changeLanguage(value);
                   (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderLanguage)(elements, value, previousValue, i18n);
@@ -30970,12 +30974,13 @@ var parseRSS = function parseRSS(data) {
 };
 var loadFeed = function loadFeed(link, currentState) {
   parseURL(link).then(function (responce) {
+    var _currentState$parsedP;
     var parserErrorCheck = parseRSS(responce).isParseError;
     var feeds = parseRSS(responce).loadedFeeds;
     var posts = parseRSS(responce).loadedPosts;
     currentState.processState = parserErrorCheck;
     currentState.parsedFeeds.unshift(feeds);
-    currentState.parsedPosts.unshift(posts);
+    (_currentState$parsedP = currentState.parsedPosts).push.apply(_currentState$parsedP, _toConsumableArray(posts));
   });
 };
 
@@ -31000,7 +31005,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 /* harmony import */ var _parser_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./parser.js */ "./src/parser.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
+// import { loadFeed, parseURL, parseRSS } from './parser.js';
+// import { loadFeed } from './parser.js';
 
 var renderFrame = function renderFrame(elements, state) {
   switch (true) {
@@ -31049,9 +31062,9 @@ var renderInput = function renderInput(elements, state, i18n) {
       break;
   }
 };
-var renderFeed = function renderFeed(elements, state, i18n) {
+var renderFeed = function renderFeed(elements, state, parsedFeed, i18n) {
   if (state.processState === 'success') {
-    state.parsedFeeds.forEach(function (feed) {
+    parsedFeed.forEach(function (feed) {
       var _document$querySelect, _document$querySelect2;
       var feedsTitle = feed.feedsTitle,
         feedsDescription = feed.feedsDescription;
@@ -31080,12 +31093,12 @@ var renderFeed = function renderFeed(elements, state, i18n) {
       feedsListGroupItem.append(feedsListGroupItemDescription);
       feedsCard.append(feedsListGroup);
       elements.feeds.prepend(feedsCard);
-      state.currentFeeds.push(feed);
     });
   }
+  state.currentFeeds = [].concat(_toConsumableArray(state.currentFeeds), _toConsumableArray(state.parsedFeeds));
   state.parsedFeeds = Object.assign([]);
 };
-var renderPosts = function renderPosts(elements, state, i18n) {
+var renderPosts = function renderPosts(elements, state, parsedPosts, i18n) {
   if (state.processState === 'success') {
     var _document$querySelect3, _document$querySelect4;
     var postsCard = document.createElement('div');
@@ -31099,52 +31112,71 @@ var renderPosts = function renderPosts(elements, state, i18n) {
     postsCard.append(postsCardBody);
     var postsListGroup = document.createElement('ul');
     postsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
-    state.parsedPosts.forEach(function (items) {
-      items.forEach(function (post) {
-        var postTitle = post.postTitle,
-          postLink = post.postLink;
-        var itemTitle = postTitle.textContent;
-        var itemLink = postLink.textContent;
-        var li = document.createElement('li');
-        li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
-        var a = document.createElement('a');
-        a.setAttribute('href', itemLink);
-        a.classList.add('fw-bold');
-        a.setAttribute('data-id', state.idCounter);
-        a.setAttribute('target', '_blank');
-        a.setAttribute('rel', 'noopener noreferrer');
-        a.textContent = itemTitle;
-        var modalButton = document.createElement('button');
-        modalButton.setAttribute('type', 'button');
-        modalButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-        modalButton.setAttribute('data-id', state.idCounter);
-        modalButton.setAttribute('data-bs-toggle', 'modal');
-        modalButton.setAttribute('data-bs-target', '#modal');
-        modalButton.textContent = i18n.t('interface.view');
-        li.append(a);
-        li.append(modalButton);
-        postsListGroup.append(li);
-        state.idCounter += 1;
-        state.currentPosts.push(post);
-      });
+    parsedPosts.forEach(function (post) {
+      var postTitle = post.postTitle,
+        postLink = post.postLink;
+      var itemTitle = postTitle.textContent;
+      var itemLink = postLink.textContent;
+      var li = document.createElement('li');
+      li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+      var a = document.createElement('a');
+      a.setAttribute('href', itemLink);
+      a.classList.add('fw-bold');
+      a.setAttribute('data-id', state.idCounter);
+      a.setAttribute('target', '_blank');
+      a.setAttribute('rel', 'noopener noreferrer');
+      a.textContent = itemTitle;
+      var modalButton = document.createElement('button');
+      modalButton.setAttribute('type', 'button');
+      modalButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+      modalButton.setAttribute('data-id', state.idCounter);
+      modalButton.setAttribute('data-bs-toggle', 'modal');
+      modalButton.setAttribute('data-bs-target', '#modal');
+      modalButton.textContent = i18n.t('interface.view');
+      li.append(a);
+      li.append(modalButton);
+      postsListGroup.append(li);
+      state.idCounter += 1;
     });
     postsCard.append(postsListGroup);
     elements.posts.prepend(postsCard);
   }
-  state.posts = Object.assign([]);
+  state.currentPosts = [].concat(_toConsumableArray(state.currentPosts), _toConsumableArray(state.parsedPosts));
+  state.parsedPosts = Object.assign([]);
 };
+
+// const updatePosts = (elements, state, i18n) => {
+//   state.rssFeedLinks.forEach((rssLink) => {
+//     loadFeed(rssLink, state);
+//     const newPosts = _.differenceBy(state.currentPosts, state.parsedPosts, 'postTitle');
+//     console.log(state.parsedPosts);
+//     if (newPosts.length > 0) {
+//       newPosts.forEach((newPost) => {
+//         state.parsedPosts.unshift(newPost);
+//       });
+//       state.parsedFeeds = Object.assign([]);
+//     }
+//   }, setTimeout(() => { updatePosts(elements, state, i18n); }, 5000));
+// };
+
 var updatePosts = function updatePosts(elements, state, i18n) {
   state.rssFeedLinks.forEach(function (rssLink) {
-    (0,_parser_js__WEBPACK_IMPORTED_MODULE_1__.loadFeed)(rssLink, state);
-    var newPosts = lodash__WEBPACK_IMPORTED_MODULE_0__.differenceBy(state.currentPosts, state.parsedPosts, 'postTitle');
-    console.log(newPosts);
-    if (newPosts.length > 0) {
-      renderPosts(elements, state, i18n);
-      state.parsedFeeds = Object.assign([]);
-    }
-  }, setTimeout(function () {
-    updatePosts(elements, state, i18n);
-  }, 5000));
+    (0,_parser_js__WEBPACK_IMPORTED_MODULE_1__.parseURL)(rssLink).then(function (responce) {
+      var parsedData = (0,_parser_js__WEBPACK_IMPORTED_MODULE_1__.parseRSS)(responce);
+      console.log(parsedData.loadedPosts);
+      console.log(state.currentPosts);
+      // console.log(parsedData.loadedPosts.map((post) => post.postTitle.textContent));
+      var newPosts = lodash__WEBPACK_IMPORTED_MODULE_0__.differenceBy(parsedData.loadedPosts, state.currentPosts, 'postTitle');
+      console.log(newPosts.map(function (post) {
+        return post.postTitle.textContent;
+      }));
+      if (newPosts.length > 0) {
+        // renderPosts(elements, state, newPosts, i18n);
+      }
+    }).then(setTimeout(function () {
+      return updatePosts(elements, state, i18n);
+    }, 5000));
+  });
 };
 
 // const updatePosts = (elements, state, i18n) => {
