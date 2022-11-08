@@ -1,5 +1,7 @@
 import _ from 'lodash';
-import { loadFeed } from './parser.js';
+// import { loadFeed, parseURL, parseRSS } from './parser.js';
+// import { loadFeed } from './parser.js';
+import { parseURL, parseRSS } from './parser.js';
 
 const renderFrame = (elements, state) => {
   switch (true) {
@@ -50,9 +52,9 @@ const renderInput = (elements, state, i18n) => {
   }
 };
 
-const renderFeed = (elements, state, i18n) => {
+const renderFeed = (elements, state, parsedFeed, i18n) => {
   if (state.processState === 'success') {
-    state.parsedFeeds.forEach((feed) => {
+    parsedFeed.forEach((feed) => {
       const { feedsTitle, feedsDescription } = feed;
       const feedsCard = document.createElement('div');
       feedsCard.classList.add('card', 'border-0');
@@ -84,13 +86,13 @@ const renderFeed = (elements, state, i18n) => {
       feedsCard.append(feedsListGroup);
 
       elements.feeds.prepend(feedsCard);
-      state.currentFeeds.push(feed);
     });
   }
+  state.currentFeeds = [...state.currentFeeds, ...state.parsedFeeds];
   state.parsedFeeds = Object.assign([]);
 };
 
-const renderPosts = (elements, state, i18n) => {
+const renderPosts = (elements, state, parsedPosts, i18n) => {
   if (state.processState === 'success') {
     const postsCard = document.createElement('div');
     postsCard.classList.add('card', 'border-0');
@@ -106,54 +108,71 @@ const renderPosts = (elements, state, i18n) => {
     const postsListGroup = document.createElement('ul');
     postsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
 
-    state.parsedPosts.forEach((items) => {
-      items.forEach((post) => {
-        const { postTitle, postLink } = post;
-        const itemTitle = postTitle.textContent;
-        const itemLink = postLink.textContent;
+    parsedPosts.forEach((post) => {
+      const { postTitle, postLink } = post;
+      const itemTitle = postTitle.textContent;
+      const itemLink = postLink.textContent;
 
-        const li = document.createElement('li');
-        li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
-        const a = document.createElement('a');
-        a.setAttribute('href', itemLink);
-        a.classList.add('fw-bold');
-        a.setAttribute('data-id', state.idCounter);
-        a.setAttribute('target', '_blank');
-        a.setAttribute('rel', 'noopener noreferrer');
-        a.textContent = itemTitle;
+      const li = document.createElement('li');
+      li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+      const a = document.createElement('a');
+      a.setAttribute('href', itemLink);
+      a.classList.add('fw-bold');
+      a.setAttribute('data-id', state.idCounter);
+      a.setAttribute('target', '_blank');
+      a.setAttribute('rel', 'noopener noreferrer');
+      a.textContent = itemTitle;
 
-        const modalButton = document.createElement('button');
-        modalButton.setAttribute('type', 'button');
-        modalButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-        modalButton.setAttribute('data-id', state.idCounter);
-        modalButton.setAttribute('data-bs-toggle', 'modal');
-        modalButton.setAttribute('data-bs-target', '#modal');
-        modalButton.textContent = i18n.t('interface.view');
+      const modalButton = document.createElement('button');
+      modalButton.setAttribute('type', 'button');
+      modalButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+      modalButton.setAttribute('data-id', state.idCounter);
+      modalButton.setAttribute('data-bs-toggle', 'modal');
+      modalButton.setAttribute('data-bs-target', '#modal');
+      modalButton.textContent = i18n.t('interface.view');
 
-        li.append(a);
-        li.append(modalButton);
-        postsListGroup.append(li);
+      li.append(a);
+      li.append(modalButton);
+      postsListGroup.append(li);
 
-        state.idCounter += 1;
-        state.currentPosts.push(post);
-      });
+      state.idCounter += 1;
     });
     postsCard.append(postsListGroup);
     elements.posts.prepend(postsCard);
   }
-  state.posts = Object.assign([]);
+  state.currentPosts = [...state.currentPosts, ...state.parsedPosts];
+  state.parsedPosts = Object.assign([]);
 };
+
+// const updatePosts = (elements, state, i18n) => {
+//   state.rssFeedLinks.forEach((rssLink) => {
+//     loadFeed(rssLink, state);
+//     const newPosts = _.differenceBy(state.currentPosts, state.parsedPosts, 'postTitle');
+//     console.log(state.parsedPosts);
+//     if (newPosts.length > 0) {
+//       newPosts.forEach((newPost) => {
+//         state.parsedPosts.unshift(newPost);
+//       });
+//       state.parsedFeeds = Object.assign([]);
+//     }
+//   }, setTimeout(() => { updatePosts(elements, state, i18n); }, 5000));
+// };
 
 const updatePosts = (elements, state, i18n) => {
   state.rssFeedLinks.forEach((rssLink) => {
-    loadFeed(rssLink, state);
-    const newPosts = _.differenceBy(state.currentPosts, state.parsedPosts, 'postTitle');
-    console.log(newPosts);
-    if (newPosts.length > 0) {
-      renderPosts(elements, state, i18n);
-      state.parsedFeeds = Object.assign([]);
-    }
-  }, setTimeout(() => { updatePosts(elements, state, i18n); }, 5000));
+    parseURL(rssLink)
+      .then((responce) => {
+        const parsedData = parseRSS(responce);
+        console.log(parsedData.loadedPosts);
+        console.log(state.currentPosts);
+        // console.log(parsedData.loadedPosts.map((post) => post.postTitle.textContent));
+        const newPosts = _.differenceBy(parsedData.loadedPosts, state.currentPosts, 'postTitle');
+        console.log(newPosts.map((post) => post.postTitle.textContent));
+        if (newPosts.length > 0) {
+          // renderPosts(elements, state, newPosts, i18n);
+        }
+      }).then(setTimeout(() => updatePosts(elements, state, i18n), 5000));
+  });
 };
 
 // const updatePosts = (elements, state, i18n) => {
