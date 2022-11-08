@@ -36,7 +36,7 @@ const loadFeed = (link, currentState) => {
     const posts = parseRSS(responce).loadedPosts;
     currentState.processState = parserErrorCheck;
     currentState.parsedFeeds.unshift(feeds);
-    currentState.parsedPosts.unshift(posts);
+    currentState.parsedPosts.push(...posts);
   });
 };
 
