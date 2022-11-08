@@ -2,9 +2,10 @@ import * as yup from 'yup';
 import onChange from 'on-change';
 import i18next from 'i18next';
 import {
-  renderPage, renderInput, renderLanguage, renderModals, updatePosts,
+  renderFeed, renderPosts, renderLanguage, renderInput, updatePosts,
 } from './view.js';
 import resources from './locales/index.js';
+import { loadFeed } from './parser.js';
 
 export default async () => {
   const defaultLanguage = 'ru';
@@ -55,14 +56,15 @@ export default async () => {
 
     const state = {
       lng: defaultLanguage,
-      processState: '',
+      processState: 'ready to load',
       valid: '',
       field: {
         url: '',
       },
       rssFeedLinks: [],
-      feeds: [],
-      posts: [],
+      parsedFeeds: [],
+      parsedPosts: [],
+      currentFeeds: [],
       currentPosts: [],
       idCounter: 1,
       errors: '',
@@ -71,18 +73,14 @@ export default async () => {
     const watchedState = onChange(state, (path, value, previousValue) => {
       switch (path) {
         case 'processState':
-          switch (value) {
-            case 'checking link':
-              renderInput(elements, watchedState, i18n);
-              break;
-            case 'success':
-              renderPage(elements, state, i18n);
-              updatePosts(elements, state);
-              renderModals();
-              break;
-            default:
-              break;
-          }
+          renderInput(elements, state, i18n);
+          break;
+        case 'parsedFeeds':
+          renderFeed(elements, state, i18n);
+          break;
+        case 'parsedPosts':
+          renderPosts(elements, state, i18n);
+          updatePosts(elements, state, i18n);
           break;
         case 'lng':
           i18n.changeLanguage(value);
@@ -99,9 +97,7 @@ export default async () => {
       const currentUrl = data.get('url').trim();
       watchedState.field.url = currentUrl;
       validateURL(currentUrl, watchedState)
-        .then(() => {
-          watchedState.processState = 'checking link';
-        });
+        .then(() => loadFeed(watchedState.field.url, watchedState));
     });
 
     elements.languageButtons.forEach((button) => {
