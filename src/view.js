@@ -52,9 +52,9 @@ const renderInput = (elements, state, i18n) => {
   }
 };
 
-const renderFeed = (elements, state, parsedFeed, i18n) => {
+const renderFeed = (elements, state, i18n) => {
   if (state.processState === 'success') {
-    parsedFeed.forEach((feed) => {
+    state.parsedFeeds.forEach((feed) => {
       const { feedsTitle, feedsDescription } = feed;
       const feedsCard = document.createElement('div');
       feedsCard.classList.add('card', 'border-0');
@@ -73,10 +73,10 @@ const renderFeed = (elements, state, parsedFeed, i18n) => {
       feedsListGroupItem.classList.add('list-group-item', 'border-0', 'border-end-0');
       const feedsListGroupItemTitle = document.createElement('h3');
       feedsListGroupItemTitle.classList.add('h6', 'm-0');
-      feedsListGroupItemTitle.textContent = feedsTitle.textContent;
+      feedsListGroupItemTitle.textContent = feedsTitle;
       const feedsListGroupItemDescription = document.createElement('p');
       feedsListGroupItemDescription.classList.add('m-0', 'small', 'text-black-50');
-      feedsListGroupItemDescription.textContent = feedsDescription.textContent;
+      feedsListGroupItemDescription.textContent = feedsDescription;
 
       feedsListGroup.append(feedsListGroupItem);
       feedsCard.append(feedsListGroup);
@@ -92,7 +92,7 @@ const renderFeed = (elements, state, parsedFeed, i18n) => {
   state.parsedFeeds = Object.assign([]);
 };
 
-const renderPosts = (elements, state, parsedPosts, i18n) => {
+const renderPosts = (elements, state, watchedState, i18n) => {
   if (state.processState === 'success') {
     const postsCard = document.createElement('div');
     postsCard.classList.add('card', 'border-0');
@@ -108,20 +108,21 @@ const renderPosts = (elements, state, parsedPosts, i18n) => {
     const postsListGroup = document.createElement('ul');
     postsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
 
-    parsedPosts.forEach((post) => {
+    state.parsedPosts.forEach((post) => {
+      console.log(post);
       const { postTitle, postLink } = post;
-      const itemTitle = postTitle.textContent;
-      const itemLink = postLink.textContent;
+      console.log(postTitle);
+      console.log(postLink);
 
       const li = document.createElement('li');
       li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
       const a = document.createElement('a');
-      a.setAttribute('href', itemLink);
+      a.setAttribute('href', postLink);
       a.classList.add('fw-bold');
       a.setAttribute('data-id', state.idCounter);
       a.setAttribute('target', '_blank');
       a.setAttribute('rel', 'noopener noreferrer');
-      a.textContent = itemTitle;
+      a.textContent = postTitle;
 
       const modalButton = document.createElement('button');
       modalButton.setAttribute('type', 'button');
@@ -142,66 +143,21 @@ const renderPosts = (elements, state, parsedPosts, i18n) => {
   }
   state.currentPosts = [...state.currentPosts, ...state.parsedPosts];
   state.parsedPosts = Object.assign([]);
+  watchedState.postsUpdateState = true;
 };
 
-// const updatePosts = (elements, state, i18n) => {
-//   state.rssFeedLinks.forEach((rssLink) => {
-//     loadFeed(rssLink, state);
-//     const newPosts = _.differenceBy(state.currentPosts, state.parsedPosts, 'postTitle');
-//     console.log(state.parsedPosts);
-//     if (newPosts.length > 0) {
-//       newPosts.forEach((newPost) => {
-//         state.parsedPosts.unshift(newPost);
-//       });
-//       state.parsedFeeds = Object.assign([]);
-//     }
-//   }, setTimeout(() => { updatePosts(elements, state, i18n); }, 5000));
-// };
-
-const updatePosts = (elements, state, i18n) => {
+const updatePosts = (elements, state, watchedState, i18n) => {
   state.rssFeedLinks.forEach((rssLink) => {
     parseURL(rssLink)
       .then((responce) => {
         const parsedData = parseRSS(responce);
-        console.log(parsedData.loadedPosts);
-        console.log(state.currentPosts);
-        // console.log(parsedData.loadedPosts.map((post) => post.postTitle.textContent));
         const newPosts = _.differenceBy(parsedData.loadedPosts, state.currentPosts, 'postTitle');
-        console.log(newPosts.map((post) => post.postTitle.textContent));
         if (newPosts.length > 0) {
-          // renderPosts(elements, state, newPosts, i18n);
+          watchedState.parsedPosts.push(...newPosts);
         }
-      }).then(setTimeout(() => updatePosts(elements, state, i18n), 5000));
+      }).then(setTimeout(() => { updatePosts(elements, state, watchedState, i18n); }, 5000));
   });
 };
-
-// const updatePosts = (elements, state, i18n) => {
-//   state.rssFeedLinks.forEach((rssLink) => {
-//     parseLink(rssLink);
-//     const newPosts = _.differenceBy(state.posts, state.currentPosts);
-// if (newPosts.length > 0) {
-//   renderPosts(elements, state, i18n);
-//   state.posts = Object.assign([]);
-// }
-//   });
-// };
-
-// const updatePosts = (state) => {
-//   state.rssFeedLinks.forEach((rssLink) => {
-//     parseLink(rssLink).then(() => {
-//       const newPosts = _.differenceBy(state.posts, state.currentPosts);
-//       renderPosts(newPosts);
-//     }, setTimeout(() => updatePosts(state), 5000));
-//   });
-// };
-
-// const updatePosts = (state) => {
-//   state.rssFeedLinks.forEach((rssLink) => {
-//     parseLink(rssLink);
-//     const newPosts = _.differenceBy(state.posts, state.currentPosts);
-//     renderPosts(newPosts);
-//   }, setTimeout(() => updatePosts(state), 5000));
-// };
 
 const renderModals = () => {};
 
