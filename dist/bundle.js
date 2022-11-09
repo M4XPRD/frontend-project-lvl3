@@ -30748,6 +30748,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             var state = {
               lng: defaultLanguage,
               processState: 'ready to load',
+              postsUpdateState: false,
               valid: '',
               field: {
                 url: ''
@@ -30767,15 +30768,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderInput)(elements, state, i18n);
                   break;
                 case 'parsedFeeds':
-                  (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderFeed)(elements, state, state.parsedFeeds, i18n);
+                  (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderFeed)(elements, state, i18n);
                   break;
                 case 'parsedPosts':
-                  (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderPosts)(elements, state, state.parsedPosts, i18n);
-                  (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.updatePosts)(elements, state, i18n);
+                  (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderPosts)(elements, state, watchedState, i18n);
                   break;
-                // case 'currentPosts':
-                //   updatePosts(elements, state, i18n);
-                //   break;
+                case 'postsUpdateState':
+                  (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.updatePosts)(elements, state, watchedState, i18n);
+                  break;
                 case 'lng':
                   i18n.changeLanguage(value);
                   (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderLanguage)(elements, value, previousValue, i18n);
@@ -30948,17 +30948,17 @@ var parseURL = function parseURL(url) {
 var parseRSS = function parseRSS(data) {
   var parser = new DOMParser();
   var doc = parser.parseFromString(data, 'application/xml');
-  var feedsTitle = doc.querySelector('title');
-  var feedsDescription = doc.querySelector('description');
+  var feedsTitle = doc.querySelector('title').textContent;
+  var feedsDescription = doc.querySelector('description').textContent;
   var loadedFeeds = {
     feedsTitle: feedsTitle,
     feedsDescription: feedsDescription
   };
   var posts = doc.querySelectorAll('item');
   var loadedPosts = _toConsumableArray(posts).map(function (item) {
-    var postTitle = item.querySelector('title');
-    var postDescription = item.querySelector('description');
-    var postLink = item.querySelector('link');
+    var postTitle = item.querySelector('title').textContent;
+    var postDescription = item.querySelector('description').textContent;
+    var postLink = item.querySelector('link').textContent;
     return {
       postTitle: postTitle,
       postDescription: postDescription,
@@ -30979,7 +30979,7 @@ var loadFeed = function loadFeed(link, currentState) {
     var feeds = parseRSS(responce).loadedFeeds;
     var posts = parseRSS(responce).loadedPosts;
     currentState.processState = parserErrorCheck;
-    currentState.parsedFeeds.unshift(feeds);
+    currentState.parsedFeeds.push(feeds);
     (_currentState$parsedP = currentState.parsedPosts).push.apply(_currentState$parsedP, _toConsumableArray(posts));
   });
 };
@@ -31062,9 +31062,9 @@ var renderInput = function renderInput(elements, state, i18n) {
       break;
   }
 };
-var renderFeed = function renderFeed(elements, state, parsedFeed, i18n) {
+var renderFeed = function renderFeed(elements, state, i18n) {
   if (state.processState === 'success') {
-    parsedFeed.forEach(function (feed) {
+    state.parsedFeeds.forEach(function (feed) {
       var _document$querySelect, _document$querySelect2;
       var feedsTitle = feed.feedsTitle,
         feedsDescription = feed.feedsDescription;
@@ -31083,10 +31083,10 @@ var renderFeed = function renderFeed(elements, state, parsedFeed, i18n) {
       feedsListGroupItem.classList.add('list-group-item', 'border-0', 'border-end-0');
       var feedsListGroupItemTitle = document.createElement('h3');
       feedsListGroupItemTitle.classList.add('h6', 'm-0');
-      feedsListGroupItemTitle.textContent = feedsTitle.textContent;
+      feedsListGroupItemTitle.textContent = feedsTitle;
       var feedsListGroupItemDescription = document.createElement('p');
       feedsListGroupItemDescription.classList.add('m-0', 'small', 'text-black-50');
-      feedsListGroupItemDescription.textContent = feedsDescription.textContent;
+      feedsListGroupItemDescription.textContent = feedsDescription;
       feedsListGroup.append(feedsListGroupItem);
       feedsCard.append(feedsListGroup);
       feedsListGroupItem.append(feedsListGroupItemTitle);
@@ -31098,7 +31098,7 @@ var renderFeed = function renderFeed(elements, state, parsedFeed, i18n) {
   state.currentFeeds = [].concat(_toConsumableArray(state.currentFeeds), _toConsumableArray(state.parsedFeeds));
   state.parsedFeeds = Object.assign([]);
 };
-var renderPosts = function renderPosts(elements, state, parsedPosts, i18n) {
+var renderPosts = function renderPosts(elements, state, watchedState, i18n) {
   if (state.processState === 'success') {
     var _document$querySelect3, _document$querySelect4;
     var postsCard = document.createElement('div');
@@ -31112,20 +31112,21 @@ var renderPosts = function renderPosts(elements, state, parsedPosts, i18n) {
     postsCard.append(postsCardBody);
     var postsListGroup = document.createElement('ul');
     postsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
-    parsedPosts.forEach(function (post) {
+    state.parsedPosts.forEach(function (post) {
+      console.log(post);
       var postTitle = post.postTitle,
         postLink = post.postLink;
-      var itemTitle = postTitle.textContent;
-      var itemLink = postLink.textContent;
+      console.log(postTitle);
+      console.log(postLink);
       var li = document.createElement('li');
       li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
       var a = document.createElement('a');
-      a.setAttribute('href', itemLink);
+      a.setAttribute('href', postLink);
       a.classList.add('fw-bold');
       a.setAttribute('data-id', state.idCounter);
       a.setAttribute('target', '_blank');
       a.setAttribute('rel', 'noopener noreferrer');
-      a.textContent = itemTitle;
+      a.textContent = postTitle;
       var modalButton = document.createElement('button');
       modalButton.setAttribute('type', 'button');
       modalButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
@@ -31143,70 +31144,22 @@ var renderPosts = function renderPosts(elements, state, parsedPosts, i18n) {
   }
   state.currentPosts = [].concat(_toConsumableArray(state.currentPosts), _toConsumableArray(state.parsedPosts));
   state.parsedPosts = Object.assign([]);
+  watchedState.postsUpdateState = true;
 };
-
-// const updatePosts = (elements, state, i18n) => {
-//   state.rssFeedLinks.forEach((rssLink) => {
-//     loadFeed(rssLink, state);
-//     const newPosts = _.differenceBy(state.currentPosts, state.parsedPosts, 'postTitle');
-//     console.log(state.parsedPosts);
-//     if (newPosts.length > 0) {
-//       newPosts.forEach((newPost) => {
-//         state.parsedPosts.unshift(newPost);
-//       });
-//       state.parsedFeeds = Object.assign([]);
-//     }
-//   }, setTimeout(() => { updatePosts(elements, state, i18n); }, 5000));
-// };
-
-var updatePosts = function updatePosts(elements, state, i18n) {
+var updatePosts = function updatePosts(elements, state, watchedState, i18n) {
   state.rssFeedLinks.forEach(function (rssLink) {
     (0,_parser_js__WEBPACK_IMPORTED_MODULE_1__.parseURL)(rssLink).then(function (responce) {
       var parsedData = (0,_parser_js__WEBPACK_IMPORTED_MODULE_1__.parseRSS)(responce);
-      console.log(parsedData.loadedPosts);
-      console.log(state.currentPosts);
-      // console.log(parsedData.loadedPosts.map((post) => post.postTitle.textContent));
       var newPosts = lodash__WEBPACK_IMPORTED_MODULE_0__.differenceBy(parsedData.loadedPosts, state.currentPosts, 'postTitle');
-      console.log(newPosts.map(function (post) {
-        return post.postTitle.textContent;
-      }));
       if (newPosts.length > 0) {
-        // renderPosts(elements, state, newPosts, i18n);
+        var _watchedState$parsedP;
+        (_watchedState$parsedP = watchedState.parsedPosts).push.apply(_watchedState$parsedP, _toConsumableArray(newPosts));
       }
     }).then(setTimeout(function () {
-      return updatePosts(elements, state, i18n);
+      updatePosts(elements, state, watchedState, i18n);
     }, 5000));
   });
 };
-
-// const updatePosts = (elements, state, i18n) => {
-//   state.rssFeedLinks.forEach((rssLink) => {
-//     parseLink(rssLink);
-//     const newPosts = _.differenceBy(state.posts, state.currentPosts);
-// if (newPosts.length > 0) {
-//   renderPosts(elements, state, i18n);
-//   state.posts = Object.assign([]);
-// }
-//   });
-// };
-
-// const updatePosts = (state) => {
-//   state.rssFeedLinks.forEach((rssLink) => {
-//     parseLink(rssLink).then(() => {
-//       const newPosts = _.differenceBy(state.posts, state.currentPosts);
-//       renderPosts(newPosts);
-//     }, setTimeout(() => updatePosts(state), 5000));
-//   });
-// };
-
-// const updatePosts = (state) => {
-//   state.rssFeedLinks.forEach((rssLink) => {
-//     parseLink(rssLink);
-//     const newPosts = _.differenceBy(state.posts, state.currentPosts);
-//     renderPosts(newPosts);
-//   }, setTimeout(() => updatePosts(state), 5000));
-// };
-
 var renderModals = function renderModals() {};
 var renderLanguage = function renderLanguage(elements, value, previousValue, i18n) {
   var previousLangButton = document.querySelector("[data-lng=\"".concat(previousValue, "\"]"));
