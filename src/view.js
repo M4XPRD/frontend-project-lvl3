@@ -1,6 +1,4 @@
 import _ from 'lodash';
-// import { loadFeed, parseURL, parseRSS } from './parser.js';
-// import { loadFeed } from './parser.js';
 import { parseURL, parseRSS } from './parser.js';
 
 const renderFrame = (elements, state) => {
@@ -52,44 +50,68 @@ const renderInput = (elements, state, i18n) => {
   }
 };
 
+const relocatePosts = (state, keyword) => {
+  switch (keyword) {
+    case 'feeds':
+      state.currentFeeds = [...state.currentFeeds, ...state.parsedFeeds];
+      state.parsedFeeds = Object.assign([]);
+      break;
+    case 'posts':
+      state.currentPosts = [...state.currentPosts, ...state.parsedPosts];
+      state.parsedPosts = Object.assign([]);
+      break;
+    default:
+      break;
+  }
+};
+
+const renderFeedsContainer = (elements, i18n) => {
+  const feedsCard = document.querySelector('.feeds > .card') ?? document.createElement('div');
+  const feedsCardBody = document.querySelector('.feeds > .card > .card-body') ?? document.createElement('div');
+  const feedsCardTitle = document.querySelector('.feeds > .card > .card-body > .card-title') ?? document.createElement('h2');
+  const feedsListGroup = document.querySelector('.feeds > .card > ul') ?? document.createElement('ul');
+
+  feedsCard.classList.add('card', 'border-0');
+  feedsCardBody.classList.add('card-body');
+  feedsCardTitle.classList.add('card-title', 'h4');
+  feedsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
+
+  feedsCardTitle.textContent = i18n.t('interface.feeds');
+
+  feedsCardBody.append(feedsCardTitle);
+  feedsCard.append(feedsCardBody);
+  feedsCard.append(feedsListGroup);
+
+  elements.feeds.append(feedsCard);
+};
+
+const renderFeedsList = (feed) => {
+  const { feedsTitle, feedsDescription } = feed;
+
+  const feedsListGroupItem = document.createElement('li');
+  const feedsListGroupItemTitle = document.createElement('h3');
+  const feedsListGroupItemDescription = document.createElement('p');
+  const feedsListGroup = document.querySelector('.feeds > .card > ul');
+
+  feedsListGroupItem.classList.add('list-group-item', 'border-0', 'border-end-0');
+  feedsListGroupItemTitle.classList.add('h6', 'm-0');
+  feedsListGroupItemDescription.classList.add('m-0', 'small', 'text-black-50');
+
+  feedsListGroupItemTitle.textContent = feedsTitle.textContent;
+  feedsListGroupItemDescription.textContent = feedsDescription.textContent;
+
+  feedsListGroupItem.append(feedsListGroupItemTitle, feedsListGroupItemDescription);
+  feedsListGroup.prepend(feedsListGroupItem);
+};
+
 const renderFeed = (elements, state, i18n) => {
   if (state.processState === 'success') {
+    renderFeedsContainer(elements, i18n);
     state.parsedFeeds.forEach((feed) => {
-      const { feedsTitle, feedsDescription } = feed;
-      const feedsCard = document.createElement('div');
-      feedsCard.classList.add('card', 'border-0');
-      const feedsCardBody = document.querySelector('.feeds > .card > .card-body') ?? document.createElement('div');
-      feedsCardBody.classList.add('card-body');
-      const feedsCardTitle = document.querySelector('.feeds > .card > .card-body > .card-title') ?? document.createElement('h2');
-      feedsCardTitle.classList.add('card-title', 'h4');
-      feedsCardTitle.textContent = i18n.t('interface.feeds');
-
-      feedsCardBody.append(feedsCardTitle);
-      feedsCard.append(feedsCardBody);
-
-      const feedsListGroup = document.createElement('ul');
-      feedsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
-      const feedsListGroupItem = document.createElement('li');
-      feedsListGroupItem.classList.add('list-group-item', 'border-0', 'border-end-0');
-      const feedsListGroupItemTitle = document.createElement('h3');
-      feedsListGroupItemTitle.classList.add('h6', 'm-0');
-      feedsListGroupItemTitle.textContent = feedsTitle;
-      const feedsListGroupItemDescription = document.createElement('p');
-      feedsListGroupItemDescription.classList.add('m-0', 'small', 'text-black-50');
-      feedsListGroupItemDescription.textContent = feedsDescription;
-
-      feedsListGroup.append(feedsListGroupItem);
-      feedsCard.append(feedsListGroup);
-      feedsListGroupItem.append(feedsListGroupItemTitle);
-      feedsListGroupItem.append(feedsListGroupItemDescription);
-
-      feedsCard.append(feedsListGroup);
-
-      elements.feeds.prepend(feedsCard);
+      renderFeedsList(feed);
     });
   }
-  state.currentFeeds = [...state.currentFeeds, ...state.parsedFeeds];
-  state.parsedFeeds = Object.assign([]);
+  relocatePosts(state, 'feeds');
 };
 
 const renderPosts = (elements, state, watchedState, i18n) => {
@@ -109,10 +131,10 @@ const renderPosts = (elements, state, watchedState, i18n) => {
     postsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
 
     state.parsedPosts.forEach((post) => {
-      console.log(post);
       const { postTitle, postLink } = post;
-      console.log(postTitle);
-      console.log(postLink);
+      // console.log(post);
+      // console.log(postTitle);
+      // console.log(postLink);
 
       const li = document.createElement('li');
       li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
@@ -141,8 +163,7 @@ const renderPosts = (elements, state, watchedState, i18n) => {
     postsCard.append(postsListGroup);
     elements.posts.prepend(postsCard);
   }
-  state.currentPosts = [...state.currentPosts, ...state.parsedPosts];
-  state.parsedPosts = Object.assign([]);
+  relocatePosts(state, 'posts');
   watchedState.postsUpdateState = true;
 };
 
