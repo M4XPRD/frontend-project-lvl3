@@ -25,8 +25,12 @@ export default async () => {
     });
 
     const validateURL = async (url, watchedState) => {
-      const schema = yup.string().url().required();
-      return schema.notOneOf(watchedState.rssFeedLinks).validate(url)
+      const schema = yup
+        .string()
+        .url()
+        .notOneOf([...watchedState.rssFeedLinks])
+        .required();
+      return schema.validate(url)
         .then(() => {
           watchedState.valid = true;
         })
