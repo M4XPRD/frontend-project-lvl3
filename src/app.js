@@ -57,6 +57,7 @@ export default async () => {
     const state = {
       lng: defaultLanguage,
       processState: 'ready to load',
+      postsUpdateState: false,
       valid: '',
       field: {
         url: '',
@@ -77,15 +78,14 @@ export default async () => {
           renderInput(elements, state, i18n);
           break;
         case 'parsedFeeds':
-          renderFeed(elements, state, state.parsedFeeds, i18n);
+          renderFeed(elements, state, i18n);
           break;
         case 'parsedPosts':
-          renderPosts(elements, state, state.parsedPosts, i18n);
-          updatePosts(elements, state, i18n);
+          renderPosts(elements, state, watchedState, i18n);
           break;
-        // case 'currentPosts':
-        //   updatePosts(elements, state, i18n);
-        //   break;
+        case 'postsUpdateState':
+          updatePosts(elements, state, watchedState, i18n);
+          break;
         case 'lng':
           i18n.changeLanguage(value);
           renderLanguage(elements, value, previousValue, i18n);
