@@ -9,6 +9,7 @@ export default {
         nonvalidURL: 'Ссылка должна быть валидным URL',
         noRSS: 'Ресурс не содержит валидный RSS',
         duplicate: 'RSS уже существует',
+        networkError: 'Ошибка сети',
       },
     },
     interface: {

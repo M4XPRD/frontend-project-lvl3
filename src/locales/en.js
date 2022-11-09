@@ -9,6 +9,7 @@ export default {
         nonvalidURL: 'The link must be a valid URL',
         noRSS: 'The resource does not contain valid RSS',
         duplicate: 'RSS already exists',
+        networkError: 'Network error',
       },
     },
     interface: {
