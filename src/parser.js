@@ -10,16 +10,16 @@ const parseURL = (url) => axios
 const parseRSS = (data) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(data, 'application/xml');
-  const feedsTitle = doc.querySelector('title');
-  const feedsDescription = doc.querySelector('description');
+  const feedsTitle = doc.querySelector('title').textContent;
+  const feedsDescription = doc.querySelector('description').textContent;
   const loadedFeeds = {
     feedsTitle, feedsDescription,
   };
   const posts = doc.querySelectorAll('item');
   const loadedPosts = [...posts].map((item) => {
-    const postTitle = item.querySelector('title');
-    const postDescription = item.querySelector('description');
-    const postLink = item.querySelector('link');
+    const postTitle = item.querySelector('title').textContent;
+    const postDescription = item.querySelector('description').textContent;
+    const postLink = item.querySelector('link').textContent;
     return { postTitle, postDescription, postLink };
   });
   const isParseError = doc.querySelector('parsererror') ? 'parser error' : 'continue render';
@@ -35,7 +35,7 @@ const loadFeed = (link, currentState) => {
     const feeds = parseRSS(responce).loadedFeeds;
     const posts = parseRSS(responce).loadedPosts;
     currentState.processState = parserErrorCheck;
-    currentState.parsedFeeds.unshift(feeds);
+    currentState.parsedFeeds.push(feeds);
     currentState.parsedPosts.push(...posts);
   });
 };
