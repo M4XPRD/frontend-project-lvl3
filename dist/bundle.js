@@ -31069,19 +31069,27 @@ var renderInput = function renderInput(elements, state, i18n) {
   }
 };
 var relocatePosts = function relocatePosts(state, keyword) {
+  state["current".concat(keyword)] = [].concat(_toConsumableArray(state["current".concat(keyword)]), _toConsumableArray(state["parsed".concat(keyword)]));
+  state["parsed".concat(keyword)] = Object.assign([]);
+};
+
+/*
+const relocatePosts = (state, keyword) => {
   switch (keyword) {
     case 'feeds':
-      state.currentFeeds = [].concat(_toConsumableArray(state.currentFeeds), _toConsumableArray(state.parsedFeeds));
+      state.currentFeeds = [...state.currentFeeds, ...state.parsedFeeds];
       state.parsedFeeds = Object.assign([]);
       break;
     case 'posts':
-      state.currentPosts = [].concat(_toConsumableArray(state.currentPosts), _toConsumableArray(state.parsedPosts));
+      state.currentPosts = [...state.currentPosts, ...state.parsedPosts];
       state.parsedPosts = Object.assign([]);
       break;
     default:
       break;
   }
 };
+*/
+
 var renderFeedsContainer = function renderFeedsContainer(elements, i18n) {
   var _document$querySelect, _document$querySelect2, _document$querySelect3, _document$querySelect4;
   var feedsCard = (_document$querySelect = document.querySelector('.feeds > .card')) !== null && _document$querySelect !== void 0 ? _document$querySelect : document.createElement('div');
@@ -31120,7 +31128,7 @@ var renderFeed = function renderFeed(elements, state, i18n) {
       renderFeedsList(feed);
     });
   }
-  relocatePosts(state, 'feeds');
+  relocatePosts(state, 'Feeds');
 };
 var renderPostsContainer = function renderPostsContainer(elements, i18n) {
   var _document$querySelect5, _document$querySelect6, _document$querySelect7;
@@ -31173,7 +31181,7 @@ var renderPosts = function renderPosts(elements, state, watchedState, i18n) {
       renderPostsList(post, state, i18n);
     });
   }
-  relocatePosts(state, 'posts');
+  relocatePosts(state, 'Posts');
   watchedState.postsUpdateState = true;
 };
 var updatePosts = function updatePosts(elements, state, watchedState, i18n) {
