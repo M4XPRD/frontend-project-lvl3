@@ -31122,50 +31122,56 @@ var renderFeed = function renderFeed(elements, state, i18n) {
   }
   relocatePosts(state, 'feeds');
 };
+var renderPostsContainer = function renderPostsContainer(elements, i18n) {
+  var _document$querySelect5, _document$querySelect6, _document$querySelect7;
+  var postsCard = (_document$querySelect5 = document.querySelector('.posts > .card')) !== null && _document$querySelect5 !== void 0 ? _document$querySelect5 : document.createElement('div');
+  var postsCardBody = (_document$querySelect6 = document.querySelector('.posts > .card > .card-body')) !== null && _document$querySelect6 !== void 0 ? _document$querySelect6 : document.createElement('div');
+  var postsCardTitle = (_document$querySelect7 = document.querySelector('.posts > .card > .card-body > .card-title')) !== null && _document$querySelect7 !== void 0 ? _document$querySelect7 : document.createElement('h2');
+  var postsListGroup = document.createElement('ul');
+  postsCard.classList.add('card', 'border-0');
+  postsCardBody.classList.add('card-body');
+  postsCardTitle.classList.add('card-title', 'h4');
+  postsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
+  postsCardTitle.textContent = i18n.t('interface.posts');
+  postsCardBody.append(postsCardTitle);
+  postsCard.prepend(postsCardBody, postsListGroup);
+  elements.posts.prepend(postsCard);
+};
+var renderPostsList = function renderPostsList(post, state, i18n) {
+  var postTitle = post.postTitle,
+    postLink = post.postLink;
+  // console.log(post);
+  // console.log(postTitle);
+  // console.log(postLink);
+
+  var li = document.createElement('li');
+  var a = document.createElement('a');
+  var modalButton = document.createElement('button');
+  var postsListGroup = document.querySelector('.posts > .card > ul');
+  li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+  a.classList.add('fw-bold');
+  a.setAttribute('href', postLink);
+  a.setAttribute('data-id', state.idCounter);
+  a.setAttribute('target', '_blank');
+  a.setAttribute('rel', 'noopener noreferrer');
+  a.textContent = postTitle;
+  modalButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+  modalButton.setAttribute('type', 'button');
+  modalButton.setAttribute('data-id', state.idCounter);
+  modalButton.setAttribute('data-bs-toggle', 'modal');
+  modalButton.setAttribute('data-bs-target', '#modal');
+  modalButton.textContent = i18n.t('interface.view');
+  li.append(a);
+  li.append(modalButton);
+  postsListGroup.append(li);
+  state.idCounter += 1;
+};
 var renderPosts = function renderPosts(elements, state, watchedState, i18n) {
   if (state.processState === 'success') {
-    var _document$querySelect5, _document$querySelect6;
-    var postsCard = document.createElement('div');
-    postsCard.classList.add('card', 'border-0');
-    var postsCardBody = (_document$querySelect5 = document.querySelector('.posts > .card > .card-body')) !== null && _document$querySelect5 !== void 0 ? _document$querySelect5 : document.createElement('div');
-    postsCardBody.classList.add('card-body');
-    var postsCardTitle = (_document$querySelect6 = document.querySelector('.posts > .card > .card-body > .card-title')) !== null && _document$querySelect6 !== void 0 ? _document$querySelect6 : document.createElement('h2');
-    postsCardTitle.classList.add('card-title', 'h4');
-    postsCardTitle.textContent = i18n.t('interface.posts');
-    postsCardBody.append(postsCardTitle);
-    postsCard.append(postsCardBody);
-    var postsListGroup = document.createElement('ul');
-    postsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
+    renderPostsContainer(elements, i18n);
     state.parsedPosts.forEach(function (post) {
-      var postTitle = post.postTitle,
-        postLink = post.postLink;
-      // console.log(post);
-      // console.log(postTitle);
-      // console.log(postLink);
-
-      var li = document.createElement('li');
-      li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
-      var a = document.createElement('a');
-      a.setAttribute('href', postLink);
-      a.classList.add('fw-bold');
-      a.setAttribute('data-id', state.idCounter);
-      a.setAttribute('target', '_blank');
-      a.setAttribute('rel', 'noopener noreferrer');
-      a.textContent = postTitle;
-      var modalButton = document.createElement('button');
-      modalButton.setAttribute('type', 'button');
-      modalButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-      modalButton.setAttribute('data-id', state.idCounter);
-      modalButton.setAttribute('data-bs-toggle', 'modal');
-      modalButton.setAttribute('data-bs-target', '#modal');
-      modalButton.textContent = i18n.t('interface.view');
-      li.append(a);
-      li.append(modalButton);
-      postsListGroup.append(li);
-      state.idCounter += 1;
+      renderPostsList(post, state, i18n);
     });
-    postsCard.append(postsListGroup);
-    elements.posts.prepend(postsCard);
   }
   relocatePosts(state, 'posts');
   watchedState.postsUpdateState = true;
