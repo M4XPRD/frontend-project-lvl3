@@ -22,6 +22,10 @@ export default {
       feeds: 'Фиды',
       posts: 'Посты',
       view: 'Просмотр',
+      modalWindow: {
+        fullArticle: 'Читать полностью',
+        closeModal: 'Закрыть',
+      },
     },
   },
 };

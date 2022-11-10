@@ -22,6 +22,10 @@ export default {
       feeds: 'Feeds',
       posts: 'Posts',
       view: 'Preview',
+      modalWindow: {
+        fullArticle: 'Read full article',
+        closeModal: 'Close',
+      },
     },
   },
 };
