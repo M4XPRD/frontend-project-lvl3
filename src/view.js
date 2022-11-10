@@ -140,8 +140,8 @@ const renderPostsContainer = (elements, i18n) => {
   elements.posts.prepend(postsCard);
 };
 
-const renderPostsList = (post, state, i18n) => {
-  const { postTitle, postLink } = post;
+const renderPostsList = (post, i18n) => {
+  const { postTitle, postLink, postID } = post;
   // console.log(post);
   // console.log(postTitle);
   // console.log(postLink);
@@ -154,7 +154,7 @@ const renderPostsList = (post, state, i18n) => {
   li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
   a.classList.add('fw-bold');
   a.setAttribute('href', postLink);
-  a.setAttribute('data-id', state.idCounter);
+  a.setAttribute('data-id', postID);
   a.setAttribute('target', '_blank');
   a.setAttribute('rel', 'noopener noreferrer');
 
@@ -162,7 +162,7 @@ const renderPostsList = (post, state, i18n) => {
 
   modalButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
   modalButton.setAttribute('type', 'button');
-  modalButton.setAttribute('data-id', state.idCounter);
+  modalButton.setAttribute('data-id', postID);
   modalButton.setAttribute('data-bs-toggle', 'modal');
   modalButton.setAttribute('data-bs-target', '#modal');
 
@@ -171,15 +171,13 @@ const renderPostsList = (post, state, i18n) => {
   li.append(a);
   li.append(modalButton);
   postsListGroup.append(li);
-
-  state.idCounter += 1;
 };
 
 const renderPosts = (elements, state, watchedState, i18n) => {
   if (state.processState === 'success') {
     renderPostsContainer(elements, i18n);
     state.parsedPosts.forEach((post) => {
-      renderPostsList(post, state, i18n);
+      renderPostsList(post, i18n);
     });
   }
   relocatePosts(state, 'Posts');
@@ -199,15 +197,37 @@ const updatePosts = (elements, state, watchedState, i18n) => {
   });
 };
 
-const renderModals = () => {};
+// const wtf = (elements, state) => {
+//   elements.modalButtons.forEach((modalButton) => {
+//     modalButton.addEventListener('click', (e) => {
+//       const { id } = e.target;
+//       watchedState.modalID = id;
+//     });
+//   });
+// };
+
+const renderModals = (elements, state, i18n) => {
+  const {
+    modalBlock, modalTitle, modalBody, modalFullArticle, modalCloseSecondary,
+  } = elements.interface.modalWindow;
+  const findPost = state.currentPosts.filter(({ postID }) => postID === state.modalID);
+  const [{ postTitle, postDescription }] = findPost;
+
+  modalBlock.classList.add('show');
+  modalTitle.textContent = postTitle;
+  modalBody.textContent = postDescription;
+  modalFullArticle.textContent = i18n.t('interface.modalWindow.fullArticle');
+  modalCloseSecondary.textContent = i18n.t('interface.modalWindow.closeModal');
+};
 
 const renderLanguage = (elements, value, previousValue, i18n) => {
   const previousLangButton = document.querySelector(`[data-lng="${previousValue}"]`);
-  previousLangButton.classList.replace('btn-primary', 'btn-outline-primary');
   const activeLangButton = document.querySelector(`[data-lng="${value}"]`);
+  const feedbackMessage = document.querySelector('[data-link-message]');
+
+  previousLangButton.classList.replace('btn-primary', 'btn-outline-primary');
   activeLangButton.classList.replace('btn-outline-primary', 'btn-primary');
 
-  const feedbackMessage = document.querySelector('[data-link-message]');
   const feedbackMessageDataset = feedbackMessage.dataset.linkMessage;
   elements.interface.title.textContent = i18n.t('interface.title');
   elements.interface.subtitle.textContent = i18n.t('interface.subtitle');
