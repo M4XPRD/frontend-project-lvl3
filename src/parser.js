@@ -34,6 +34,10 @@ const loadFeed = (link, currentState) => {
     const parserErrorCheck = parseRSS(responce).isParseError;
     const feeds = parseRSS(responce).loadedFeeds;
     const posts = parseRSS(responce).loadedPosts;
+    posts.forEach((post) => {
+      post.postID = currentState.idCounter;
+      currentState.idCounter += 1;
+    });
     currentState.processState = parserErrorCheck;
     currentState.parsedFeeds.push(feeds);
     currentState.parsedPosts.push(...posts);
