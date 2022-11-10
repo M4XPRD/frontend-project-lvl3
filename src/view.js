@@ -51,6 +51,12 @@ const renderInput = (elements, state, i18n) => {
 };
 
 const relocatePosts = (state, keyword) => {
+  state[`current${keyword}`] = [...state[`current${keyword}`], ...state[`parsed${keyword}`]];
+  state[`parsed${keyword}`] = Object.assign([]);
+};
+
+/*
+const relocatePosts = (state, keyword) => {
   switch (keyword) {
     case 'feeds':
       state.currentFeeds = [...state.currentFeeds, ...state.parsedFeeds];
@@ -64,6 +70,7 @@ const relocatePosts = (state, keyword) => {
       break;
   }
 };
+*/
 
 const renderFeedsContainer = (elements, i18n) => {
   const feedsCard = document.querySelector('.feeds > .card') ?? document.createElement('div');
@@ -111,7 +118,7 @@ const renderFeed = (elements, state, i18n) => {
       renderFeedsList(feed);
     });
   }
-  relocatePosts(state, 'feeds');
+  relocatePosts(state, 'Feeds');
 };
 
 const renderPostsContainer = (elements, i18n) => {
@@ -175,7 +182,7 @@ const renderPosts = (elements, state, watchedState, i18n) => {
       renderPostsList(post, state, i18n);
     });
   }
-  relocatePosts(state, 'posts');
+  relocatePosts(state, 'Posts');
   watchedState.postsUpdateState = true;
 };
 
