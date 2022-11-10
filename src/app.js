@@ -2,7 +2,7 @@ import * as yup from 'yup';
 import onChange from 'on-change';
 import i18next from 'i18next';
 import {
-  renderFeed, renderPosts, renderLanguage, renderInput, updatePosts,
+  renderFeed, renderPosts, renderLanguage, renderInput, updatePosts, renderModals,
 } from './view.js';
 import resources from './locales/index.js';
 import { loadFeed } from './parser.js';
@@ -55,6 +55,14 @@ export default async () => {
         buttonText: document.querySelector('[data-button]'),
         example: document.querySelector('[data-example]'),
         hexlet: document.querySelector('[data-hexlet'),
+        modalWindow: {
+          modalBlock: document.querySelector('#modal'),
+          modalTitle: document.querySelector('.modal-title'),
+          modalBody: document.querySelector('.modal-body'),
+          modalFullArticle: document.querySelector('.full-article'),
+          modalCloseSecondary: document.querySelector('.btn-secondary'),
+          modalCloseButtons: document.querySelectorAll('[data-bs-dismiss="modal"]'),
+        },
       },
     };
 
@@ -69,10 +77,10 @@ export default async () => {
       rssFeedLinks: [],
       parsedFeeds: [],
       parsedPosts: [],
-      newPosts: [],
       currentFeeds: [],
       currentPosts: [],
       idCounter: 1,
+      modalID: '',
       errors: '',
     };
 
@@ -80,6 +88,7 @@ export default async () => {
       switch (path) {
         case 'processState':
           renderInput(elements, state, i18n);
+          console.log(elements.modalButtons);
           break;
         case 'parsedFeeds':
           renderFeed(elements, state, i18n);
@@ -90,6 +99,9 @@ export default async () => {
         case 'postsUpdateState':
           updatePosts(elements, state, watchedState, i18n);
           break;
+        // case 'modalID':
+        //   renderModals(elements, watchedState, i18n, id);
+        //   break;
         case 'lng':
           i18n.changeLanguage(value);
           renderLanguage(elements, value, previousValue, i18n);
@@ -108,16 +120,18 @@ export default async () => {
         .then(() => loadFeed(watchedState.field.url, watchedState));
     });
 
-    elements.languageButtons.forEach((button) => {
-      button.addEventListener('click', () => {
-        watchedState.lng = button.dataset.lng;
+    elements.languageButtons.forEach((languageButton) => {
+      languageButton.addEventListener('click', () => {
+        watchedState.lng = languageButton.dataset.lng;
       });
     });
 
-    // elements.modalButtons.forEach((modalButton) => {
-    //   modalButton.addEventListener('click', () => {
-
-    //   });
-    // });
+    elements.modalButtons.forEach((modalButton) => {
+      modalButton.addEventListener('click', (e) => {
+        const { id } = e.target;
+        watchedState.modalID = id;
+        renderModals(elements, watchedState, i18n);
+      });
+    });
   });
 };
