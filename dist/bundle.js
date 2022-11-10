@@ -30748,7 +30748,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 inputPlaceholder: document.querySelector('[data-label]'),
                 buttonText: document.querySelector('[data-button]'),
                 example: document.querySelector('[data-example]'),
-                hexlet: document.querySelector('[data-hexlet')
+                hexlet: document.querySelector('[data-hexlet'),
+                modalWindow: {
+                  modalBlock: document.querySelector('#modal'),
+                  modalTitle: document.querySelector('.modal-title'),
+                  modalBody: document.querySelector('.modal-body'),
+                  modalFullArticle: document.querySelector('.full-article'),
+                  modalCloseSecondary: document.querySelector('.btn-secondary'),
+                  modalCloseButtons: document.querySelectorAll('[data-bs-dismiss="modal"]')
+                }
               }
             };
             var state = {
@@ -30762,16 +30770,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               rssFeedLinks: [],
               parsedFeeds: [],
               parsedPosts: [],
-              newPosts: [],
               currentFeeds: [],
               currentPosts: [],
               idCounter: 1,
+              modalID: '',
               errors: ''
             };
             var watchedState = (0,on_change__WEBPACK_IMPORTED_MODULE_1__["default"])(state, function (path, value, previousValue) {
               switch (path) {
                 case 'processState':
                   (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderInput)(elements, state, i18n);
+                  console.log(elements.modalButtons);
                   break;
                 case 'parsedFeeds':
                   (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderFeed)(elements, state, i18n);
@@ -30782,6 +30791,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 case 'postsUpdateState':
                   (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.updatePosts)(elements, state, watchedState, i18n);
                   break;
+                // case 'modalID':
+                //   renderModals(elements, watchedState, i18n, id);
+                //   break;
                 case 'lng':
                   i18n.changeLanguage(value);
                   (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderLanguage)(elements, value, previousValue, i18n);
@@ -30799,17 +30811,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return (0,_parser_js__WEBPACK_IMPORTED_MODULE_5__.loadFeed)(watchedState.field.url, watchedState);
               });
             });
-            elements.languageButtons.forEach(function (button) {
-              button.addEventListener('click', function () {
-                watchedState.lng = button.dataset.lng;
+            elements.languageButtons.forEach(function (languageButton) {
+              languageButton.addEventListener('click', function () {
+                watchedState.lng = languageButton.dataset.lng;
               });
             });
-
-            // elements.modalButtons.forEach((modalButton) => {
-            //   modalButton.addEventListener('click', () => {
-
-            //   });
-            // });
+            elements.modalButtons.forEach(function (modalButton) {
+              modalButton.addEventListener('click', function (e) {
+                var id = e.target.id;
+                watchedState.modalID = id;
+                (0,_view_js__WEBPACK_IMPORTED_MODULE_3__.renderModals)(elements, watchedState, i18n);
+              });
+            });
           });
         case 3:
         case "end":
@@ -30855,7 +30868,11 @@ __webpack_require__.r(__webpack_exports__);
       hexlet: 'created by ',
       feeds: 'Feeds',
       posts: 'Posts',
-      view: 'Preview'
+      view: 'Preview',
+      modalWindow: {
+        fullArticle: 'Read full article',
+        closeModal: 'Close'
+      }
     }
   }
 });
@@ -30918,7 +30935,11 @@ __webpack_require__.r(__webpack_exports__);
       hexlet: 'создано в ',
       feeds: 'Фиды',
       posts: 'Посты',
-      view: 'Просмотр'
+      view: 'Просмотр',
+      modalWindow: {
+        fullArticle: 'Читать полностью',
+        closeModal: 'Закрыть'
+      }
     }
   }
 });
@@ -30986,6 +31007,10 @@ var loadFeed = function loadFeed(link, currentState) {
     var parserErrorCheck = parseRSS(responce).isParseError;
     var feeds = parseRSS(responce).loadedFeeds;
     var posts = parseRSS(responce).loadedPosts;
+    posts.forEach(function (post) {
+      post.postID = currentState.idCounter;
+      currentState.idCounter += 1;
+    });
     currentState.processState = parserErrorCheck;
     currentState.parsedFeeds.push(feeds);
     (_currentState$parsedP = currentState.parsedPosts).push.apply(_currentState$parsedP, _toConsumableArray(posts));
@@ -31013,6 +31038,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 /* harmony import */ var _parser_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./parser.js */ "./src/parser.js");
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -31145,9 +31174,10 @@ var renderPostsContainer = function renderPostsContainer(elements, i18n) {
   postsCard.prepend(postsCardBody, postsListGroup);
   elements.posts.prepend(postsCard);
 };
-var renderPostsList = function renderPostsList(post, state, i18n) {
+var renderPostsList = function renderPostsList(post, i18n) {
   var postTitle = post.postTitle,
-    postLink = post.postLink;
+    postLink = post.postLink,
+    postID = post.postID;
   // console.log(post);
   // console.log(postTitle);
   // console.log(postLink);
@@ -31159,26 +31189,25 @@ var renderPostsList = function renderPostsList(post, state, i18n) {
   li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
   a.classList.add('fw-bold');
   a.setAttribute('href', postLink);
-  a.setAttribute('data-id', state.idCounter);
+  a.setAttribute('data-id', postID);
   a.setAttribute('target', '_blank');
   a.setAttribute('rel', 'noopener noreferrer');
   a.textContent = postTitle;
   modalButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
   modalButton.setAttribute('type', 'button');
-  modalButton.setAttribute('data-id', state.idCounter);
+  modalButton.setAttribute('data-id', postID);
   modalButton.setAttribute('data-bs-toggle', 'modal');
   modalButton.setAttribute('data-bs-target', '#modal');
   modalButton.textContent = i18n.t('interface.view');
   li.append(a);
   li.append(modalButton);
   postsListGroup.append(li);
-  state.idCounter += 1;
 };
 var renderPosts = function renderPosts(elements, state, watchedState, i18n) {
   if (state.processState === 'success') {
     renderPostsContainer(elements, i18n);
     state.parsedPosts.forEach(function (post) {
-      renderPostsList(post, state, i18n);
+      renderPostsList(post, i18n);
     });
   }
   relocatePosts(state, 'Posts');
@@ -31198,13 +31227,43 @@ var updatePosts = function updatePosts(elements, state, watchedState, i18n) {
     }, 5000));
   });
 };
-var renderModals = function renderModals() {};
+
+// const wtf = (elements, state) => {
+//   elements.modalButtons.forEach((modalButton) => {
+//     modalButton.addEventListener('click', (e) => {
+//       const { id } = e.target;
+//       watchedState.modalID = id;
+//     });
+//   });
+// };
+
+var renderModals = function renderModals(elements, state, i18n) {
+  var _elements$interface$m = elements["interface"].modalWindow,
+    modalBlock = _elements$interface$m.modalBlock,
+    modalTitle = _elements$interface$m.modalTitle,
+    modalBody = _elements$interface$m.modalBody,
+    modalFullArticle = _elements$interface$m.modalFullArticle,
+    modalCloseSecondary = _elements$interface$m.modalCloseSecondary;
+  var findPost = state.currentPosts.filter(function (_ref) {
+    var postID = _ref.postID;
+    return postID === state.modalID;
+  });
+  var _findPost = _slicedToArray(findPost, 1),
+    _findPost$ = _findPost[0],
+    postTitle = _findPost$.postTitle,
+    postDescription = _findPost$.postDescription;
+  modalBlock.classList.add('show');
+  modalTitle.textContent = postTitle;
+  modalBody.textContent = postDescription;
+  modalFullArticle.textContent = i18n.t('interface.modalWindow.fullArticle');
+  modalCloseSecondary.textContent = i18n.t('interface.modalWindow.closeModal');
+};
 var renderLanguage = function renderLanguage(elements, value, previousValue, i18n) {
   var previousLangButton = document.querySelector("[data-lng=\"".concat(previousValue, "\"]"));
-  previousLangButton.classList.replace('btn-primary', 'btn-outline-primary');
   var activeLangButton = document.querySelector("[data-lng=\"".concat(value, "\"]"));
-  activeLangButton.classList.replace('btn-outline-primary', 'btn-primary');
   var feedbackMessage = document.querySelector('[data-link-message]');
+  previousLangButton.classList.replace('btn-primary', 'btn-outline-primary');
+  activeLangButton.classList.replace('btn-outline-primary', 'btn-primary');
   var feedbackMessageDataset = feedbackMessage.dataset.linkMessage;
   elements["interface"].title.textContent = i18n.t('interface.title');
   elements["interface"].subtitle.textContent = i18n.t('interface.subtitle');
