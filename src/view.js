@@ -114,54 +114,66 @@ const renderFeed = (elements, state, i18n) => {
   relocatePosts(state, 'feeds');
 };
 
+const renderPostsContainer = (elements, i18n) => {
+  const postsCard = document.querySelector('.posts > .card') ?? document.createElement('div');
+  const postsCardBody = document.querySelector('.posts > .card > .card-body') ?? document.createElement('div');
+  const postsCardTitle = document.querySelector('.posts > .card > .card-body > .card-title') ?? document.createElement('h2');
+  const postsListGroup = document.createElement('ul');
+
+  postsCard.classList.add('card', 'border-0');
+  postsCardBody.classList.add('card-body');
+  postsCardTitle.classList.add('card-title', 'h4');
+  postsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
+
+  postsCardTitle.textContent = i18n.t('interface.posts');
+
+  postsCardBody.append(postsCardTitle);
+  postsCard.prepend(postsCardBody, postsListGroup);
+
+  elements.posts.prepend(postsCard);
+};
+
+const renderPostsList = (post, state, i18n) => {
+  const { postTitle, postLink } = post;
+  // console.log(post);
+  // console.log(postTitle);
+  // console.log(postLink);
+
+  const li = document.createElement('li');
+  const a = document.createElement('a');
+  const modalButton = document.createElement('button');
+  const postsListGroup = document.querySelector('.posts > .card > ul');
+
+  li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
+  a.classList.add('fw-bold');
+  a.setAttribute('href', postLink);
+  a.setAttribute('data-id', state.idCounter);
+  a.setAttribute('target', '_blank');
+  a.setAttribute('rel', 'noopener noreferrer');
+
+  a.textContent = postTitle;
+
+  modalButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
+  modalButton.setAttribute('type', 'button');
+  modalButton.setAttribute('data-id', state.idCounter);
+  modalButton.setAttribute('data-bs-toggle', 'modal');
+  modalButton.setAttribute('data-bs-target', '#modal');
+
+  modalButton.textContent = i18n.t('interface.view');
+
+  li.append(a);
+  li.append(modalButton);
+  postsListGroup.append(li);
+
+  state.idCounter += 1;
+};
+
 const renderPosts = (elements, state, watchedState, i18n) => {
   if (state.processState === 'success') {
-    const postsCard = document.createElement('div');
-    postsCard.classList.add('card', 'border-0');
-    const postsCardBody = document.querySelector('.posts > .card > .card-body') ?? document.createElement('div');
-    postsCardBody.classList.add('card-body');
-    const postsCardTitle = document.querySelector('.posts > .card > .card-body > .card-title') ?? document.createElement('h2');
-    postsCardTitle.classList.add('card-title', 'h4');
-    postsCardTitle.textContent = i18n.t('interface.posts');
-
-    postsCardBody.append(postsCardTitle);
-    postsCard.append(postsCardBody);
-
-    const postsListGroup = document.createElement('ul');
-    postsListGroup.classList.add('list-group', 'border-0', 'rounded-0');
-
+    renderPostsContainer(elements, i18n);
     state.parsedPosts.forEach((post) => {
-      const { postTitle, postLink } = post;
-      // console.log(post);
-      // console.log(postTitle);
-      // console.log(postLink);
-
-      const li = document.createElement('li');
-      li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
-      const a = document.createElement('a');
-      a.setAttribute('href', postLink);
-      a.classList.add('fw-bold');
-      a.setAttribute('data-id', state.idCounter);
-      a.setAttribute('target', '_blank');
-      a.setAttribute('rel', 'noopener noreferrer');
-      a.textContent = postTitle;
-
-      const modalButton = document.createElement('button');
-      modalButton.setAttribute('type', 'button');
-      modalButton.classList.add('btn', 'btn-outline-primary', 'btn-sm');
-      modalButton.setAttribute('data-id', state.idCounter);
-      modalButton.setAttribute('data-bs-toggle', 'modal');
-      modalButton.setAttribute('data-bs-target', '#modal');
-      modalButton.textContent = i18n.t('interface.view');
-
-      li.append(a);
-      li.append(modalButton);
-      postsListGroup.append(li);
-
-      state.idCounter += 1;
+      renderPostsList(post, state, i18n);
     });
-    postsCard.append(postsListGroup);
-    elements.posts.prepend(postsCard);
   }
   relocatePosts(state, 'posts');
   watchedState.postsUpdateState = true;
