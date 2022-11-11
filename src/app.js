@@ -74,8 +74,8 @@ export default async () => {
         url: '',
       },
       uiState: {
-        viewedPosts: new Set(),
-        currentPost: '',
+        viewedLinks: new Set(),
+        clickedPostLink: '',
       },
       rssFeedLinks: [],
       parsedFeeds: [],
@@ -96,13 +96,14 @@ export default async () => {
           renderFeed(elements, state, i18n);
           break;
         case 'parsedPosts':
+        case 'uiState.viewedLinks':
           renderPosts(elements, state, watchedState, i18n);
           break;
         case 'postsUpdateState':
           updatePosts(elements, state, watchedState, i18n);
           break;
-        case 'idModal':
-          renderModals(elements, watchedState, i18n);
+        case 'uiState.clickedPostLink':
+          renderModals(elements, state);
           break;
         case 'lng':
           i18n.changeLanguage(value);
@@ -129,8 +130,20 @@ export default async () => {
     });
 
     elements.posts.addEventListener('click', (e) => {
+      const { target } = e;
       const { id } = e.target.dataset;
       watchedState.idModal = Number(id);
+      switch (target.tagName) {
+        case 'A':
+          watchedState.uiState.viewedLinks.add(target.href);
+          break;
+        case 'BUTTON':
+          watchedState.uiState.viewedLinks.add(target.previousSibling.href);
+          watchedState.uiState.clickedPostLink = target.previousSibling.href;
+          break;
+        default:
+          break;
+      }
     });
   });
 };
