@@ -148,14 +148,15 @@ const renderPostsList = (state, post, i18n) => {
   const modalButton = document.createElement('button');
   const postsListGroup = document.querySelector('.posts > .card > ul');
 
-  // if (state.uiState.viewedPosts.has(postLink)) {
-  //   a.classList.add('fw-normal', 'link-secondary');
-  // } else {
-  //   a.classList.add('fw-bold');
-  // }
+  console.log(state.uiState.viewedLinks.has(postLink));
+
+  if (state.uiState.viewedLinks.has(postLink)) {
+    a.classList.add('fw-normal', 'link-secondary');
+  } else {
+    a.classList.add('fw-bold');
+  }
 
   li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
-  a.classList.add('fw-bold');
   a.setAttribute('href', postLink);
   a.setAttribute('data-id', postID);
   a.setAttribute('target', '_blank');
@@ -200,21 +201,32 @@ const updatePosts = (elements, state, watchedState, i18n) => {
   });
 };
 
-const renderModals = (elements, state, i18n) => {
+const renderModals = (elements, state) => {
   const {
-    modalTitle, modalBody, modalFullArticle, modalCloseSecondary,
+    modalTitle, modalBody, modalFullArticle,
   } = elements.interface.modalWindow;
 
-  const findPost = state.currentPosts.filter(({ postID }) => postID === state.idModal);
+  const findPost = state.currentPosts
+    .filter(({ postLink }) => postLink === state.uiState.clickedPostLink);
   const [{ postTitle, postDescription, postLink }] = findPost;
-  // state.uiState.viewedPosts.add(postLink);
 
   modalTitle.textContent = postTitle;
   modalBody.textContent = postDescription;
   modalFullArticle.href = postLink;
-  modalFullArticle.textContent = i18n.t('interface.modalWindow.fullArticle');
-  modalCloseSecondary.textContent = i18n.t('interface.modalWindow.closeModal');
 };
+
+// const renderModals = (elements, state) => {
+//   const {
+//     modalTitle, modalBody, modalFullArticle,
+//   } = elements.interface.modalWindow;
+
+//   const findPost = state.currentPosts.filter(({ postID }) => postID === state.idModal);
+//   const [{ postTitle, postDescription, postLink }] = findPost;
+
+//   modalTitle.textContent = postTitle;
+//   modalBody.textContent = postDescription;
+//   modalFullArticle.href = postLink;
+// };
 
 const renderLanguage = (elements, value, previousValue, i18n) => {
   const previousLangButton = document.querySelector(`[data-lng="${previousValue}"]`);
@@ -242,6 +254,10 @@ const renderLanguage = (elements, value, previousValue, i18n) => {
     modalButtons.forEach((button) => {
       button.textContent = i18n.t('interface.view');
     });
+    const modalFullArticle = document.querySelector('[data-full-article]');
+    const modalCloseButton = document.querySelector('[data-close-button]');
+    modalFullArticle.textContent = i18n.t('interface.modalWindow.fullArticle');
+    modalCloseButton.textContent = i18n.t('interface.modalWindow.closeModal');
   }
 };
 
