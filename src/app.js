@@ -56,7 +56,6 @@ export default async () => {
         example: document.querySelector('[data-example]'),
         hexlet: document.querySelector('[data-hexlet'),
         modalWindow: {
-          modalBlock: document.querySelector('#modal'),
           modalTitle: document.querySelector('.modal-title'),
           modalBody: document.querySelector('.modal-body'),
           modalFullArticle: document.querySelector('.full-article'),
@@ -74,13 +73,17 @@ export default async () => {
       field: {
         url: '',
       },
+      uiState: {
+        viewedPosts: new Set(),
+        currentPost: '',
+      },
       rssFeedLinks: [],
       parsedFeeds: [],
       parsedPosts: [],
       currentFeeds: [],
       currentPosts: [],
       idCounter: 1,
-      modalID: '',
+      idModal: '',
       errors: '',
     };
 
@@ -88,7 +91,6 @@ export default async () => {
       switch (path) {
         case 'processState':
           renderInput(elements, state, i18n);
-          console.log(elements.modalButtons);
           break;
         case 'parsedFeeds':
           renderFeed(elements, state, i18n);
@@ -99,9 +101,9 @@ export default async () => {
         case 'postsUpdateState':
           updatePosts(elements, state, watchedState, i18n);
           break;
-        // case 'modalID':
-        //   renderModals(elements, watchedState, i18n, id);
-        //   break;
+        case 'idModal':
+          renderModals(elements, watchedState, i18n);
+          break;
         case 'lng':
           i18n.changeLanguage(value);
           renderLanguage(elements, value, previousValue, i18n);
@@ -126,12 +128,9 @@ export default async () => {
       });
     });
 
-    elements.modalButtons.forEach((modalButton) => {
-      modalButton.addEventListener('click', (e) => {
-        const { id } = e.target;
-        watchedState.modalID = id;
-        renderModals(elements, watchedState, i18n);
-      });
+    elements.posts.addEventListener('click', (e) => {
+      const { id } = e.target.dataset;
+      watchedState.idModal = Number(id);
     });
   });
 };
