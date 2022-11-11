@@ -29,18 +29,18 @@ const parseRSS = (data) => {
   };
 };
 
-const loadFeed = (link, currentState) => {
-  parseURL(link).then((responce) => {
+const loadFeed = (url, watchedState) => {
+  parseURL(url).then((responce) => {
     const parserErrorCheck = parseRSS(responce).isParseError;
     const feeds = parseRSS(responce).loadedFeeds;
     const posts = parseRSS(responce).loadedPosts;
     posts.forEach((post) => {
-      post.postID = currentState.idCounter;
-      currentState.idCounter += 1;
+      post.postID = watchedState.idCounter;
+      watchedState.idCounter += 1;
     });
-    currentState.processState = parserErrorCheck;
-    currentState.parsedFeeds.push(feeds);
-    currentState.parsedPosts.push(...posts);
+    watchedState.processState = parserErrorCheck;
+    watchedState.parsedFeeds.push(feeds);
+    watchedState.parsedPosts.push(...posts);
   });
 };
 
