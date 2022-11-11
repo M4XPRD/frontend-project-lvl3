@@ -140,16 +140,19 @@ const renderPostsContainer = (elements, i18n) => {
   elements.posts.prepend(postsCard);
 };
 
-const renderPostsList = (post, i18n) => {
+const renderPostsList = (state, post, i18n) => {
   const { postTitle, postLink, postID } = post;
-  // console.log(post);
-  // console.log(postTitle);
-  // console.log(postLink);
 
   const li = document.createElement('li');
   const a = document.createElement('a');
   const modalButton = document.createElement('button');
   const postsListGroup = document.querySelector('.posts > .card > ul');
+
+  // if (state.uiState.viewedPosts.has(postLink)) {
+  //   a.classList.add('fw-normal', 'link-secondary');
+  // } else {
+  //   a.classList.add('fw-bold');
+  // }
 
   li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start', 'border-0', 'border-end-0');
   a.classList.add('fw-bold');
@@ -177,7 +180,7 @@ const renderPosts = (elements, state, watchedState, i18n) => {
   if (state.processState === 'success') {
     renderPostsContainer(elements, i18n);
     state.parsedPosts.forEach((post) => {
-      renderPostsList(post, i18n);
+      renderPostsList(state, post, i18n);
     });
   }
   relocatePosts(state, 'Posts');
@@ -197,25 +200,18 @@ const updatePosts = (elements, state, watchedState, i18n) => {
   });
 };
 
-// const wtf = (elements, state) => {
-//   elements.modalButtons.forEach((modalButton) => {
-//     modalButton.addEventListener('click', (e) => {
-//       const { id } = e.target;
-//       watchedState.modalID = id;
-//     });
-//   });
-// };
-
 const renderModals = (elements, state, i18n) => {
   const {
-    modalBlock, modalTitle, modalBody, modalFullArticle, modalCloseSecondary,
+    modalTitle, modalBody, modalFullArticle, modalCloseSecondary,
   } = elements.interface.modalWindow;
-  const findPost = state.currentPosts.filter(({ postID }) => postID === state.modalID);
-  const [{ postTitle, postDescription }] = findPost;
 
-  modalBlock.classList.add('show');
+  const findPost = state.currentPosts.filter(({ postID }) => postID === state.idModal);
+  const [{ postTitle, postDescription, postLink }] = findPost;
+  // state.uiState.viewedPosts.add(postLink);
+
   modalTitle.textContent = postTitle;
   modalBody.textContent = postDescription;
+  modalFullArticle.href = postLink;
   modalFullArticle.textContent = i18n.t('interface.modalWindow.fullArticle');
   modalCloseSecondary.textContent = i18n.t('interface.modalWindow.closeModal');
 };
