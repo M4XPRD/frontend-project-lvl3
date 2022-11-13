@@ -39861,18 +39861,16 @@ var renderLanguage = function renderLanguage(elements, value, previousValue, i18
   elements.feedback.textContent = i18n.t(feedbackMessageDataset);
   var feeds = document.querySelector('.feeds > .card > .card-body > .card-title');
   var posts = document.querySelector('.posts > .card > .card-body > .card-title');
-  if (feeds && posts) {
-    feeds.textContent = i18n.t('interface.feeds');
-    posts.textContent = i18n.t('interface.posts');
-    var modalButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
-    modalButtons.forEach(function (button) {
-      button.textContent = i18n.t('interface.view');
-    });
-    var modalFullArticle = document.querySelector('[data-full-article]');
-    var modalCloseButton = document.querySelector('[data-close-button]');
-    modalFullArticle.textContent = i18n.t('interface.modalWindow.fullArticle');
-    modalCloseButton.textContent = i18n.t('interface.modalWindow.closeModal');
-  }
+  feeds.textContent = i18n.t('interface.feeds');
+  posts.textContent = i18n.t('interface.posts');
+  var modalButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
+  modalButtons.forEach(function (button) {
+    button.textContent = i18n.t('interface.view');
+  });
+  var modalFullArticle = document.querySelector('[data-full-article]');
+  var modalCloseButton = document.querySelector('[data-close-button]');
+  modalFullArticle.textContent = i18n.t('interface.modalWindow.fullArticle');
+  modalCloseButton.textContent = i18n.t('interface.modalWindow.closeModal');
 };
 
 
