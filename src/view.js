@@ -50,33 +50,12 @@ const renderInput = (elements, state, i18n) => {
   }
 };
 
-const relocatePosts = (state, keyword) => {
-  state[`current${keyword}`] = [...state[`current${keyword}`], ...state[`parsed${keyword}`]];
-  state[`parsed${keyword}`] = Object.assign([]);
-};
-
-/*
-const relocatePosts = (state, keyword) => {
-  switch (keyword) {
-    case 'feeds':
-      state.currentFeeds = [...state.currentFeeds, ...state.parsedFeeds];
-      state.parsedFeeds = Object.assign([]);
-      break;
-    case 'posts':
-      state.currentPosts = [...state.currentPosts, ...state.parsedPosts];
-      state.parsedPosts = Object.assign([]);
-      break;
-    default:
-      break;
-  }
-};
-*/
-
 const renderFeedsContainer = (elements, i18n) => {
-  const feedsCard = document.querySelector('.feeds > .card') ?? document.createElement('div');
-  const feedsCardBody = document.querySelector('.feeds > .card > .card-body') ?? document.createElement('div');
-  const feedsCardTitle = document.querySelector('.feeds > .card > .card-body > .card-title') ?? document.createElement('h2');
-  const feedsListGroup = document.querySelector('.feeds > .card > ul') ?? document.createElement('ul');
+  elements.feeds.textContent = '';
+  const feedsCard = document.createElement('div');
+  const feedsCardBody = document.createElement('div');
+  const feedsCardTitle = document.createElement('h2');
+  const feedsListGroup = document.createElement('ul');
 
   feedsCard.classList.add('card', 'border-0');
   feedsCardBody.classList.add('card-body');
@@ -108,7 +87,7 @@ const renderFeedsList = (feed) => {
   feedsListGroupItemDescription.textContent = feedsDescription.textContent;
 
   feedsListGroupItem.append(feedsListGroupItemTitle, feedsListGroupItemDescription);
-  feedsListGroup.prepend(feedsListGroupItem);
+  feedsListGroup.append(feedsListGroupItem);
 };
 
 const renderFeed = (elements, state, i18n) => {
@@ -118,13 +97,13 @@ const renderFeed = (elements, state, i18n) => {
       renderFeedsList(feed);
     });
   }
-  relocatePosts(state, 'Feeds');
 };
 
 const renderPostsContainer = (elements, i18n) => {
-  const postsCard = document.querySelector('.posts > .card') ?? document.createElement('div');
-  const postsCardBody = document.querySelector('.posts > .card > .card-body') ?? document.createElement('div');
-  const postsCardTitle = document.querySelector('.posts > .card > .card-body > .card-title') ?? document.createElement('h2');
+  elements.posts.textContent = '';
+  const postsCard = document.createElement('div');
+  const postsCardBody = document.createElement('div');
+  const postsCardTitle = document.createElement('h2');
   const postsListGroup = document.createElement('ul');
 
   postsCard.classList.add('card', 'border-0');
@@ -148,9 +127,7 @@ const renderPostsList = (state, post, i18n) => {
   const modalButton = document.createElement('button');
   const postsListGroup = document.querySelector('.posts > .card > ul');
 
-  console.log(state.uiState.viewedLinks.has(postLink));
-
-  if (state.uiState.viewedLinks.has(postLink)) {
+  if (state.uiState.viewedLinks.includes(postLink)) {
     a.classList.add('fw-normal', 'link-secondary');
   } else {
     a.classList.add('fw-bold');
@@ -184,7 +161,6 @@ const renderPosts = (elements, state, watchedState, i18n) => {
       renderPostsList(state, post, i18n);
     });
   }
-  relocatePosts(state, 'Posts');
   watchedState.postsUpdateState = true;
 };
 
@@ -193,9 +169,9 @@ const updatePosts = (elements, state, watchedState, i18n) => {
     parseURL(rssLink)
       .then((responce) => {
         const parsedData = parseRSS(responce);
-        const newPosts = _.differenceBy(parsedData.loadedPosts, state.currentPosts, 'postTitle');
+        const newPosts = _.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
         if (newPosts.length > 0) {
-          watchedState.parsedPosts.push(...newPosts);
+          watchedState.parsedPosts = [...newPosts, ...state.parsedPosts];
         }
       }).then(setTimeout(() => { updatePosts(elements, state, watchedState, i18n); }, 5000));
   });
@@ -206,7 +182,7 @@ const renderModals = (elements, state) => {
     modalTitle, modalBody, modalFullArticle,
   } = elements.interface.modalWindow;
 
-  const findPost = state.currentPosts
+  const findPost = state.parsedPosts
     .filter(({ postLink }) => postLink === state.uiState.clickedPostLink);
   const [{ postTitle, postDescription, postLink }] = findPost;
 
@@ -214,19 +190,6 @@ const renderModals = (elements, state) => {
   modalBody.textContent = postDescription;
   modalFullArticle.href = postLink;
 };
-
-// const renderModals = (elements, state) => {
-//   const {
-//     modalTitle, modalBody, modalFullArticle,
-//   } = elements.interface.modalWindow;
-
-//   const findPost = state.currentPosts.filter(({ postID }) => postID === state.idModal);
-//   const [{ postTitle, postDescription, postLink }] = findPost;
-
-//   modalTitle.textContent = postTitle;
-//   modalBody.textContent = postDescription;
-//   modalFullArticle.href = postLink;
-// };
 
 const renderLanguage = (elements, value, previousValue, i18n) => {
   const previousLangButton = document.querySelector(`[data-lng="${previousValue}"]`);
