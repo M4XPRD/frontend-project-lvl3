@@ -74,14 +74,12 @@ export default async () => {
         url: '',
       },
       uiState: {
-        viewedLinks: new Set(),
+        viewedLinks: [],
         clickedPostLink: '',
       },
       rssFeedLinks: [],
       parsedFeeds: [],
       parsedPosts: [],
-      currentFeeds: [],
-      currentPosts: [],
       idCounter: 1,
       idModal: '',
       errors: '',
@@ -135,10 +133,10 @@ export default async () => {
       watchedState.idModal = Number(id);
       switch (target.tagName) {
         case 'A':
-          watchedState.uiState.viewedLinks.add(target.href);
+          watchedState.uiState.viewedLinks.push(target.href);
           break;
         case 'BUTTON':
-          watchedState.uiState.viewedLinks.add(target.previousSibling.href);
+          watchedState.uiState.viewedLinks.push(target.previousSibling.href);
           watchedState.uiState.clickedPostLink = target.previousSibling.href;
           break;
         default:
