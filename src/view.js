@@ -195,8 +195,10 @@ const renderLanguage = (elements, value, previousValue, i18n) => {
   const previousLangButton = document.querySelector(`[data-lng="${previousValue}"]`);
   const activeLangButton = document.querySelector(`[data-lng="${value}"]`);
   const feedbackMessage = document.querySelector('[data-link-message]');
+
   previousLangButton.classList.replace('btn-primary', 'btn-outline-primary');
   activeLangButton.classList.replace('btn-outline-primary', 'btn-primary');
+
   const feedbackMessageDataset = feedbackMessage.dataset.linkMessage;
   elements.interface.title.textContent = i18n.t('interface.title');
   elements.interface.subtitle.textContent = i18n.t('interface.subtitle');
@@ -208,18 +210,16 @@ const renderLanguage = (elements, value, previousValue, i18n) => {
 
   const feeds = document.querySelector('.feeds > .card > .card-body > .card-title');
   const posts = document.querySelector('.posts > .card > .card-body > .card-title');
-  if (feeds && posts) {
-    feeds.textContent = i18n.t('interface.feeds');
-    posts.textContent = i18n.t('interface.posts');
-    const modalButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
-    modalButtons.forEach((button) => {
-      button.textContent = i18n.t('interface.view');
-    });
-    const modalFullArticle = document.querySelector('[data-full-article]');
-    const modalCloseButton = document.querySelector('[data-close-button]');
-    modalFullArticle.textContent = i18n.t('interface.modalWindow.fullArticle');
-    modalCloseButton.textContent = i18n.t('interface.modalWindow.closeModal');
-  }
+  feeds.textContent = i18n.t('interface.feeds');
+  posts.textContent = i18n.t('interface.posts');
+  const modalButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
+  modalButtons.forEach((button) => {
+    button.textContent = i18n.t('interface.view');
+  });
+  const modalFullArticle = document.querySelector('[data-full-article]');
+  const modalCloseButton = document.querySelector('[data-close-button]');
+  modalFullArticle.textContent = i18n.t('interface.modalWindow.fullArticle');
+  modalCloseButton.textContent = i18n.t('interface.modalWindow.closeModal');
 };
 
 export {
