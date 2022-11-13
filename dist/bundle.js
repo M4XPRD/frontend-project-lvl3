@@ -39371,14 +39371,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 url: ''
               },
               uiState: {
-                viewedLinks: new Set(),
+                viewedLinks: [],
                 clickedPostLink: ''
               },
               rssFeedLinks: [],
               parsedFeeds: [],
               parsedPosts: [],
-              currentFeeds: [],
-              currentPosts: [],
               idCounter: 1,
               idModal: '',
               errors: ''
@@ -39429,10 +39427,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               watchedState.idModal = Number(id);
               switch (target.tagName) {
                 case 'A':
-                  watchedState.uiState.viewedLinks.add(target.href);
+                  watchedState.uiState.viewedLinks.push(target.href);
                   break;
                 case 'BUTTON':
-                  watchedState.uiState.viewedLinks.add(target.previousSibling.href);
+                  watchedState.uiState.viewedLinks.push(target.previousSibling.href);
                   watchedState.uiState.clickedPostLink = target.previousSibling.href;
                   break;
                 default:
@@ -39617,19 +39615,30 @@ var parseRSS = function parseRSS(data) {
     isParseError: isParseError
   };
 };
+var checkIfPostInFeed = function checkIfPostInFeed(watchedState, newPost) {
+  var filter = watchedState.parsedPosts.filter(function (post) {
+    return post.postTitle === newPost.postTitle;
+  });
+  return filter.length > 0;
+};
 var loadFeed = function loadFeed(url, watchedState) {
   parseURL(url).then(function (responce) {
     var _watchedState$parsedP;
     var parserErrorCheck = parseRSS(responce).isParseError;
     var feeds = parseRSS(responce).loadedFeeds;
     var posts = parseRSS(responce).loadedPosts;
+    var filteredPosts = [];
     posts.forEach(function (post) {
       post.postID = watchedState.idCounter;
       watchedState.idCounter += 1;
+      var checkPost = checkIfPostInFeed(watchedState, post);
+      if (!checkPost) {
+        filteredPosts.push(post);
+      }
     });
     watchedState.processState = parserErrorCheck;
-    watchedState.parsedFeeds.push(feeds);
-    (_watchedState$parsedP = watchedState.parsedPosts).push.apply(_watchedState$parsedP, _toConsumableArray(posts));
+    watchedState.parsedFeeds.unshift(feeds);
+    (_watchedState$parsedP = watchedState.parsedPosts).unshift.apply(_watchedState$parsedP, filteredPosts);
   });
 };
 
@@ -39713,34 +39722,12 @@ var renderInput = function renderInput(elements, state, i18n) {
       break;
   }
 };
-var relocatePosts = function relocatePosts(state, keyword) {
-  state["current".concat(keyword)] = [].concat(_toConsumableArray(state["current".concat(keyword)]), _toConsumableArray(state["parsed".concat(keyword)]));
-  state["parsed".concat(keyword)] = Object.assign([]);
-};
-
-/*
-const relocatePosts = (state, keyword) => {
-  switch (keyword) {
-    case 'feeds':
-      state.currentFeeds = [...state.currentFeeds, ...state.parsedFeeds];
-      state.parsedFeeds = Object.assign([]);
-      break;
-    case 'posts':
-      state.currentPosts = [...state.currentPosts, ...state.parsedPosts];
-      state.parsedPosts = Object.assign([]);
-      break;
-    default:
-      break;
-  }
-};
-*/
-
 var renderFeedsContainer = function renderFeedsContainer(elements, i18n) {
-  var _document$querySelect, _document$querySelect2, _document$querySelect3, _document$querySelect4;
-  var feedsCard = (_document$querySelect = document.querySelector('.feeds > .card')) !== null && _document$querySelect !== void 0 ? _document$querySelect : document.createElement('div');
-  var feedsCardBody = (_document$querySelect2 = document.querySelector('.feeds > .card > .card-body')) !== null && _document$querySelect2 !== void 0 ? _document$querySelect2 : document.createElement('div');
-  var feedsCardTitle = (_document$querySelect3 = document.querySelector('.feeds > .card > .card-body > .card-title')) !== null && _document$querySelect3 !== void 0 ? _document$querySelect3 : document.createElement('h2');
-  var feedsListGroup = (_document$querySelect4 = document.querySelector('.feeds > .card > ul')) !== null && _document$querySelect4 !== void 0 ? _document$querySelect4 : document.createElement('ul');
+  elements.feeds.textContent = '';
+  var feedsCard = document.createElement('div');
+  var feedsCardBody = document.createElement('div');
+  var feedsCardTitle = document.createElement('h2');
+  var feedsListGroup = document.createElement('ul');
   feedsCard.classList.add('card', 'border-0');
   feedsCardBody.classList.add('card-body');
   feedsCardTitle.classList.add('card-title', 'h4');
@@ -39764,7 +39751,7 @@ var renderFeedsList = function renderFeedsList(feed) {
   feedsListGroupItemTitle.textContent = feedsTitle.textContent;
   feedsListGroupItemDescription.textContent = feedsDescription.textContent;
   feedsListGroupItem.append(feedsListGroupItemTitle, feedsListGroupItemDescription);
-  feedsListGroup.prepend(feedsListGroupItem);
+  feedsListGroup.append(feedsListGroupItem);
 };
 var renderFeed = function renderFeed(elements, state, i18n) {
   if (state.processState === 'success') {
@@ -39773,13 +39760,12 @@ var renderFeed = function renderFeed(elements, state, i18n) {
       renderFeedsList(feed);
     });
   }
-  relocatePosts(state, 'Feeds');
 };
 var renderPostsContainer = function renderPostsContainer(elements, i18n) {
-  var _document$querySelect5, _document$querySelect6, _document$querySelect7;
-  var postsCard = (_document$querySelect5 = document.querySelector('.posts > .card')) !== null && _document$querySelect5 !== void 0 ? _document$querySelect5 : document.createElement('div');
-  var postsCardBody = (_document$querySelect6 = document.querySelector('.posts > .card > .card-body')) !== null && _document$querySelect6 !== void 0 ? _document$querySelect6 : document.createElement('div');
-  var postsCardTitle = (_document$querySelect7 = document.querySelector('.posts > .card > .card-body > .card-title')) !== null && _document$querySelect7 !== void 0 ? _document$querySelect7 : document.createElement('h2');
+  elements.posts.textContent = '';
+  var postsCard = document.createElement('div');
+  var postsCardBody = document.createElement('div');
+  var postsCardTitle = document.createElement('h2');
   var postsListGroup = document.createElement('ul');
   postsCard.classList.add('card', 'border-0');
   postsCardBody.classList.add('card-body');
@@ -39798,8 +39784,7 @@ var renderPostsList = function renderPostsList(state, post, i18n) {
   var a = document.createElement('a');
   var modalButton = document.createElement('button');
   var postsListGroup = document.querySelector('.posts > .card > ul');
-  console.log(state.uiState.viewedLinks.has(postLink));
-  if (state.uiState.viewedLinks.has(postLink)) {
+  if (state.uiState.viewedLinks.includes(postLink)) {
     a.classList.add('fw-normal', 'link-secondary');
   } else {
     a.classList.add('fw-bold');
@@ -39827,17 +39812,15 @@ var renderPosts = function renderPosts(elements, state, watchedState, i18n) {
       renderPostsList(state, post, i18n);
     });
   }
-  relocatePosts(state, 'Posts');
   watchedState.postsUpdateState = true;
 };
 var updatePosts = function updatePosts(elements, state, watchedState, i18n) {
   state.rssFeedLinks.forEach(function (rssLink) {
     (0,_parser_js__WEBPACK_IMPORTED_MODULE_1__.parseURL)(rssLink).then(function (responce) {
       var parsedData = (0,_parser_js__WEBPACK_IMPORTED_MODULE_1__.parseRSS)(responce);
-      var newPosts = lodash__WEBPACK_IMPORTED_MODULE_0__.differenceBy(parsedData.loadedPosts, state.currentPosts, 'postTitle');
+      var newPosts = lodash__WEBPACK_IMPORTED_MODULE_0__.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
       if (newPosts.length > 0) {
-        var _watchedState$parsedP;
-        (_watchedState$parsedP = watchedState.parsedPosts).push.apply(_watchedState$parsedP, _toConsumableArray(newPosts));
+        watchedState.parsedPosts = [].concat(_toConsumableArray(newPosts), _toConsumableArray(state.parsedPosts));
       }
     }).then(setTimeout(function () {
       updatePosts(elements, state, watchedState, i18n);
@@ -39849,7 +39832,7 @@ var renderModals = function renderModals(elements, state) {
     modalTitle = _elements$interface$m.modalTitle,
     modalBody = _elements$interface$m.modalBody,
     modalFullArticle = _elements$interface$m.modalFullArticle;
-  var findPost = state.currentPosts.filter(function (_ref) {
+  var findPost = state.parsedPosts.filter(function (_ref) {
     var postLink = _ref.postLink;
     return postLink === state.uiState.clickedPostLink;
   });
@@ -39862,20 +39845,6 @@ var renderModals = function renderModals(elements, state) {
   modalBody.textContent = postDescription;
   modalFullArticle.href = postLink;
 };
-
-// const renderModals = (elements, state) => {
-//   const {
-//     modalTitle, modalBody, modalFullArticle,
-//   } = elements.interface.modalWindow;
-
-//   const findPost = state.currentPosts.filter(({ postID }) => postID === state.idModal);
-//   const [{ postTitle, postDescription, postLink }] = findPost;
-
-//   modalTitle.textContent = postTitle;
-//   modalBody.textContent = postDescription;
-//   modalFullArticle.href = postLink;
-// };
-
 var renderLanguage = function renderLanguage(elements, value, previousValue, i18n) {
   var previousLangButton = document.querySelector("[data-lng=\"".concat(previousValue, "\"]"));
   var activeLangButton = document.querySelector("[data-lng=\"".concat(value, "\"]"));
