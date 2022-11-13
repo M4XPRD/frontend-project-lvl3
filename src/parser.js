@@ -29,18 +29,29 @@ const parseRSS = (data) => {
   };
 };
 
+const checkIfPostInFeed = (watchedState, newPost) => {
+  const filter = watchedState.parsedPosts.filter((post) => post.postTitle === newPost.postTitle);
+  return filter.length > 0;
+};
+
 const loadFeed = (url, watchedState) => {
   parseURL(url).then((responce) => {
     const parserErrorCheck = parseRSS(responce).isParseError;
     const feeds = parseRSS(responce).loadedFeeds;
     const posts = parseRSS(responce).loadedPosts;
+
+    const filteredPosts = [];
     posts.forEach((post) => {
       post.postID = watchedState.idCounter;
       watchedState.idCounter += 1;
+      const checkPost = checkIfPostInFeed(watchedState, post);
+      if (!checkPost) {
+        filteredPosts.push(post);
+      }
     });
     watchedState.processState = parserErrorCheck;
-    watchedState.parsedFeeds.push(feeds);
-    watchedState.parsedPosts.push(...posts);
+    watchedState.parsedFeeds.unshift(feeds);
+    watchedState.parsedPosts.unshift(...filteredPosts);
   });
 };
 
