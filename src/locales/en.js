@@ -5,7 +5,6 @@ export default {
         success: 'RSS uploaded successfully',
       },
       invalid: {
-        defaultMessage: 'Invalid URL',
         nonvalidURL: 'The link must be a valid URL',
         noRSS: 'The resource does not contain valid RSS',
         duplicate: 'RSS already exists',
