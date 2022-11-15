@@ -24,4 +24,7 @@ $ make install
 
 # Step 3 — install the packages
 $ sudo npm link
+
+# Step 4 — make new bundle using production mode
+$ make production
 ```
