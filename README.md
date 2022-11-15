@@ -4,13 +4,13 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/c99e1ba900628cc47e44/maintainability)](https://codeclimate.com/github/M4XPRD/frontend-project-lvl3/maintainability)
 
 ## Description:
-[RSS Reader](frontend-project-lvl3-d2gm-eu3w80smx-m4xprd.vercel.app) is a service for aggregating RSS feeds that makes it easy to read a variety of sources, such as blogs or your favourite news. It allows you to add an unlimited number of RSS feeds, update them and add new entries to the whole stream.
+[RSS Reader](https://frontend-project-lvl3-d2gm.vercel.app/) is a service for aggregating RSS feeds that makes it easy to read a variety of sources, such as blogs or your favourite news. It allows you to add an unlimited number of RSS feeds, update them and add new entries to the whole stream.
 <br></br>
 **How to use it:**
 
 • Find a blog or news feed, which you prefer to read
 
-• Use RSS converters to make your blog/news link suitable for [RSS Reader](frontend-project-lvl3-d2gm-eu3w80smx-m4xprd.vercel.app)
+• Use RSS converters to make your blog/news link suitable for [RSS Reader](https://frontend-project-lvl3-d2gm.vercel.app/)
 
 • Make sure the link is a file with ```xml``` markup
 
