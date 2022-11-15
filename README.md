@@ -8,9 +8,15 @@
 <br></br>
 **How to use it:**
 
-• JSON (```.json``` file extension)
+• Find a blog or news feed, which you prefer to read
 
-• YML/YAML (```.yml```or ```.yaml``` file extensions)
+• Use RSS converters to make your blog/news link suitable for [RSS Reader](https://frontend-project-lvl3-f1fsx7uf2-m4xprd.vercel.app)
+
+• Make sure the link is a file with ```xml``` markup
+
+• Add this link to the feed
+
+• That's it!
 <br></br>
 ## Installation:
 
