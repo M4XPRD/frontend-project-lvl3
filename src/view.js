@@ -13,12 +13,12 @@ const handleButton = (elements, state) => {
 
 const renderFrame = (elements, state) => {
   switch (true) {
-    case !state.valid:
-      elements.input.classList.add('is-invalid');
+    case (!state.valid && state.error === 'validation.invalid.noRSS'):
+      elements.input.classList.remove('is-invalid');
       elements.feedback.classList.replace('text-success', 'text-danger');
       break;
-    case state.processState === 'parser error':
-      elements.input.classList.remove('is-invalid');
+    case (!state.valid):
+      elements.input.classList.add('is-invalid');
       elements.feedback.classList.replace('text-success', 'text-danger');
       break;
     default:
@@ -30,25 +30,13 @@ const renderFrame = (elements, state) => {
 
 const renderInput = (elements, state, i18n) => {
   switch (true) {
-    case (state.valid && state.processState === 'parser error'):
-      elements.feedback.textContent = i18n.t('validation.invalid.noRSS');
-      elements.feedback.setAttribute('data-link-message', 'validation.invalid.noRSS');
+    case (!state.valid && !_.isEmpty(state.error)):
+      elements.feedback.textContent = i18n.t(`${state.error}`);
+      elements.feedback.setAttribute('data-link-message', `${state.error}`);
       renderFrame(elements, state);
-      break;
-    case (!state.valid && !state.rssFeedLinks.includes(state.field.url)):
-      elements.feedback.textContent = i18n.t(`${state.errors}`);
-      elements.feedback.setAttribute('data-link-message', `${state.errors}`);
-      renderFrame(elements, state);
-      state.processState = 'invalid link error';
-      break;
-    case (!state.valid && state.rssFeedLinks.includes(state.field.url)):
-      elements.feedback.textContent = i18n.t('validation.invalid.duplicate');
-      elements.feedback.setAttribute('data-link-message', 'validation.invalid.duplicate');
-      renderFrame(elements, state);
-      state.processState = 'duplication error';
       break;
     default:
-      state.errors = '';
+      state.error = '';
       state.rssFeedLinks.push(state.field.url);
       elements.feedback.textContent = i18n.t('validation.valid.success');
       elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
@@ -83,8 +71,6 @@ const renderFeedsContainer = (elements, i18n) => {
 
 const renderFeedsList = (feed) => {
   const { feedsTitle, feedsDescription } = feed;
-  console.log(feedsTitle.textContent);
-  console.log(feedsDescription.textContent);
 
   const feedsListGroupItem = document.createElement('li');
   const feedsListGroupItemTitle = document.createElement('h3');
@@ -103,12 +89,24 @@ const renderFeedsList = (feed) => {
 };
 
 const renderFeed = (elements, state, i18n) => {
-  if (state.processState === 'success') {
-    renderFeedsContainer(elements, i18n);
-    _.uniq(state.parsedFeeds).forEach((feed) => {
-      renderFeedsList(feed);
-    });
-  }
+  renderFeedsContainer(elements, i18n);
+  _.uniqBy(state.parsedFeeds, 'feedsTitle').forEach((feed) => {
+    renderFeedsList(feed);
+  });
+};
+
+const updatePosts = (elements, state, watchedState, i18n) => {
+  state.rssFeedLinks.forEach((rssLink) => {
+    parseURL(rssLink)
+      .then((responce) => {
+        const parsedData = parseRSS(responce);
+        const newPosts = _.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
+        if (newPosts.length > 0) {
+          watchedState.parsedPosts = [...newPosts, ...state.parsedPosts];
+          console.log(state.parsedPosts);
+        }
+      }).then(setTimeout(() => { updatePosts(elements, state, watchedState, i18n); }, 5000));
+  });
 };
 
 const renderPostsContainer = (elements, i18n) => {
@@ -167,26 +165,11 @@ const renderPostsList = (state, post, i18n) => {
 };
 
 const renderPosts = (elements, state, watchedState, i18n) => {
-  if (state.processState === 'success') {
-    renderPostsContainer(elements, i18n);
-    _.uniq(state.parsedPosts).forEach((post) => {
-      renderPostsList(state, post, i18n);
-    });
-  }
-  watchedState.postsUpdateState = true;
-};
-
-const updatePosts = (elements, state, watchedState, i18n) => {
-  state.rssFeedLinks.forEach((rssLink) => {
-    parseURL(rssLink)
-      .then((responce) => {
-        const parsedData = parseRSS(responce);
-        const newPosts = _.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
-        if (newPosts.length > 0) {
-          watchedState.parsedPosts = [...newPosts, ...state.parsedPosts];
-        }
-      }).then(setTimeout(() => { updatePosts(elements, state, watchedState, i18n); }, 5000));
+  renderPostsContainer(elements, i18n);
+  _.uniq(state.parsedPosts).forEach((post) => {
+    renderPostsList(state, post, i18n);
   });
+  updatePosts(elements, state, watchedState, i18n);
 };
 
 const renderModals = (elements, state) => {
@@ -222,18 +205,20 @@ const renderLanguage = (elements, value, previousValue, i18n) => {
 
   const feeds = document.querySelector('.feeds > .card > .card-body > .card-title');
   const posts = document.querySelector('.posts > .card > .card-body > .card-title');
-  feeds.textContent = i18n.t('interface.feeds');
-  posts.textContent = i18n.t('interface.posts');
-  const modalButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
-  modalButtons.forEach((button) => {
-    button.textContent = i18n.t('interface.view');
-  });
-  const modalFullArticle = document.querySelector('[data-full-article]');
-  const modalCloseButton = document.querySelector('[data-close-button]');
-  modalFullArticle.textContent = i18n.t('interface.modalWindow.fullArticle');
-  modalCloseButton.textContent = i18n.t('interface.modalWindow.closeModal');
+  if (feeds || posts) {
+    feeds.textContent = i18n.t('interface.feeds');
+    posts.textContent = i18n.t('interface.posts');
+    const modalButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
+    modalButtons.forEach((button) => {
+      button.textContent = i18n.t('interface.view');
+    });
+    const modalFullArticle = document.querySelector('[data-full-article]');
+    const modalCloseButton = document.querySelector('[data-close-button]');
+    modalFullArticle.textContent = i18n.t('interface.modalWindow.fullArticle');
+    modalCloseButton.textContent = i18n.t('interface.modalWindow.closeModal');
+  }
 };
 
 export {
-  renderInput, renderLanguage, renderPosts, renderFeed, renderModals, updatePosts, handleButton,
+  renderInput, renderLanguage, renderPosts, renderFeed, renderModals, handleButton,
 };
