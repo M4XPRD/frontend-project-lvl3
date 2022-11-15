@@ -1,9 +1,10 @@
+/* eslint-disable max-len */
 import * as yup from 'yup';
 import _ from 'lodash';
 import onChange from 'on-change';
 import i18next from 'i18next';
 import {
-  renderFeed, renderPosts, renderLanguage, renderInput, updatePosts, renderModals, handleButton,
+  renderFeed, renderPosts, renderLanguage, renderInput, renderModals, handleButton,
 } from './view.js';
 import resources from './locales/index.js';
 import { parseRSS, parseURL } from './parser.js';
@@ -31,14 +32,7 @@ export default () => {
         .url()
         .notOneOf([...watchedState.rssFeedLinks])
         .required();
-      return schema.validate(url)
-        .then(() => {
-          watchedState.valid = true;
-        })
-        .catch((error) => {
-          watchedState.errors = error.errors;
-          watchedState.valid = false;
-        });
+      return schema.validate(url);
     };
 
     const elements = {
@@ -67,8 +61,9 @@ export default () => {
     const state = {
       lng: defaultLanguage,
       processState: 'ready to load',
+      loading: false,
       valid: '',
-      errors: '',
+      error: '',
       field: {
         url: '',
       },
@@ -79,14 +74,16 @@ export default () => {
       rssFeedLinks: [],
       parsedFeeds: [],
       parsedPosts: [],
-      postsUpdateState: false,
     };
 
     const watchedState = onChange(state, (path, value, previousValue) => {
       switch (path) {
         case 'processState':
-          handleButton(elements, watchedState);
+        case 'error':
           renderInput(elements, state, i18n);
+          break;
+        case 'loading':
+          handleButton(elements, watchedState);
           break;
         case 'parsedFeeds':
           renderFeed(elements, state, i18n);
@@ -94,9 +91,6 @@ export default () => {
         case 'parsedPosts':
         case 'uiState.viewedLinks':
           renderPosts(elements, state, watchedState, i18n);
-          break;
-        case 'postsUpdateState':
-          updatePosts(elements, state, watchedState, i18n);
           break;
         case 'uiState.clickedPostLink':
           renderModals(elements, state);
@@ -115,7 +109,7 @@ export default () => {
       const data = new FormData(e.target);
       const currentUrl = data.get('url').trim();
       watchedState.field.url = currentUrl;
-      watchedState.processState = 'loading';
+      watchedState.loading = true;
       validateURL(currentUrl, watchedState)
         .then(() => {
           parseURL(watchedState.field.url).then((responce) => {
@@ -123,13 +117,40 @@ export default () => {
             const feeds = parseRSS(responce).loadedFeeds;
             const posts = parseRSS(responce).loadedPosts;
 
-            posts.forEach((post) => {
-              post.postID = _.uniqueId();
-            });
-            watchedState.processState = parserErrorCheck;
-            watchedState.parsedFeeds.unshift(feeds);
-            watchedState.parsedPosts.unshift(...posts);
-          });
+            if (parserErrorCheck) {
+              watchedState.error = 'validation.invalid.noRSS'; // создание искуственной ошибки не помогло
+              watchedState.valid = false; // каждый раз throw new Error (разными методами) не переходит в последний catch
+              watchedState.loading = false; // поэтому решил оставить такой метод
+            } else {
+              posts.forEach((post) => {
+                post.postID = _.uniqueId();
+              });
+              watchedState.valid = true;
+              watchedState.processState = 'success';
+              watchedState.parsedFeeds.unshift(feeds);
+              watchedState.parsedPosts.unshift(...posts);
+              watchedState.loading = false;
+            }
+          }); // здесь раньше был catch, который передаёт ошибку в следующий catch
+        }).catch((error) => {
+          watchedState.valid = false;
+          watchedState.loading = false;
+          switch (error.message) {
+            // case 'parser error':  <---- вот сюда
+            //   watchedState.error = 'validation.invalid.noRSS'; <---- ошибка полностью игнорируется
+            //   break;
+            case 'validation.invalid.nonvalidURL':
+              watchedState.error = 'validation.invalid.nonvalidURL';
+              break;
+            case 'validation.invalid.duplicate':
+              watchedState.error = 'validation.invalid.duplicate';
+              break;
+            case 'network error':
+              watchedState.error = 'validation.invalid.networkError';
+              break;
+            default:
+              break;
+          }
         });
     });
 
