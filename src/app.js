@@ -61,7 +61,6 @@ export default () => {
     const state = {
       lng: defaultLanguage,
       processState: 'ready to load',
-      loading: false,
       valid: '',
       error: '',
       field: {
@@ -80,10 +79,8 @@ export default () => {
       switch (path) {
         case 'processState':
         case 'error':
-          renderInput(elements, state, i18n);
-          break;
-        case 'loading':
           handleButton(elements, watchedState);
+          renderInput(elements, state, i18n);
           break;
         case 'parsedFeeds':
           renderFeed(elements, state, i18n);
@@ -110,7 +107,7 @@ export default () => {
       const data = new FormData(e.target);
       const currentUrl = data.get('url').trim();
       watchedState.field.url = currentUrl;
-      watchedState.loading = true;
+      watchedState.processState = 'loading';
       validateURL(currentUrl, watchedState)
         .then(() => {
           parseURL(watchedState.field.url).then((responce) => {
@@ -121,7 +118,7 @@ export default () => {
             if (parserErrorCheck) {
               watchedState.error = 'validation.invalid.noRSS'; // создание искуственной ошибки не помогло
               watchedState.valid = false; // каждый раз throw new Error (разными методами) не переходит в последний catch
-              watchedState.loading = false; // поэтому решил оставить такую проверку
+              watchedState.processState = 'failed loading'; // поэтому решил оставить такую проверку
             } else {
               posts.forEach((post) => {
                 post.postID = _.uniqueId();
@@ -131,12 +128,11 @@ export default () => {
               watchedState.rssFeedLinks.push(watchedState.field.url);
               watchedState.parsedFeeds.unshift(feeds);
               watchedState.parsedPosts.unshift(...posts);
-              watchedState.loading = false;
             }
           }); // здесь раньше был ещё один catch, который передаёт ошибку в последний catch
         }).catch((error) => {
           watchedState.valid = false;
-          watchedState.loading = false;
+          watchedState.processState = 'failed loading';
           switch (error.message) {
             // case 'parser error':  <---- вот сюда
             //   watchedState.error = 'validation.invalid.noRSS'; <---- ошибка полностью игнорируется

@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { parseURL, parseRSS } from './parser.js';
 
 const handleButton = (elements, state) => {
-  if (state.loading) {
+  if (state.processState === 'loading') {
     elements.input.disabled = true;
     elements.button.disabled = true;
   } else {
@@ -40,7 +40,6 @@ const renderInput = (elements, state, i18n) => {
       elements.feedback.textContent = i18n.t('validation.valid.success');
       elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
       renderFrame(elements, state);
-      state.processState = 'success';
       elements.form.reset();
       elements.input.focus();
       break;
