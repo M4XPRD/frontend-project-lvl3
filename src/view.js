@@ -1,6 +1,16 @@
 import _ from 'lodash';
 import { parseURL, parseRSS } from './parser.js';
 
+const handleButton = (elements, state) => {
+  if (state.processState === 'loading') {
+    elements.input.disable = true;
+    elements.button.disable = true;
+  } else {
+    elements.input.disable = false;
+    elements.button.disable = false;
+  }
+};
+
 const renderFrame = (elements, state) => {
   switch (true) {
     case !state.valid:
@@ -157,7 +167,6 @@ const renderPostsList = (state, post, i18n) => {
 };
 
 const renderPosts = (elements, state, watchedState, i18n) => {
-  console.log(state.parsedPosts.length);
   if (state.processState === 'success') {
     renderPostsContainer(elements, i18n);
     _.uniq(state.parsedPosts).forEach((post) => {
@@ -206,7 +215,7 @@ const renderLanguage = (elements, value, previousValue, i18n) => {
   elements.title.textContent = i18n.t('interface.title');
   elements.subtitle.textContent = i18n.t('interface.subtitle');
   elements.inputPlaceholder.textContent = i18n.t('interface.placeholder');
-  elements.buttonText.textContent = i18n.t('interface.button');
+  elements.button.textContent = i18n.t('interface.button');
   elements.example.textContent = i18n.t('interface.example');
   elements.hexlet.textContent = i18n.t('interface.hexlet');
   elements.feedback.textContent = i18n.t(feedbackMessageDataset);
@@ -226,5 +235,5 @@ const renderLanguage = (elements, value, previousValue, i18n) => {
 };
 
 export {
-  renderInput, renderLanguage, renderPosts, renderFeed, renderModals, updatePosts,
+  renderInput, renderLanguage, renderPosts, renderFeed, renderModals, updatePosts, handleButton,
 };
