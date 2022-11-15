@@ -10,7 +10,7 @@
 
 • Find a blog or news feed, which you prefer to read
 
-• Use link-to-RSS converters to make your blog/news link suitable for [RSS Reader](https://frontend-project-lvl3-m4xprd.vercel.app/)
+• Use "link-to-RSS" converters to make your blog/news link suitable for [RSS Reader](https://frontend-project-lvl3-m4xprd.vercel.app/)
 
 • Make sure the link is a file with ```xml``` markup
 
