@@ -39315,7 +39315,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           }).then(function () {
             yup__WEBPACK_IMPORTED_MODULE_0__.setLocale({
               mixed: {
-                "default": 'validation.invalid.defaultMessage'
+                notOneOf: 'validation.invalid.duplicate'
               },
               string: {
                 url: 'validation.invalid.nonvalidURL'
@@ -39357,7 +39357,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               title: document.querySelector('h1'),
               subtitle: document.querySelector('.lead'),
               inputPlaceholder: document.querySelector('[data-label]'),
-              buttonText: document.querySelector('[data-button]'),
+              button: document.querySelector('[data-button]'),
               example: document.querySelector('[data-example]'),
               hexlet: document.querySelector('[data-hexlet'),
               modalWindow: {
@@ -39371,8 +39371,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             var state = {
               lng: defaultLanguage,
               processState: 'ready to load',
-              postsUpdateState: false,
               valid: '',
+              errors: '',
               field: {
                 url: ''
               },
@@ -39383,11 +39383,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               rssFeedLinks: [],
               parsedFeeds: [],
               parsedPosts: [],
-              errors: ''
+              postsUpdateState: false
             };
             var watchedState = (0,on_change__WEBPACK_IMPORTED_MODULE_2__["default"])(state, function (path, value, previousValue) {
               switch (path) {
                 case 'processState':
+                  (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.handleButton)(elements, watchedState);
                   (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderInput)(elements, state, i18n);
                   break;
                 case 'parsedFeeds':
@@ -39417,6 +39418,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               var currentUrl = data.get('url').trim();
               watchedState.field.url = currentUrl;
               validateURL(currentUrl, watchedState).then(function () {
+                watchedState.processState = 'loading';
                 (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseURL)(watchedState.field.url).then(function (responce) {
                   var _watchedState$parsedP;
                   var parserErrorCheck = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseRSS)(responce).isParseError;
@@ -39489,7 +39491,7 @@ __webpack_require__.r(__webpack_exports__);
       title: 'RSS Aggregator',
       subtitle: "Start reading RSS today! It's easy, it's pretty.",
       placeholder: 'RSS link',
-      example: 'Example: https://ru.hexlet.io/lessons.rss',
+      example: 'Example: https://ru.hexlet.io/lessons.rss, http://lorem-rss.herokuapp.com/feed?unit=second&interval=5',
       button: 'Add',
       hexlet: 'created by ',
       feeds: 'Feeds',
@@ -39555,7 +39557,7 @@ __webpack_require__.r(__webpack_exports__);
       title: 'RSS-агрегатор',
       subtitle: 'Начните читать RSS сегодня! Это легко, это красиво.',
       placeholder: 'Ссылка RSS',
-      example: 'Пример: https://ru.hexlet.io/lessons.rss',
+      example: 'Пример: https://ru.hexlet.io/lessons.rss, http://lorem-rss.herokuapp.com/feed?unit=second&interval=5',
       button: 'Добавить',
       hexlet: 'создано в ',
       feeds: 'Фиды',
@@ -39638,6 +39640,7 @@ var parseRSS = function parseRSS(data) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "handleButton": () => (/* binding */ handleButton),
 /* harmony export */   "renderFeed": () => (/* binding */ renderFeed),
 /* harmony export */   "renderInput": () => (/* binding */ renderInput),
 /* harmony export */   "renderLanguage": () => (/* binding */ renderLanguage),
@@ -39659,6 +39662,15 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToAr
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 
+var handleButton = function handleButton(elements, state) {
+  if (state.processState === 'loading') {
+    elements.input.disable = true;
+    elements.button.disable = true;
+  } else {
+    elements.input.disable = false;
+    elements.button.disable = false;
+  }
+};
 var renderFrame = function renderFrame(elements, state) {
   switch (true) {
     case !state.valid:
@@ -39792,7 +39804,6 @@ var renderPostsList = function renderPostsList(state, post, i18n) {
   postsListGroup.append(li);
 };
 var renderPosts = function renderPosts(elements, state, watchedState, i18n) {
-  console.log(state.parsedPosts.length);
   if (state.processState === 'success') {
     renderPostsContainer(elements, i18n);
     lodash__WEBPACK_IMPORTED_MODULE_0__.uniq(state.parsedPosts).forEach(function (post) {
@@ -39842,7 +39853,7 @@ var renderLanguage = function renderLanguage(elements, value, previousValue, i18
   elements.title.textContent = i18n.t('interface.title');
   elements.subtitle.textContent = i18n.t('interface.subtitle');
   elements.inputPlaceholder.textContent = i18n.t('interface.placeholder');
-  elements.buttonText.textContent = i18n.t('interface.button');
+  elements.button.textContent = i18n.t('interface.button');
   elements.example.textContent = i18n.t('interface.example');
   elements.hexlet.textContent = i18n.t('interface.hexlet');
   elements.feedback.textContent = i18n.t(feedbackMessageDataset);
