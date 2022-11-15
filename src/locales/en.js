@@ -12,7 +12,7 @@ export default {
       },
     },
     interface: {
-      title: 'RSS Aggregator',
+      title: 'RSS Reader',
       subtitle: "Start reading RSS today! It's easy, it's pretty.",
       placeholder: 'RSS link',
       example: 'Example: https://ru.hexlet.io/lessons.rss, http://lorem-rss.herokuapp.com/feed?unit=second&interval=5',
