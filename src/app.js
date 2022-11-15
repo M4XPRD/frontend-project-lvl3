@@ -8,12 +8,7 @@ import {
 import resources from './locales/index.js';
 import { parseRSS, parseURL } from './parser.js';
 
-// const checkIfPostInFeed = (watchedState, newPost) => {
-//   const filter = watchedState.parsedPosts.filter((post) => post.postTitle === newPost.postTitle);
-//   return filter.length > 0;
-// };
-
-export default async () => {
+export default () => {
   const defaultLanguage = 'ru';
   const i18n = i18next.createInstance();
   i18n.init({
@@ -120,9 +115,9 @@ export default async () => {
       const data = new FormData(e.target);
       const currentUrl = data.get('url').trim();
       watchedState.field.url = currentUrl;
+      watchedState.processState = 'loading';
       validateURL(currentUrl, watchedState)
         .then(() => {
-          watchedState.processState = 'loading';
           parseURL(watchedState.field.url).then((responce) => {
             const parserErrorCheck = parseRSS(responce).isParseError;
             const feeds = parseRSS(responce).loadedFeeds;
