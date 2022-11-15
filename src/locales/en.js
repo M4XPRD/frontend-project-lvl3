@@ -15,7 +15,7 @@ export default {
       title: 'RSS Aggregator',
       subtitle: "Start reading RSS today! It's easy, it's pretty.",
       placeholder: 'RSS link',
-      example: 'Example: https://ru.hexlet.io/lessons.rss',
+      example: 'Example: https://ru.hexlet.io/lessons.rss, http://lorem-rss.herokuapp.com/feed?unit=second&interval=5',
       button: 'Add',
       hexlet: 'created by ',
       feeds: 'Feeds',
