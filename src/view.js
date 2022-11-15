@@ -73,6 +73,8 @@ const renderFeedsContainer = (elements, i18n) => {
 
 const renderFeedsList = (feed) => {
   const { feedsTitle, feedsDescription } = feed;
+  console.log(feedsTitle.textContent);
+  console.log(feedsDescription.textContent);
 
   const feedsListGroupItem = document.createElement('li');
   const feedsListGroupItemTitle = document.createElement('h3');
@@ -93,7 +95,7 @@ const renderFeedsList = (feed) => {
 const renderFeed = (elements, state, i18n) => {
   if (state.processState === 'success') {
     renderFeedsContainer(elements, i18n);
-    state.parsedFeeds.forEach((feed) => {
+    _.uniq(state.parsedFeeds).forEach((feed) => {
       renderFeedsList(feed);
     });
   }
@@ -155,9 +157,10 @@ const renderPostsList = (state, post, i18n) => {
 };
 
 const renderPosts = (elements, state, watchedState, i18n) => {
+  console.log(state.parsedPosts.length);
   if (state.processState === 'success') {
     renderPostsContainer(elements, i18n);
-    state.parsedPosts.forEach((post) => {
+    _.uniq(state.parsedPosts).forEach((post) => {
       renderPostsList(state, post, i18n);
     });
   }
@@ -180,7 +183,7 @@ const updatePosts = (elements, state, watchedState, i18n) => {
 const renderModals = (elements, state) => {
   const {
     modalTitle, modalBody, modalFullArticle,
-  } = elements.interface.modalWindow;
+  } = elements.modalWindow;
 
   const findPost = state.parsedPosts
     .filter(({ postLink }) => postLink === state.uiState.clickedPostLink);
@@ -200,12 +203,12 @@ const renderLanguage = (elements, value, previousValue, i18n) => {
   activeLangButton.classList.replace('btn-outline-primary', 'btn-primary');
 
   const feedbackMessageDataset = feedbackMessage.dataset.linkMessage;
-  elements.interface.title.textContent = i18n.t('interface.title');
-  elements.interface.subtitle.textContent = i18n.t('interface.subtitle');
-  elements.interface.inputPlaceholder.textContent = i18n.t('interface.placeholder');
-  elements.interface.buttonText.textContent = i18n.t('interface.button');
-  elements.interface.example.textContent = i18n.t('interface.example');
-  elements.interface.hexlet.textContent = i18n.t('interface.hexlet');
+  elements.title.textContent = i18n.t('interface.title');
+  elements.subtitle.textContent = i18n.t('interface.subtitle');
+  elements.inputPlaceholder.textContent = i18n.t('interface.placeholder');
+  elements.buttonText.textContent = i18n.t('interface.button');
+  elements.example.textContent = i18n.t('interface.example');
+  elements.hexlet.textContent = i18n.t('interface.hexlet');
   elements.feedback.textContent = i18n.t(feedbackMessageDataset);
 
   const feeds = document.querySelector('.feeds > .card > .card-body > .card-title');
