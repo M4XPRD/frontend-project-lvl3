@@ -16,6 +16,8 @@
 
 • Add this link to the feed
 
+• If you need to change the language, press the buttons in the upper-right corner
+
 • That's it!
 <br></br>
 ## Installation:
