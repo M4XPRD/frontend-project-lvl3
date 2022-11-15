@@ -4,7 +4,7 @@ import _ from 'lodash';
 import onChange from 'on-change';
 import i18next from 'i18next';
 import {
-  renderFeed, renderPosts, renderLanguage, renderInput, renderModals, handleButton,
+  renderFeed, renderPosts, renderLanguage, renderInput, renderModals, handleButton, updatePosts,
 } from './view.js';
 import resources from './locales/index.js';
 import { parseRSS, parseURL } from './parser.js';
@@ -91,6 +91,7 @@ export default () => {
         case 'parsedPosts':
         case 'uiState.viewedLinks':
           renderPosts(elements, state, watchedState, i18n);
+          updatePosts(elements, state, watchedState, i18n);
           break;
         case 'uiState.clickedPostLink':
           renderModals(elements, state);
@@ -127,6 +128,7 @@ export default () => {
               });
               watchedState.valid = true;
               watchedState.processState = 'success';
+              watchedState.rssFeedLinks.push(watchedState.field.url);
               watchedState.parsedFeeds.unshift(feeds);
               watchedState.parsedPosts.unshift(...posts);
               watchedState.loading = false;
