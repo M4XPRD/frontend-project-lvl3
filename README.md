@@ -4,31 +4,20 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/c99e1ba900628cc47e44/maintainability)](https://codeclimate.com/github/M4XPRD/frontend-project-lvl3/maintainability)
 
 ## Description:
-This is the utility, which shows the difference between two files. The output can be shown with different formats.
-
-[RSS-Aggregator (demo)](https://frontend-project-lvl3-f1fsx7uf2-m4xprd.vercel.app)
-
+[RSS Reader](https://frontend-project-lvl3-f1fsx7uf2-m4xprd.vercel.app) is a service for aggregating RSS feeds that makes it easy to read a variety of sources, such as blogs or your favourite news. It allows you to add an unlimited number of RSS feeds, update them and add new entries to the whole stream.
 <br></br>
-**List of supported extensions:**
+**How to use it:**
 
 • JSON (```.json``` file extension)
 
 • YML/YAML (```.yml```or ```.yaml``` file extensions)
 <br></br>
-**List of output formats:**
-
-• ```stylish``` is standart format, which will show the difference between files with ```+``` and ```-``` signs.
-
-• ```plain``` is human-readable variant, where you can see the string-like output of each line, that has any changes. 
-
-• ```json``` is variant, which is similar to *stylish*. But instead of ```+``` and ```-``` you will see AST-tree-like system with statuses of *keys* and their *types*.
-
 ## Installation:
 
 ```sh
 
 # Step 1 — clone this repository
-$ git clone https://github.com/M4XPRD/frontend-project-lvl2
+$ git clone https://github.com/M4XPRD/frontend-project-lvl3
 
 # Step 2 — install the dependencies
 $ make install
