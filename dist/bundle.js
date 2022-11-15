@@ -39287,6 +39287,7 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToAr
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+/* eslint-disable max-len */
 
 
 
@@ -39318,12 +39319,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 schema = yup__WEBPACK_IMPORTED_MODULE_0__.string().url().notOneOf(_toConsumableArray(watchedState.rssFeedLinks)).required();
-                return _context.abrupt("return", schema.validate(url).then(function () {
-                  watchedState.valid = true;
-                })["catch"](function (error) {
-                  watchedState.errors = error.errors;
-                  watchedState.valid = false;
-                }));
+                return _context.abrupt("return", schema.validate(url));
               case 2:
               case "end":
                 return _context.stop();
@@ -39360,8 +39356,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var state = {
       lng: defaultLanguage,
       processState: 'ready to load',
+      loading: false,
       valid: '',
-      errors: '',
+      error: '',
       field: {
         url: ''
       },
@@ -39371,14 +39368,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       },
       rssFeedLinks: [],
       parsedFeeds: [],
-      parsedPosts: [],
-      postsUpdateState: false
+      parsedPosts: []
     };
     var watchedState = (0,on_change__WEBPACK_IMPORTED_MODULE_2__["default"])(state, function (path, value, previousValue) {
       switch (path) {
         case 'processState':
-          (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.handleButton)(elements, watchedState);
+        case 'error':
           (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderInput)(elements, state, i18n);
+          break;
+        case 'loading':
+          (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.handleButton)(elements, watchedState);
           break;
         case 'parsedFeeds':
           (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderFeed)(elements, state, i18n);
@@ -39386,9 +39385,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         case 'parsedPosts':
         case 'uiState.viewedLinks':
           (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderPosts)(elements, state, watchedState, i18n);
-          break;
-        case 'postsUpdateState':
-          (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.updatePosts)(elements, state, watchedState, i18n);
           break;
         case 'uiState.clickedPostLink':
           (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderModals)(elements, state);
@@ -39406,20 +39402,47 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var data = new FormData(e.target);
       var currentUrl = data.get('url').trim();
       watchedState.field.url = currentUrl;
-      watchedState.processState = 'loading';
+      watchedState.loading = true;
       validateURL(currentUrl, watchedState).then(function () {
         (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseURL)(watchedState.field.url).then(function (responce) {
-          var _watchedState$parsedP;
           var parserErrorCheck = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseRSS)(responce).isParseError;
           var feeds = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseRSS)(responce).loadedFeeds;
           var posts = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseRSS)(responce).loadedPosts;
-          posts.forEach(function (post) {
-            post.postID = lodash__WEBPACK_IMPORTED_MODULE_1__.uniqueId();
-          });
-          watchedState.processState = parserErrorCheck;
-          watchedState.parsedFeeds.unshift(feeds);
-          (_watchedState$parsedP = watchedState.parsedPosts).unshift.apply(_watchedState$parsedP, _toConsumableArray(posts));
-        });
+          if (parserErrorCheck) {
+            watchedState.error = 'validation.invalid.noRSS'; // создание искуственной ошибки не помогло
+            watchedState.valid = false; // каждый раз throw new Error (разными методами) не переходит в последний catch
+            watchedState.loading = false; // поэтому решил оставить такой метод
+          } else {
+            var _watchedState$parsedP;
+            posts.forEach(function (post) {
+              post.postID = lodash__WEBPACK_IMPORTED_MODULE_1__.uniqueId();
+            });
+            watchedState.valid = true;
+            watchedState.processState = 'success';
+            watchedState.parsedFeeds.unshift(feeds);
+            (_watchedState$parsedP = watchedState.parsedPosts).unshift.apply(_watchedState$parsedP, _toConsumableArray(posts));
+            watchedState.loading = false;
+          }
+        }); // здесь раньше был catch, который передаёт ошибку в следующий catch
+      })["catch"](function (error) {
+        watchedState.valid = false;
+        watchedState.loading = false;
+        switch (error.message) {
+          // case 'parser error':  <---- вот сюда
+          //   watchedState.error = 'validation.invalid.noRSS'; <---- ошибка полностью игнорируется
+          //   break;
+          case 'validation.invalid.nonvalidURL':
+            watchedState.error = 'validation.invalid.nonvalidURL';
+            break;
+          case 'validation.invalid.duplicate':
+            watchedState.error = 'validation.invalid.duplicate';
+            break;
+          case 'network error':
+            watchedState.error = 'validation.invalid.networkError';
+            break;
+          default:
+            break;
+        }
       });
     });
     elements.languageButtons.forEach(function (languageButton) {
@@ -39579,14 +39602,14 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 var parseURL = function parseURL(url) {
   return axios__WEBPACK_IMPORTED_MODULE_0__["default"].get("https://allorigins.hexlet.app/get?disableCache=true&url=".concat(encodeURIComponent(url))).then(function (responce) {
     return responce.data.contents;
-  })["catch"](function (err) {
-    throw new Error(err);
+  })["catch"](function (error) {
+    error.message = 'network error';
   });
 };
 var parseRSS = function parseRSS(data) {
   var parser = new DOMParser();
   var doc = parser.parseFromString(data, 'application/xml');
-  var isParseError = doc.querySelector('parsererror') ? 'parser error' : 'continue render';
+  var isParseError = doc.querySelector('parsererror');
   var feedsTitle = doc.querySelector('title');
   var feedsDescription = doc.querySelector('description');
   var loadedFeeds = {
@@ -39628,8 +39651,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "renderInput": () => (/* binding */ renderInput),
 /* harmony export */   "renderLanguage": () => (/* binding */ renderLanguage),
 /* harmony export */   "renderModals": () => (/* binding */ renderModals),
-/* harmony export */   "renderPosts": () => (/* binding */ renderPosts),
-/* harmony export */   "updatePosts": () => (/* binding */ updatePosts)
+/* harmony export */   "renderPosts": () => (/* binding */ renderPosts)
 /* harmony export */ });
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 /* harmony import */ var _parser_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./parser.js */ "./src/parser.js");
@@ -39656,12 +39678,12 @@ var handleButton = function handleButton(elements, state) {
 };
 var renderFrame = function renderFrame(elements, state) {
   switch (true) {
-    case !state.valid:
-      elements.input.classList.add('is-invalid');
+    case !state.valid && state.error === 'validation.invalid.noRSS':
+      elements.input.classList.remove('is-invalid');
       elements.feedback.classList.replace('text-success', 'text-danger');
       break;
-    case state.processState === 'parser error':
-      elements.input.classList.remove('is-invalid');
+    case !state.valid:
+      elements.input.classList.add('is-invalid');
       elements.feedback.classList.replace('text-success', 'text-danger');
       break;
     default:
@@ -39672,25 +39694,13 @@ var renderFrame = function renderFrame(elements, state) {
 };
 var renderInput = function renderInput(elements, state, i18n) {
   switch (true) {
-    case state.valid && state.processState === 'parser error':
-      elements.feedback.textContent = i18n.t('validation.invalid.noRSS');
-      elements.feedback.setAttribute('data-link-message', 'validation.invalid.noRSS');
+    case !state.valid && !lodash__WEBPACK_IMPORTED_MODULE_0__.isEmpty(state.error):
+      elements.feedback.textContent = i18n.t("".concat(state.error));
+      elements.feedback.setAttribute('data-link-message', "".concat(state.error));
       renderFrame(elements, state);
-      break;
-    case !state.valid && !state.rssFeedLinks.includes(state.field.url):
-      elements.feedback.textContent = i18n.t("".concat(state.errors));
-      elements.feedback.setAttribute('data-link-message', "".concat(state.errors));
-      renderFrame(elements, state);
-      state.processState = 'invalid link error';
-      break;
-    case !state.valid && state.rssFeedLinks.includes(state.field.url):
-      elements.feedback.textContent = i18n.t('validation.invalid.duplicate');
-      elements.feedback.setAttribute('data-link-message', 'validation.invalid.duplicate');
-      renderFrame(elements, state);
-      state.processState = 'duplication error';
       break;
     default:
-      state.errors = '';
+      state.error = '';
       state.rssFeedLinks.push(state.field.url);
       elements.feedback.textContent = i18n.t('validation.valid.success');
       elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
@@ -39720,8 +39730,6 @@ var renderFeedsContainer = function renderFeedsContainer(elements, i18n) {
 var renderFeedsList = function renderFeedsList(feed) {
   var feedsTitle = feed.feedsTitle,
     feedsDescription = feed.feedsDescription;
-  console.log(feedsTitle.textContent);
-  console.log(feedsDescription.textContent);
   var feedsListGroupItem = document.createElement('li');
   var feedsListGroupItemTitle = document.createElement('h3');
   var feedsListGroupItemDescription = document.createElement('p');
@@ -39735,12 +39743,24 @@ var renderFeedsList = function renderFeedsList(feed) {
   feedsListGroup.append(feedsListGroupItem);
 };
 var renderFeed = function renderFeed(elements, state, i18n) {
-  if (state.processState === 'success') {
-    renderFeedsContainer(elements, i18n);
-    lodash__WEBPACK_IMPORTED_MODULE_0__.uniq(state.parsedFeeds).forEach(function (feed) {
-      renderFeedsList(feed);
-    });
-  }
+  renderFeedsContainer(elements, i18n);
+  lodash__WEBPACK_IMPORTED_MODULE_0__.uniqBy(state.parsedFeeds, 'feedsTitle').forEach(function (feed) {
+    renderFeedsList(feed);
+  });
+};
+var updatePosts = function updatePosts(elements, state, watchedState, i18n) {
+  state.rssFeedLinks.forEach(function (rssLink) {
+    (0,_parser_js__WEBPACK_IMPORTED_MODULE_1__.parseURL)(rssLink).then(function (responce) {
+      var parsedData = (0,_parser_js__WEBPACK_IMPORTED_MODULE_1__.parseRSS)(responce);
+      var newPosts = lodash__WEBPACK_IMPORTED_MODULE_0__.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
+      if (newPosts.length > 0) {
+        watchedState.parsedPosts = [].concat(_toConsumableArray(newPosts), _toConsumableArray(state.parsedPosts));
+        console.log(state.parsedPosts);
+      }
+    }).then(setTimeout(function () {
+      updatePosts(elements, state, watchedState, i18n);
+    }, 5000));
+  });
 };
 var renderPostsContainer = function renderPostsContainer(elements, i18n) {
   elements.posts.textContent = '';
@@ -39787,26 +39807,11 @@ var renderPostsList = function renderPostsList(state, post, i18n) {
   postsListGroup.append(li);
 };
 var renderPosts = function renderPosts(elements, state, watchedState, i18n) {
-  if (state.processState === 'success') {
-    renderPostsContainer(elements, i18n);
-    lodash__WEBPACK_IMPORTED_MODULE_0__.uniq(state.parsedPosts).forEach(function (post) {
-      renderPostsList(state, post, i18n);
-    });
-  }
-  watchedState.postsUpdateState = true;
-};
-var updatePosts = function updatePosts(elements, state, watchedState, i18n) {
-  state.rssFeedLinks.forEach(function (rssLink) {
-    (0,_parser_js__WEBPACK_IMPORTED_MODULE_1__.parseURL)(rssLink).then(function (responce) {
-      var parsedData = (0,_parser_js__WEBPACK_IMPORTED_MODULE_1__.parseRSS)(responce);
-      var newPosts = lodash__WEBPACK_IMPORTED_MODULE_0__.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
-      if (newPosts.length > 0) {
-        watchedState.parsedPosts = [].concat(_toConsumableArray(newPosts), _toConsumableArray(state.parsedPosts));
-      }
-    }).then(setTimeout(function () {
-      updatePosts(elements, state, watchedState, i18n);
-    }, 5000));
+  renderPostsContainer(elements, i18n);
+  lodash__WEBPACK_IMPORTED_MODULE_0__.uniq(state.parsedPosts).forEach(function (post) {
+    renderPostsList(state, post, i18n);
   });
+  updatePosts(elements, state, watchedState, i18n);
 };
 var renderModals = function renderModals(elements, state) {
   var _elements$modalWindow = elements.modalWindow,
@@ -39842,16 +39847,18 @@ var renderLanguage = function renderLanguage(elements, value, previousValue, i18
   elements.feedback.textContent = i18n.t(feedbackMessageDataset);
   var feeds = document.querySelector('.feeds > .card > .card-body > .card-title');
   var posts = document.querySelector('.posts > .card > .card-body > .card-title');
-  feeds.textContent = i18n.t('interface.feeds');
-  posts.textContent = i18n.t('interface.posts');
-  var modalButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
-  modalButtons.forEach(function (button) {
-    button.textContent = i18n.t('interface.view');
-  });
-  var modalFullArticle = document.querySelector('[data-full-article]');
-  var modalCloseButton = document.querySelector('[data-close-button]');
-  modalFullArticle.textContent = i18n.t('interface.modalWindow.fullArticle');
-  modalCloseButton.textContent = i18n.t('interface.modalWindow.closeModal');
+  if (feeds || posts) {
+    feeds.textContent = i18n.t('interface.feeds');
+    posts.textContent = i18n.t('interface.posts');
+    var modalButtons = document.querySelectorAll('[data-bs-toggle="modal"]');
+    modalButtons.forEach(function (button) {
+      button.textContent = i18n.t('interface.view');
+    });
+    var modalFullArticle = document.querySelector('[data-full-article]');
+    var modalCloseButton = document.querySelector('[data-close-button]');
+    modalFullArticle.textContent = i18n.t('interface.modalWindow.fullArticle');
+    modalCloseButton.textContent = i18n.t('interface.modalWindow.closeModal');
+  }
 };
 
 
