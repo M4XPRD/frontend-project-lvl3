@@ -3,7 +3,7 @@ import _ from 'lodash';
 import onChange from 'on-change';
 import i18next from 'i18next';
 import {
-  renderFeed, renderPosts, renderLanguage, renderInput, updatePosts, renderModals,
+  renderFeed, renderPosts, renderLanguage, renderInput, updatePosts, renderModals, handleButton,
 } from './view.js';
 import resources from './locales/index.js';
 import { parseRSS, parseURL } from './parser.js';
@@ -57,7 +57,7 @@ export default async () => {
       title: document.querySelector('h1'),
       subtitle: document.querySelector('.lead'),
       inputPlaceholder: document.querySelector('[data-label]'),
-      buttonText: document.querySelector('[data-button]'),
+      button: document.querySelector('[data-button]'),
       example: document.querySelector('[data-example]'),
       hexlet: document.querySelector('[data-hexlet'),
       modalWindow: {
@@ -72,8 +72,8 @@ export default async () => {
     const state = {
       lng: defaultLanguage,
       processState: 'ready to load',
-      postsUpdateState: false,
       valid: '',
+      errors: '',
       field: {
         url: '',
       },
@@ -84,12 +84,13 @@ export default async () => {
       rssFeedLinks: [],
       parsedFeeds: [],
       parsedPosts: [],
-      errors: '',
+      postsUpdateState: false,
     };
 
     const watchedState = onChange(state, (path, value, previousValue) => {
       switch (path) {
         case 'processState':
+          handleButton(elements, watchedState);
           renderInput(elements, state, i18n);
           break;
         case 'parsedFeeds':
@@ -121,6 +122,7 @@ export default async () => {
       watchedState.field.url = currentUrl;
       validateURL(currentUrl, watchedState)
         .then(() => {
+          watchedState.processState = 'loading';
           parseURL(watchedState.field.url).then((responce) => {
             const parserErrorCheck = parseRSS(responce).isParseError;
             const feeds = parseRSS(responce).loadedFeeds;
