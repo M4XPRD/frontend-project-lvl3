@@ -37,7 +37,6 @@ const renderInput = (elements, state, i18n) => {
       break;
     default:
       state.error = '';
-      state.rssFeedLinks.push(state.field.url);
       elements.feedback.textContent = i18n.t('validation.valid.success');
       elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
       renderFrame(elements, state);
@@ -92,20 +91,6 @@ const renderFeed = (elements, state, i18n) => {
   renderFeedsContainer(elements, i18n);
   _.uniqBy(state.parsedFeeds, 'feedsTitle').forEach((feed) => {
     renderFeedsList(feed);
-  });
-};
-
-const updatePosts = (elements, state, watchedState, i18n) => {
-  state.rssFeedLinks.forEach((rssLink) => {
-    parseURL(rssLink)
-      .then((responce) => {
-        const parsedData = parseRSS(responce);
-        const newPosts = _.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
-        if (newPosts.length > 0) {
-          watchedState.parsedPosts = [...newPosts, ...state.parsedPosts];
-          console.log(state.parsedPosts);
-        }
-      }).then(setTimeout(() => { updatePosts(elements, state, watchedState, i18n); }, 5000));
   });
 };
 
@@ -169,7 +154,20 @@ const renderPosts = (elements, state, watchedState, i18n) => {
   _.uniq(state.parsedPosts).forEach((post) => {
     renderPostsList(state, post, i18n);
   });
-  updatePosts(elements, state, watchedState, i18n);
+};
+
+const updatePosts = (elements, state, watchedState, i18n) => {
+  state.rssFeedLinks.forEach((rssLink) => {
+    parseURL(rssLink)
+      .then((responce) => {
+        const parsedData = parseRSS(responce);
+        const newPosts = _.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
+        if (newPosts.length > 0) {
+          watchedState.parsedPosts = [...newPosts, ...state.parsedPosts];
+          console.log(state.parsedPosts);
+        }
+      }).then(setTimeout(() => { updatePosts(elements, state, watchedState, i18n); }, 5000));
+  });
 };
 
 const renderModals = (elements, state) => {
@@ -220,5 +218,5 @@ const renderLanguage = (elements, value, previousValue, i18n) => {
 };
 
 export {
-  renderInput, renderLanguage, renderPosts, renderFeed, renderModals, handleButton,
+  renderInput, renderLanguage, renderPosts, renderFeed, renderModals, handleButton, updatePosts,
 };
