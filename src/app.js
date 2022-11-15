@@ -121,7 +121,7 @@ export default () => {
             if (parserErrorCheck) {
               watchedState.error = 'validation.invalid.noRSS'; // создание искуственной ошибки не помогло
               watchedState.valid = false; // каждый раз throw new Error (разными методами) не переходит в последний catch
-              watchedState.loading = false; // поэтому решил оставить такой метод
+              watchedState.loading = false; // поэтому решил оставить такую проверку
             } else {
               posts.forEach((post) => {
                 post.postID = _.uniqueId();
@@ -133,7 +133,7 @@ export default () => {
               watchedState.parsedPosts.unshift(...posts);
               watchedState.loading = false;
             }
-          }); // здесь раньше был catch, который передаёт ошибку в следующий catch
+          }); // здесь раньше был ещё один catch, который передаёт ошибку в последний catch
         }).catch((error) => {
           watchedState.valid = false;
           watchedState.loading = false;

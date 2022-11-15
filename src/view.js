@@ -2,12 +2,12 @@ import _ from 'lodash';
 import { parseURL, parseRSS } from './parser.js';
 
 const handleButton = (elements, state) => {
-  if (state.processState === 'loading') {
-    elements.input.disable = true;
-    elements.button.disable = true;
+  if (state.loading) {
+    elements.input.disabled = true;
+    elements.button.disabled = true;
   } else {
-    elements.input.disable = false;
-    elements.button.disable = false;
+    elements.input.disabled = false;
+    elements.button.disabled = false;
   }
 };
 
