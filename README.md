@@ -5,7 +5,6 @@
 
 ## Description:
 [RSS Reader](https://frontend-project-lvl3-m4xprd.vercel.app/) is a service for aggregating RSS feeds that makes it easy to read a variety of sources, such as blogs or your favourite news. It allows you to add an unlimited number of RSS feeds, update them and add new entries to the whole stream.
-<br></br>
 **How to use it:**
 
 • Find a blog or news feed, which you prefer to read
@@ -19,7 +18,7 @@
 • If you need to change the language, press the buttons in the upper-right corner
 
 • That's it!
-<br></br>
+
 ## Installation:
 
 ```sh
