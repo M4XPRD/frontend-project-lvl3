@@ -39412,7 +39412,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           if (parserErrorCheck) {
             watchedState.error = 'validation.invalid.noRSS'; // создание искуственной ошибки не помогло
             watchedState.valid = false; // каждый раз throw new Error (разными методами) не переходит в последний catch
-            watchedState.loading = false; // поэтому решил оставить такой метод
+            watchedState.loading = false; // поэтому решил оставить такую проверку
           } else {
             var _watchedState$parsedP;
             posts.forEach(function (post) {
@@ -39425,7 +39425,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             (_watchedState$parsedP = watchedState.parsedPosts).unshift.apply(_watchedState$parsedP, _toConsumableArray(posts));
             watchedState.loading = false;
           }
-        }); // здесь раньше был catch, который передаёт ошибку в следующий catch
+        }); // здесь раньше был ещё один catch, который передаёт ошибку в последний catch
       })["catch"](function (error) {
         watchedState.valid = false;
         watchedState.loading = false;
@@ -39671,12 +39671,12 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 
 var handleButton = function handleButton(elements, state) {
-  if (state.processState === 'loading') {
-    elements.input.disable = true;
-    elements.button.disable = true;
+  if (state.loading) {
+    elements.input.disabled = true;
+    elements.button.disabled = true;
   } else {
-    elements.input.disable = false;
-    elements.button.disable = false;
+    elements.input.disabled = false;
+    elements.button.disabled = false;
   }
 };
 var renderFrame = function renderFrame(elements, state) {
