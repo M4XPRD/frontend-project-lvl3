@@ -39294,172 +39294,155 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
-
-// const checkIfPostInFeed = (watchedState, newPost) => {
-//   const filter = watchedState.parsedPosts.filter((post) => post.postTitle === newPost.postTitle);
-//   return filter.length > 0;
-// };
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (/*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-  var defaultLanguage, i18n;
-  return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-    while (1) {
-      switch (_context2.prev = _context2.next) {
-        case 0:
-          defaultLanguage = 'ru';
-          i18n = i18next__WEBPACK_IMPORTED_MODULE_3__["default"].createInstance();
-          i18n.init({
-            lng: defaultLanguage,
-            debug: true,
-            resources: _locales_index_js__WEBPACK_IMPORTED_MODULE_5__["default"]
-          }).then(function () {
-            yup__WEBPACK_IMPORTED_MODULE_0__.setLocale({
-              mixed: {
-                notOneOf: 'validation.invalid.duplicate'
-              },
-              string: {
-                url: 'validation.invalid.nonvalidURL'
-              }
-            });
-            var validateURL = /*#__PURE__*/function () {
-              var _ref2 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(url, watchedState) {
-                var schema;
-                return _regeneratorRuntime().wrap(function _callee$(_context) {
-                  while (1) {
-                    switch (_context.prev = _context.next) {
-                      case 0:
-                        schema = yup__WEBPACK_IMPORTED_MODULE_0__.string().url().notOneOf(_toConsumableArray(watchedState.rssFeedLinks)).required();
-                        return _context.abrupt("return", schema.validate(url).then(function () {
-                          watchedState.valid = true;
-                        })["catch"](function (error) {
-                          watchedState.errors = error.errors;
-                          watchedState.valid = false;
-                        }));
-                      case 2:
-                      case "end":
-                        return _context.stop();
-                    }
-                  }
-                }, _callee);
-              }));
-              return function validateURL(_x, _x2) {
-                return _ref2.apply(this, arguments);
-              };
-            }();
-            var elements = {
-              form: document.querySelector('.rss-form'),
-              input: document.querySelector('#url-input'),
-              feedback: document.querySelector('.feedback'),
-              posts: document.querySelector('.posts'),
-              feeds: document.querySelector('.feeds'),
-              languageButtons: document.querySelectorAll('[data-lng]'),
-              modalButtons: document.querySelectorAll('[data-bs-toggle="modal"]'),
-              title: document.querySelector('h1'),
-              subtitle: document.querySelector('.lead'),
-              inputPlaceholder: document.querySelector('[data-label]'),
-              button: document.querySelector('[data-button]'),
-              example: document.querySelector('[data-example]'),
-              hexlet: document.querySelector('[data-hexlet'),
-              modalWindow: {
-                modalTitle: document.querySelector('.modal-title'),
-                modalBody: document.querySelector('.modal-body'),
-                modalFullArticle: document.querySelector('.full-article'),
-                modalCloseSecondary: document.querySelector('.btn-secondary'),
-                modalCloseButtons: document.querySelectorAll('[data-bs-dismiss="modal"]')
-              }
-            };
-            var state = {
-              lng: defaultLanguage,
-              processState: 'ready to load',
-              valid: '',
-              errors: '',
-              field: {
-                url: ''
-              },
-              uiState: {
-                viewedLinks: [],
-                clickedPostLink: ''
-              },
-              rssFeedLinks: [],
-              parsedFeeds: [],
-              parsedPosts: [],
-              postsUpdateState: false
-            };
-            var watchedState = (0,on_change__WEBPACK_IMPORTED_MODULE_2__["default"])(state, function (path, value, previousValue) {
-              switch (path) {
-                case 'processState':
-                  (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.handleButton)(elements, watchedState);
-                  (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderInput)(elements, state, i18n);
-                  break;
-                case 'parsedFeeds':
-                  (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderFeed)(elements, state, i18n);
-                  break;
-                case 'parsedPosts':
-                case 'uiState.viewedLinks':
-                  (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderPosts)(elements, state, watchedState, i18n);
-                  break;
-                case 'postsUpdateState':
-                  (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.updatePosts)(elements, state, watchedState, i18n);
-                  break;
-                case 'uiState.clickedPostLink':
-                  (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderModals)(elements, state);
-                  break;
-                case 'lng':
-                  i18n.changeLanguage(value);
-                  (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderLanguage)(elements, value, previousValue, i18n);
-                  break;
-                default:
-                  break;
-              }
-            });
-            elements.form.addEventListener('submit', function (e) {
-              e.preventDefault();
-              var data = new FormData(e.target);
-              var currentUrl = data.get('url').trim();
-              watchedState.field.url = currentUrl;
-              validateURL(currentUrl, watchedState).then(function () {
-                watchedState.processState = 'loading';
-                (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseURL)(watchedState.field.url).then(function (responce) {
-                  var _watchedState$parsedP;
-                  var parserErrorCheck = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseRSS)(responce).isParseError;
-                  var feeds = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseRSS)(responce).loadedFeeds;
-                  var posts = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseRSS)(responce).loadedPosts;
-                  posts.forEach(function (post) {
-                    post.postID = lodash__WEBPACK_IMPORTED_MODULE_1__.uniqueId();
-                  });
-                  watchedState.processState = parserErrorCheck;
-                  watchedState.parsedFeeds.unshift(feeds);
-                  (_watchedState$parsedP = watchedState.parsedPosts).unshift.apply(_watchedState$parsedP, _toConsumableArray(posts));
-                });
-              });
-            });
-            elements.languageButtons.forEach(function (languageButton) {
-              languageButton.addEventListener('click', function () {
-                watchedState.lng = languageButton.dataset.lng;
-              });
-            });
-            elements.posts.addEventListener('click', function (e) {
-              var target = e.target;
-              switch (target.tagName) {
-                case 'A':
-                  watchedState.uiState.viewedLinks.push(target.href);
-                  break;
-                case 'BUTTON':
-                  watchedState.uiState.viewedLinks.push(target.previousSibling.href);
-                  watchedState.uiState.clickedPostLink = target.previousSibling.href;
-                  break;
-                default:
-                  break;
-              }
-            });
-          });
-        case 3:
-        case "end":
-          return _context2.stop();
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (function () {
+  var defaultLanguage = 'ru';
+  var i18n = i18next__WEBPACK_IMPORTED_MODULE_3__["default"].createInstance();
+  i18n.init({
+    lng: defaultLanguage,
+    debug: true,
+    resources: _locales_index_js__WEBPACK_IMPORTED_MODULE_5__["default"]
+  }).then(function () {
+    yup__WEBPACK_IMPORTED_MODULE_0__.setLocale({
+      mixed: {
+        notOneOf: 'validation.invalid.duplicate'
+      },
+      string: {
+        url: 'validation.invalid.nonvalidURL'
       }
-    }
-  }, _callee2);
-})));
+    });
+    var validateURL = /*#__PURE__*/function () {
+      var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee(url, watchedState) {
+        var schema;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                schema = yup__WEBPACK_IMPORTED_MODULE_0__.string().url().notOneOf(_toConsumableArray(watchedState.rssFeedLinks)).required();
+                return _context.abrupt("return", schema.validate(url).then(function () {
+                  watchedState.valid = true;
+                })["catch"](function (error) {
+                  watchedState.errors = error.errors;
+                  watchedState.valid = false;
+                }));
+              case 2:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }));
+      return function validateURL(_x, _x2) {
+        return _ref.apply(this, arguments);
+      };
+    }();
+    var elements = {
+      form: document.querySelector('.rss-form'),
+      input: document.querySelector('#url-input'),
+      feedback: document.querySelector('.feedback'),
+      posts: document.querySelector('.posts'),
+      feeds: document.querySelector('.feeds'),
+      languageButtons: document.querySelectorAll('[data-lng]'),
+      modalButtons: document.querySelectorAll('[data-bs-toggle="modal"]'),
+      title: document.querySelector('h1'),
+      subtitle: document.querySelector('.lead'),
+      inputPlaceholder: document.querySelector('[data-label]'),
+      button: document.querySelector('[data-button]'),
+      example: document.querySelector('[data-example]'),
+      hexlet: document.querySelector('[data-hexlet'),
+      modalWindow: {
+        modalTitle: document.querySelector('.modal-title'),
+        modalBody: document.querySelector('.modal-body'),
+        modalFullArticle: document.querySelector('.full-article'),
+        modalCloseSecondary: document.querySelector('.btn-secondary'),
+        modalCloseButtons: document.querySelectorAll('[data-bs-dismiss="modal"]')
+      }
+    };
+    var state = {
+      lng: defaultLanguage,
+      processState: 'ready to load',
+      valid: '',
+      errors: '',
+      field: {
+        url: ''
+      },
+      uiState: {
+        viewedLinks: [],
+        clickedPostLink: ''
+      },
+      rssFeedLinks: [],
+      parsedFeeds: [],
+      parsedPosts: [],
+      postsUpdateState: false
+    };
+    var watchedState = (0,on_change__WEBPACK_IMPORTED_MODULE_2__["default"])(state, function (path, value, previousValue) {
+      switch (path) {
+        case 'processState':
+          (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.handleButton)(elements, watchedState);
+          (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderInput)(elements, state, i18n);
+          break;
+        case 'parsedFeeds':
+          (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderFeed)(elements, state, i18n);
+          break;
+        case 'parsedPosts':
+        case 'uiState.viewedLinks':
+          (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderPosts)(elements, state, watchedState, i18n);
+          break;
+        case 'postsUpdateState':
+          (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.updatePosts)(elements, state, watchedState, i18n);
+          break;
+        case 'uiState.clickedPostLink':
+          (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderModals)(elements, state);
+          break;
+        case 'lng':
+          i18n.changeLanguage(value);
+          (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderLanguage)(elements, value, previousValue, i18n);
+          break;
+        default:
+          break;
+      }
+    });
+    elements.form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var data = new FormData(e.target);
+      var currentUrl = data.get('url').trim();
+      watchedState.field.url = currentUrl;
+      watchedState.processState = 'loading';
+      validateURL(currentUrl, watchedState).then(function () {
+        (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseURL)(watchedState.field.url).then(function (responce) {
+          var _watchedState$parsedP;
+          var parserErrorCheck = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseRSS)(responce).isParseError;
+          var feeds = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseRSS)(responce).loadedFeeds;
+          var posts = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseRSS)(responce).loadedPosts;
+          posts.forEach(function (post) {
+            post.postID = lodash__WEBPACK_IMPORTED_MODULE_1__.uniqueId();
+          });
+          watchedState.processState = parserErrorCheck;
+          watchedState.parsedFeeds.unshift(feeds);
+          (_watchedState$parsedP = watchedState.parsedPosts).unshift.apply(_watchedState$parsedP, _toConsumableArray(posts));
+        });
+      });
+    });
+    elements.languageButtons.forEach(function (languageButton) {
+      languageButton.addEventListener('click', function () {
+        watchedState.lng = languageButton.dataset.lng;
+      });
+    });
+    elements.posts.addEventListener('click', function (e) {
+      var target = e.target;
+      switch (target.tagName) {
+        case 'A':
+          watchedState.uiState.viewedLinks.push(target.href);
+          break;
+        case 'BUTTON':
+          watchedState.uiState.viewedLinks.push(target.previousSibling.href);
+          watchedState.uiState.clickedPostLink = target.previousSibling.href;
+          break;
+        default:
+          break;
+      }
+    });
+  });
+});
 
 /***/ }),
 
