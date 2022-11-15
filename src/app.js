@@ -1,11 +1,17 @@
 import * as yup from 'yup';
+import _ from 'lodash';
 import onChange from 'on-change';
 import i18next from 'i18next';
 import {
   renderFeed, renderPosts, renderLanguage, renderInput, updatePosts, renderModals,
 } from './view.js';
 import resources from './locales/index.js';
-import { loadFeed } from './parser.js';
+import { parseRSS, parseURL } from './parser.js';
+
+// const checkIfPostInFeed = (watchedState, newPost) => {
+//   const filter = watchedState.parsedPosts.filter((post) => post.postTitle === newPost.postTitle);
+//   return filter.length > 0;
+// };
 
 export default async () => {
   const defaultLanguage = 'ru';
@@ -48,20 +54,18 @@ export default async () => {
       feeds: document.querySelector('.feeds'),
       languageButtons: document.querySelectorAll('[data-lng]'),
       modalButtons: document.querySelectorAll('[data-bs-toggle="modal"]'),
-      interface: {
-        title: document.querySelector('h1'),
-        subtitle: document.querySelector('.lead'),
-        inputPlaceholder: document.querySelector('[data-label]'),
-        buttonText: document.querySelector('[data-button]'),
-        example: document.querySelector('[data-example]'),
-        hexlet: document.querySelector('[data-hexlet'),
-        modalWindow: {
-          modalTitle: document.querySelector('.modal-title'),
-          modalBody: document.querySelector('.modal-body'),
-          modalFullArticle: document.querySelector('.full-article'),
-          modalCloseSecondary: document.querySelector('.btn-secondary'),
-          modalCloseButtons: document.querySelectorAll('[data-bs-dismiss="modal"]'),
-        },
+      title: document.querySelector('h1'),
+      subtitle: document.querySelector('.lead'),
+      inputPlaceholder: document.querySelector('[data-label]'),
+      buttonText: document.querySelector('[data-button]'),
+      example: document.querySelector('[data-example]'),
+      hexlet: document.querySelector('[data-hexlet'),
+      modalWindow: {
+        modalTitle: document.querySelector('.modal-title'),
+        modalBody: document.querySelector('.modal-body'),
+        modalFullArticle: document.querySelector('.full-article'),
+        modalCloseSecondary: document.querySelector('.btn-secondary'),
+        modalCloseButtons: document.querySelectorAll('[data-bs-dismiss="modal"]'),
       },
     };
 
@@ -80,8 +84,6 @@ export default async () => {
       rssFeedLinks: [],
       parsedFeeds: [],
       parsedPosts: [],
-      idCounter: 1,
-      idModal: '',
       errors: '',
     };
 
@@ -118,7 +120,20 @@ export default async () => {
       const currentUrl = data.get('url').trim();
       watchedState.field.url = currentUrl;
       validateURL(currentUrl, watchedState)
-        .then(() => loadFeed(watchedState.field.url, watchedState));
+        .then(() => {
+          parseURL(watchedState.field.url).then((responce) => {
+            const parserErrorCheck = parseRSS(responce).isParseError;
+            const feeds = parseRSS(responce).loadedFeeds;
+            const posts = parseRSS(responce).loadedPosts;
+
+            posts.forEach((post) => {
+              post.postID = _.uniqueId();
+            });
+            watchedState.processState = parserErrorCheck;
+            watchedState.parsedFeeds.unshift(feeds);
+            watchedState.parsedPosts.unshift(...posts);
+          });
+        });
     });
 
     elements.languageButtons.forEach((languageButton) => {
@@ -129,8 +144,6 @@ export default async () => {
 
     elements.posts.addEventListener('click', (e) => {
       const { target } = e;
-      const { id } = e.target.dataset;
-      watchedState.idModal = Number(id);
       switch (target.tagName) {
         case 'A':
           watchedState.uiState.viewedLinks.push(target.href);
