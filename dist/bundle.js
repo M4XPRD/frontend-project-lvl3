@@ -39385,6 +39385,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         case 'parsedPosts':
         case 'uiState.viewedLinks':
           (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderPosts)(elements, state, watchedState, i18n);
+          (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.updatePosts)(elements, state, watchedState, i18n);
           break;
         case 'uiState.clickedPostLink':
           (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderModals)(elements, state);
@@ -39419,6 +39420,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             });
             watchedState.valid = true;
             watchedState.processState = 'success';
+            watchedState.rssFeedLinks.push(watchedState.field.url);
             watchedState.parsedFeeds.unshift(feeds);
             (_watchedState$parsedP = watchedState.parsedPosts).unshift.apply(_watchedState$parsedP, _toConsumableArray(posts));
             watchedState.loading = false;
@@ -39651,7 +39653,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "renderInput": () => (/* binding */ renderInput),
 /* harmony export */   "renderLanguage": () => (/* binding */ renderLanguage),
 /* harmony export */   "renderModals": () => (/* binding */ renderModals),
-/* harmony export */   "renderPosts": () => (/* binding */ renderPosts)
+/* harmony export */   "renderPosts": () => (/* binding */ renderPosts),
+/* harmony export */   "updatePosts": () => (/* binding */ updatePosts)
 /* harmony export */ });
 /* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! lodash */ "./node_modules/lodash/lodash.js");
 /* harmony import */ var _parser_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./parser.js */ "./src/parser.js");
@@ -39701,7 +39704,6 @@ var renderInput = function renderInput(elements, state, i18n) {
       break;
     default:
       state.error = '';
-      state.rssFeedLinks.push(state.field.url);
       elements.feedback.textContent = i18n.t('validation.valid.success');
       elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
       renderFrame(elements, state);
@@ -39746,20 +39748,6 @@ var renderFeed = function renderFeed(elements, state, i18n) {
   renderFeedsContainer(elements, i18n);
   lodash__WEBPACK_IMPORTED_MODULE_0__.uniqBy(state.parsedFeeds, 'feedsTitle').forEach(function (feed) {
     renderFeedsList(feed);
-  });
-};
-var updatePosts = function updatePosts(elements, state, watchedState, i18n) {
-  state.rssFeedLinks.forEach(function (rssLink) {
-    (0,_parser_js__WEBPACK_IMPORTED_MODULE_1__.parseURL)(rssLink).then(function (responce) {
-      var parsedData = (0,_parser_js__WEBPACK_IMPORTED_MODULE_1__.parseRSS)(responce);
-      var newPosts = lodash__WEBPACK_IMPORTED_MODULE_0__.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
-      if (newPosts.length > 0) {
-        watchedState.parsedPosts = [].concat(_toConsumableArray(newPosts), _toConsumableArray(state.parsedPosts));
-        console.log(state.parsedPosts);
-      }
-    }).then(setTimeout(function () {
-      updatePosts(elements, state, watchedState, i18n);
-    }, 5000));
   });
 };
 var renderPostsContainer = function renderPostsContainer(elements, i18n) {
@@ -39811,7 +39799,20 @@ var renderPosts = function renderPosts(elements, state, watchedState, i18n) {
   lodash__WEBPACK_IMPORTED_MODULE_0__.uniq(state.parsedPosts).forEach(function (post) {
     renderPostsList(state, post, i18n);
   });
-  updatePosts(elements, state, watchedState, i18n);
+};
+var updatePosts = function updatePosts(elements, state, watchedState, i18n) {
+  state.rssFeedLinks.forEach(function (rssLink) {
+    (0,_parser_js__WEBPACK_IMPORTED_MODULE_1__.parseURL)(rssLink).then(function (responce) {
+      var parsedData = (0,_parser_js__WEBPACK_IMPORTED_MODULE_1__.parseRSS)(responce);
+      var newPosts = lodash__WEBPACK_IMPORTED_MODULE_0__.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
+      if (newPosts.length > 0) {
+        watchedState.parsedPosts = [].concat(_toConsumableArray(newPosts), _toConsumableArray(state.parsedPosts));
+        console.log(state.parsedPosts);
+      }
+    }).then(setTimeout(function () {
+      updatePosts(elements, state, watchedState, i18n);
+    }, 5000));
+  });
 };
 var renderModals = function renderModals(elements, state) {
   var _elements$modalWindow = elements.modalWindow,
