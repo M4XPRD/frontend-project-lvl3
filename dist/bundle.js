@@ -39356,7 +39356,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var state = {
       lng: defaultLanguage,
       processState: 'ready to load',
-      loading: false,
       valid: '',
       error: '',
       field: {
@@ -39374,10 +39373,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       switch (path) {
         case 'processState':
         case 'error':
-          (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderInput)(elements, state, i18n);
-          break;
-        case 'loading':
           (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.handleButton)(elements, watchedState);
+          (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderInput)(elements, state, i18n);
           break;
         case 'parsedFeeds':
           (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderFeed)(elements, state, i18n);
@@ -39403,7 +39400,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var data = new FormData(e.target);
       var currentUrl = data.get('url').trim();
       watchedState.field.url = currentUrl;
-      watchedState.loading = true;
+      watchedState.processState = 'loading';
       validateURL(currentUrl, watchedState).then(function () {
         (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseURL)(watchedState.field.url).then(function (responce) {
           var parserErrorCheck = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseRSS)(responce).isParseError;
@@ -39412,7 +39409,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           if (parserErrorCheck) {
             watchedState.error = 'validation.invalid.noRSS'; // создание искуственной ошибки не помогло
             watchedState.valid = false; // каждый раз throw new Error (разными методами) не переходит в последний catch
-            watchedState.loading = false; // поэтому решил оставить такую проверку
+            watchedState.processState = 'failed loading'; // поэтому решил оставить такую проверку
           } else {
             var _watchedState$parsedP;
             posts.forEach(function (post) {
@@ -39423,12 +39420,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             watchedState.rssFeedLinks.push(watchedState.field.url);
             watchedState.parsedFeeds.unshift(feeds);
             (_watchedState$parsedP = watchedState.parsedPosts).unshift.apply(_watchedState$parsedP, _toConsumableArray(posts));
-            watchedState.loading = false;
           }
         }); // здесь раньше был ещё один catch, который передаёт ошибку в последний catch
       })["catch"](function (error) {
         watchedState.valid = false;
-        watchedState.loading = false;
+        watchedState.processState = 'failed loading';
         switch (error.message) {
           // case 'parser error':  <---- вот сюда
           //   watchedState.error = 'validation.invalid.noRSS'; <---- ошибка полностью игнорируется
@@ -39469,6 +39465,187 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   });
 });
 
+// /* eslint-disable max-len */
+// import * as yup from 'yup';
+// import _ from 'lodash';
+// import onChange from 'on-change';
+// import i18next from 'i18next';
+// import {
+//   renderFeed, renderPosts, renderLanguage, renderInput, renderModals, handleButton, updatePosts,
+// } from './view.js';
+// import resources from './locales/index.js';
+// import { parseRSS, parseURL } from './parser.js';
+
+// export default () => {
+//   const defaultLanguage = 'ru';
+//   const i18n = i18next.createInstance();
+//   i18n.init({
+//     lng: defaultLanguage,
+//     debug: true,
+//     resources,
+//   }).then(() => {
+//     yup.setLocale({
+//       mixed: {
+//         notOneOf: 'validation.invalid.duplicate',
+//       },
+//       string: {
+//         url: 'validation.invalid.nonvalidURL',
+//       },
+//     });
+
+//     const validateURL = async (url, watchedState) => {
+//       const schema = yup
+//         .string()
+//         .url()
+//         .notOneOf([...watchedState.rssFeedLinks])
+//         .required();
+//       return schema.validate(url);
+//     };
+
+//     const elements = {
+//       form: document.querySelector('.rss-form'),
+//       input: document.querySelector('#url-input'),
+//       feedback: document.querySelector('.feedback'),
+//       posts: document.querySelector('.posts'),
+//       feeds: document.querySelector('.feeds'),
+//       languageButtons: document.querySelectorAll('[data-lng]'),
+//       modalButtons: document.querySelectorAll('[data-bs-toggle="modal"]'),
+//       title: document.querySelector('h1'),
+//       subtitle: document.querySelector('.lead'),
+//       inputPlaceholder: document.querySelector('[data-label]'),
+//       button: document.querySelector('[data-button]'),
+//       example: document.querySelector('[data-example]'),
+//       hexlet: document.querySelector('[data-hexlet'),
+//       modalWindow: {
+//         modalTitle: document.querySelector('.modal-title'),
+//         modalBody: document.querySelector('.modal-body'),
+//         modalFullArticle: document.querySelector('.full-article'),
+//         modalCloseSecondary: document.querySelector('.btn-secondary'),
+//         modalCloseButtons: document.querySelectorAll('[data-bs-dismiss="modal"]'),
+//       },
+//     };
+
+//     const state = {
+//       lng: defaultLanguage,
+//       processState: 'ready to load',
+//       loading: false,
+//       valid: '',
+//       error: '',
+//       field: {
+//         url: '',
+//       },
+//       uiState: {
+//         viewedLinks: [],
+//         clickedPostLink: '',
+//       },
+//       rssFeedLinks: [],
+//       parsedFeeds: [],
+//       parsedPosts: [],
+//     };
+
+//     const watchedState = onChange(state, (path, value, previousValue) => {
+//       switch (path) {
+//         case 'processState':
+//         case 'error':
+//           renderInput(elements, state, i18n);
+//           break;
+//         case 'loading':
+//           handleButton(elements, watchedState);
+//           break;
+//         case 'parsedFeeds':
+//           renderFeed(elements, state, i18n);
+//           break;
+//         case 'parsedPosts':
+//         case 'uiState.viewedLinks':
+//           renderPosts(elements, state, watchedState, i18n);
+//           updatePosts(elements, state, watchedState, i18n);
+//           break;
+//         case 'uiState.clickedPostLink':
+//           renderModals(elements, state);
+//           break;
+//         case 'lng':
+//           i18n.changeLanguage(value);
+//           renderLanguage(elements, value, previousValue, i18n);
+//           break;
+//         default:
+//           break;
+//       }
+//     });
+
+//     elements.form.addEventListener('submit', (e) => {
+//       e.preventDefault();
+//       const data = new FormData(e.target);
+//       const currentUrl = data.get('url').trim();
+//       watchedState.field.url = currentUrl;
+//       watchedState.loading = true;
+//       validateURL(currentUrl, watchedState)
+//         .then(() => {
+//           parseURL(watchedState.field.url).then((responce) => {
+//             const parserErrorCheck = parseRSS(responce).isParseError;
+//             const feeds = parseRSS(responce).loadedFeeds;
+//             const posts = parseRSS(responce).loadedPosts;
+
+//             if (parserErrorCheck) {
+//               watchedState.error = 'validation.invalid.noRSS'; // создание искуственной ошибки не помогло
+//               watchedState.valid = false; // каждый раз throw new Error (разными методами) не переходит в последний catch
+//               watchedState.loading = false; // поэтому решил оставить такую проверку
+//             } else {
+//               posts.forEach((post) => {
+//                 post.postID = _.uniqueId();
+//               });
+//               watchedState.valid = true;
+//               watchedState.processState = 'success';
+//               watchedState.rssFeedLinks.push(watchedState.field.url);
+//               watchedState.parsedFeeds.unshift(feeds);
+//               watchedState.parsedPosts.unshift(...posts);
+//               watchedState.loading = false;
+//             }
+//           }); // здесь раньше был ещё один catch, который передаёт ошибку в последний catch
+//         }).catch((error) => {
+//           watchedState.valid = false;
+//           watchedState.loading = false;
+//           switch (error.message) {
+//             // case 'parser error':  <---- вот сюда
+//             //   watchedState.error = 'validation.invalid.noRSS'; <---- ошибка полностью игнорируется
+//             //   break;
+//             case 'validation.invalid.nonvalidURL':
+//               watchedState.error = 'validation.invalid.nonvalidURL';
+//               break;
+//             case 'validation.invalid.duplicate':
+//               watchedState.error = 'validation.invalid.duplicate';
+//               break;
+//             case 'network error':
+//               watchedState.error = 'validation.invalid.networkError';
+//               break;
+//             default:
+//               break;
+//           }
+//         });
+//     });
+
+//     elements.languageButtons.forEach((languageButton) => {
+//       languageButton.addEventListener('click', () => {
+//         watchedState.lng = languageButton.dataset.lng;
+//       });
+//     });
+
+//     elements.posts.addEventListener('click', (e) => {
+//       const { target } = e;
+//       switch (target.tagName) {
+//         case 'A':
+//           watchedState.uiState.viewedLinks.push(target.href);
+//           break;
+//         case 'BUTTON':
+//           watchedState.uiState.viewedLinks.push(target.previousSibling.href);
+//           watchedState.uiState.clickedPostLink = target.previousSibling.href;
+//           break;
+//         default:
+//           break;
+//       }
+//     });
+//   });
+// };
+
 /***/ }),
 
 /***/ "./src/locales/en.js":
@@ -39490,7 +39667,7 @@ __webpack_require__.r(__webpack_exports__);
       },
       invalid: {
         nonvalidURL: 'The link must be a valid URL',
-        noRSS: 'The resource does not contain valid RSS',
+        noRSS: 'The resource does not contain valid RSS. Try again or replace with another link',
         duplicate: 'RSS already exists',
         networkError: 'Network error'
       }
@@ -39556,7 +39733,7 @@ __webpack_require__.r(__webpack_exports__);
       },
       invalid: {
         nonvalidURL: 'Ссылка должна быть валидным URL',
-        noRSS: 'Ресурс не содержит валидный RSS',
+        noRSS: 'Ресурс не содержит валидный RSS. Попробуйте ещё раз или загрузите другую ссылку',
         duplicate: 'RSS уже существует',
         networkError: 'Ошибка сети'
       }
@@ -39671,7 +39848,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 
 var handleButton = function handleButton(elements, state) {
-  if (state.loading) {
+  if (state.processState === 'loading') {
     elements.input.disabled = true;
     elements.button.disabled = true;
   } else {
@@ -39679,6 +39856,17 @@ var handleButton = function handleButton(elements, state) {
     elements.button.disabled = false;
   }
 };
+
+// const handleButton = (elements, state) => {
+//   if (state.loading) {
+//     elements.input.disabled = true;
+//     elements.button.disabled = true;
+//   } else {
+//     elements.input.disabled = false;
+//     elements.button.disabled = false;
+//   }
+// };
+
 var renderFrame = function renderFrame(elements, state) {
   switch (true) {
     case !state.valid && state.error === 'validation.invalid.noRSS':
@@ -39707,7 +39895,6 @@ var renderInput = function renderInput(elements, state, i18n) {
       elements.feedback.textContent = i18n.t('validation.valid.success');
       elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
       renderFrame(elements, state);
-      state.processState = 'success';
       elements.form.reset();
       elements.input.focus();
       break;
