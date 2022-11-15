@@ -12,3 +12,5 @@ start:
 	npm run start
 watch:
 	npm run watch
+production:
+	npm run build
