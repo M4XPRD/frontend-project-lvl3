@@ -23,7 +23,7 @@ export default async () => {
   }).then(() => {
     yup.setLocale({
       mixed: {
-        default: 'validation.invalid.defaultMessage',
+        notOneOf: 'validation.invalid.duplicate',
       },
       string: {
         url: 'validation.invalid.nonvalidURL',
