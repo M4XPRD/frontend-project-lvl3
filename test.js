@@ -1,4 +1,3 @@
-// import _ from 'lodash';
 // import * as yup from 'yup';
 
 // yup.setLocale({
@@ -17,12 +16,15 @@
 //     .notOneOf(watchedState.rssFeedLinks)
 //     .required();
 
-//   try {
-//     schema.validateSync(url);
-//     watchedState.valid = true;
-//   } catch (err) {
-//     console.log(err.message);
-//   }
+//   return schema.validateSync(url);
+
+//   // try {
+//   //   schema.validateSync(url);
+//   //   watchedState.valid = true;
+//   // } catch (err) {
+//   //   err.message = 'test error';
+//   //   console.log(err.message);
+//   // }
 // };
 
 // const watchedState = {
@@ -31,11 +33,13 @@
 //   rssFeedLinks: ['http://ya.ru/'],
 // };
 
-// const url1 = 'http://ya/ru';
+// const url1 = 'http://ya.ru/';
 
-// validateURL(url1, watchedState);
-
-// console.log(watchedState.errors);
+// try {
+//   validateURL(url1, watchedState);
+// } catch (err) {
+//   console.log(err.message);
+// }
 
 // const test = {
 //   errors: '',
@@ -68,26 +72,46 @@
 // console.log(_.isEmpty(err2));
 // console.log(_.isEmpty(err3));
 // console.log(_.isEmpty(err4));
+// import _ from 'lodash';
 
 // try {
 //   try {
 //     const num = 1;
-//     num + word;
+//     if (num === 2) {
+//       throw new Error('num');
+//     }
 //   } catch (err) {
+//     err.type = 'FIRST';
 //     throw new Error('wtf');
+//   } try {
+//     num + example;
+//   } catch (err) {
+//     err.type = 'SECOND';
+//     throw new Error('hi');
 //   }
 // } catch (err) {
-//   console.log(err.name);
+//   console.log(err.message);
 // }
 
-// const test1 = _.uniqueId();
-// const test2 = _.uniqueId();
-// const test3 = _.uniqueId();
-// const test4 = _.uniqueId();
-// const test5 = _.uniqueId();
+try {
+  try {
+    const one = 1;
+    if (one === 1) {
+      const error = new Error('number');
+      error.message = 'test completed';
+      throw error;
+    }
+  } catch (err) {
+    console.log('almost');
+  }
+} catch (err) {
+  console.log('done!');
+}
 
-// console.log(test1);
-// console.log(test2);
-// console.log(test3);
-// console.log(test4);
-// console.log(test5);
+/*
+if (errorNode) {
+  const error = new Error(errorNode);
+  error.type = 'parseError';
+  throw error;
+}
+*/
