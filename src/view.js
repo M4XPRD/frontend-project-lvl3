@@ -163,7 +163,6 @@ const updatePosts = (elements, state, watchedState, i18n) => {
         const newPosts = _.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
         if (newPosts.length > 0) {
           watchedState.parsedPosts = [...newPosts, ...state.parsedPosts];
-          console.log(state.parsedPosts);
         }
       }).then(setTimeout(() => { updatePosts(elements, state, watchedState, i18n); }, 5000));
   });
