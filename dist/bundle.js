@@ -39384,9 +39384,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           var feeds = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseRSS)(responce).loadedFeeds;
           var posts = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__.parseRSS)(responce).loadedPosts;
           if (parserErrorCheck) {
-            watchedState.error = 'validation.invalid.noRSS'; // создание искуственной ошибки не помогло
-            watchedState.valid = false; // каждый раз throw new Error (разными методами) не переходит в последний catch
-            watchedState.processState = 'failed loading'; // поэтому решил оставить такую проверку
+            watchedState.valid = false;
+            watchedState.processState = 'failed loading';
+            (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderErrors)('parser error', watchedState);
           } else {
             var _watchedState$parsedP;
             posts.forEach(function (post) {
@@ -39398,26 +39398,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             watchedState.parsedFeeds.unshift(feeds);
             (_watchedState$parsedP = watchedState.parsedPosts).unshift.apply(_watchedState$parsedP, _toConsumableArray(posts));
           }
-        }); // здесь раньше был ещё один catch, который передаёт ошибку в последний catch
+        });
       })["catch"](function (error) {
+        console.log("FOUND ERROR: ".concat(error.message));
         watchedState.valid = false;
         watchedState.processState = 'failed loading';
-        switch (error.message) {
-          // case 'parser error':  <---- вот сюда
-          //   watchedState.error = 'validation.invalid.noRSS'; <---- ошибка полностью игнорируется
-          //   break;
-          case 'network error':
-            watchedState.error = 'validation.invalid.networkError';
-            break;
-          case 'validation.invalid.nonvalidURL':
-            watchedState.error = 'validation.invalid.nonvalidURL';
-            break;
-          case 'validation.invalid.duplicate':
-            watchedState.error = 'validation.invalid.duplicate';
-            break;
-          default:
-            break;
-        }
+        (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderErrors)(error.message, watchedState);
       });
     });
     elements.languageButtons.forEach(function (languageButton) {
@@ -39578,6 +39564,7 @@ var parseURL = function parseURL(url) {
   return axios__WEBPACK_IMPORTED_MODULE_0__["default"].get("https://allorigins.hexlet.app/get?disableCache=true&url=".concat(encodeURIComponent(url))).then(function (responce) {
     return responce.data.contents;
   })["catch"](function (error) {
+    console.log('NETWORK ERROR');
     error.message = 'network error';
   });
 };
@@ -39622,6 +39609,7 @@ var parseRSS = function parseRSS(data) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "handleFormAccessibility": () => (/* binding */ handleFormAccessibility),
+/* harmony export */   "renderErrors": () => (/* binding */ renderErrors),
 /* harmony export */   "renderFeed": () => (/* binding */ renderFeed),
 /* harmony export */   "renderFeedback": () => (/* binding */ renderFeedback),
 /* harmony export */   "renderLanguage": () => (/* binding */ renderLanguage),
@@ -39650,6 +39638,25 @@ var handleFormAccessibility = function handleFormAccessibility(elements, state) 
   } else {
     elements.input.disabled = false;
     elements.button.disabled = false;
+  }
+};
+var renderErrors = function renderErrors(errorName, watchedState) {
+  switch (errorName) {
+    case 'parser error':
+      console.log('PARSER ERROR WORKED');
+      watchedState.error = 'validation.invalid.noRSS';
+      break;
+    case 'network error':
+      watchedState.error = 'validation.invalid.networkError';
+      break;
+    case 'validation.invalid.nonvalidURL':
+      watchedState.error = 'validation.invalid.nonvalidURL';
+      break;
+    case 'validation.invalid.duplicate':
+      watchedState.error = 'validation.invalid.duplicate';
+      break;
+    default:
+      break;
   }
 };
 var renderFrame = function renderFrame(elements, state) {
