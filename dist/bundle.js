@@ -39358,7 +39358,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           break;
         case 'parsedPosts':
         case 'uiState.viewedLinks':
-          (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderPosts)(elements, state, watchedState, i18n);
+          (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderPosts)(elements, state, i18n);
           (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.updatePosts)(elements, state, watchedState, i18n);
           break;
         case 'uiState.clickedPostLink':
@@ -39406,14 +39406,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           // case 'parser error':  <---- вот сюда
           //   watchedState.error = 'validation.invalid.noRSS'; <---- ошибка полностью игнорируется
           //   break;
+          case 'network error':
+            watchedState.error = 'validation.invalid.networkError';
+            break;
           case 'validation.invalid.nonvalidURL':
             watchedState.error = 'validation.invalid.nonvalidURL';
             break;
           case 'validation.invalid.duplicate':
             watchedState.error = 'validation.invalid.duplicate';
-            break;
-          case 'network error':
-            watchedState.error = 'validation.invalid.networkError';
             break;
           default:
             break;
@@ -39579,7 +39579,6 @@ var parseURL = function parseURL(url) {
     return responce.data.contents;
   })["catch"](function (error) {
     error.message = 'network error';
-    throw error;
   });
 };
 var parseRSS = function parseRSS(data) {
@@ -39776,7 +39775,7 @@ var renderPostsList = function renderPostsList(state, post, i18n) {
   li.append(modalButton);
   postsListGroup.append(li);
 };
-var renderPosts = function renderPosts(elements, state, watchedState, i18n) {
+var renderPosts = function renderPosts(elements, state, i18n) {
   renderPostsContainer(elements, i18n);
   lodash__WEBPACK_IMPORTED_MODULE_0__.uniq(state.parsedPosts).forEach(function (post) {
     renderPostsList(state, post, i18n);
