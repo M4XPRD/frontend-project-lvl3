@@ -2,10 +2,7 @@ import axios from 'axios';
 
 const parseURL = (url) => axios
   .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
-  .then((responce) => responce.data.contents)
-  .catch((error) => {
-    error.message = 'network error';
-  });
+  .then((responce) => responce.data.contents);
 
 const parseRSS = (data) => {
   const parser = new DOMParser();
