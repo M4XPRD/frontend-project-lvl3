@@ -4,7 +4,7 @@ import _ from 'lodash';
 import onChange from 'on-change';
 import i18next from 'i18next';
 import {
-  renderFeed, renderPosts, renderLanguage, renderInput, renderModals, handleButton, updatePosts,
+  renderFeed, renderPosts, renderLanguage, renderFeedback, renderModals, handleFormAccessibility, updatePosts,
 } from './view.js';
 import resources from './locales/index.js';
 import { parseRSS, parseURL } from './parser.js';
@@ -79,8 +79,8 @@ export default () => {
       switch (path) {
         case 'processState':
         case 'error':
-          handleButton(elements, watchedState);
-          renderInput(elements, state, i18n);
+          handleFormAccessibility(elements, watchedState);
+          renderFeedback(elements, state, i18n);
           break;
         case 'parsedFeeds':
           renderFeed(elements, state, i18n);

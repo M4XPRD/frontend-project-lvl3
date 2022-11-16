@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { parseURL, parseRSS } from './parser.js';
 
-const handleButton = (elements, state) => {
+const handleFormAccessibility = (elements, state) => {
   if (state.processState === 'loading') {
     elements.input.disabled = true;
     elements.button.disabled = true;
@@ -13,37 +13,53 @@ const handleButton = (elements, state) => {
 
 const renderFrame = (elements, state) => {
   switch (true) {
+    case (state.processState === 'loading'):
+      elements.input.classList.remove('is-invalid');
+      break;
     case (!state.valid && state.error === 'validation.invalid.noRSS'):
       elements.input.classList.remove('is-invalid');
       elements.feedback.classList.replace('text-success', 'text-danger');
       break;
-    case (!state.valid):
+    case (!state.valid && !_.isEmpty(state.error)):
       elements.input.classList.add('is-invalid');
       elements.feedback.classList.replace('text-success', 'text-danger');
       break;
-    default:
+    case (state.processState === 'success'):
       elements.input.classList.remove('is-invalid');
       elements.feedback.classList.replace('text-danger', 'text-success');
+      break;
+    default:
       break;
   }
 };
 
-const renderInput = (elements, state, i18n) => {
+const renderFeedback = (elements, state, i18n) => {
   switch (true) {
+    case (state.processState === 'loading'):
+      elements.feedback.textContent = '';
+      renderFrame(elements, state);
+      break;
+    case (!state.valid && state.error === 'validation.invalid.noRSS'):
+      elements.feedback.textContent = i18n.t(`${state.error}`);
+      elements.feedback.setAttribute('data-link-message', `${state.error}`);
+      renderFrame(elements, state);
+      break;
     case (!state.valid && !_.isEmpty(state.error)):
       elements.feedback.textContent = i18n.t(`${state.error}`);
       elements.feedback.setAttribute('data-link-message', `${state.error}`);
       renderFrame(elements, state);
       break;
-    default:
+    case (state.processState === 'success'):
       state.error = '';
       elements.feedback.textContent = i18n.t('validation.valid.success');
       elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
       renderFrame(elements, state);
       elements.form.reset();
-      elements.input.focus();
+      break;
+    default:
       break;
   }
+  elements.input.focus();
 };
 
 const renderFeedsContainer = (elements, i18n) => {
@@ -216,5 +232,11 @@ const renderLanguage = (elements, value, previousValue, i18n) => {
 };
 
 export {
-  renderInput, renderLanguage, renderPosts, renderFeed, renderModals, handleButton, updatePosts,
+  renderFeedback,
+  renderLanguage,
+  renderPosts,
+  renderFeed,
+  renderModals,
+  handleFormAccessibility,
+  updatePosts,
 };
