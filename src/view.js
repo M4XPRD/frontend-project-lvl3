@@ -14,7 +14,6 @@ const handleFormAccessibility = (elements, state) => {
 const renderErrors = (errorName, watchedState) => {
   switch (errorName) {
     case 'parser error':
-      console.log('PARSER ERROR WORKED');
       watchedState.error = 'validation.invalid.noRSS';
       break;
     case 'network error':

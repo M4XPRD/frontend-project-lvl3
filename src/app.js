@@ -129,9 +129,13 @@ export default () => {
               watchedState.parsedFeeds.unshift(feeds);
               watchedState.parsedPosts.unshift(...posts);
             }
+          }).catch((error) => {
+            error.message = 'network error';
+            watchedState.valid = false;
+            watchedState.processState = 'failed loading';
+            renderErrors(error.message, watchedState);
           });
         }).catch((error) => {
-          console.log(`FOUND ERROR: ${error.message}`);
           watchedState.valid = false;
           watchedState.processState = 'failed loading';
           renderErrors(error.message, watchedState);
