@@ -87,7 +87,7 @@ export default () => {
           break;
         case 'parsedPosts':
         case 'uiState.viewedLinks':
-          renderPosts(elements, state, watchedState, i18n);
+          renderPosts(elements, state, i18n);
           updatePosts(elements, state, watchedState, i18n);
           break;
         case 'uiState.clickedPostLink':
@@ -137,14 +137,14 @@ export default () => {
             // case 'parser error':  <---- вот сюда
             //   watchedState.error = 'validation.invalid.noRSS'; <---- ошибка полностью игнорируется
             //   break;
+            case 'network error':
+              watchedState.error = 'validation.invalid.networkError';
+              break;
             case 'validation.invalid.nonvalidURL':
               watchedState.error = 'validation.invalid.nonvalidURL';
               break;
             case 'validation.invalid.duplicate':
               watchedState.error = 'validation.invalid.duplicate';
-              break;
-            case 'network error':
-              watchedState.error = 'validation.invalid.networkError';
               break;
             default:
               break;

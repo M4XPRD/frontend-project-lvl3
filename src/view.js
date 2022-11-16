@@ -157,7 +157,7 @@ const renderPostsList = (state, post, i18n) => {
   postsListGroup.append(li);
 };
 
-const renderPosts = (elements, state, watchedState, i18n) => {
+const renderPosts = (elements, state, i18n) => {
   renderPostsContainer(elements, i18n);
   _.uniq(state.parsedPosts).forEach((post) => {
     renderPostsList(state, post, i18n);
