@@ -11,6 +11,26 @@ const handleFormAccessibility = (elements, state) => {
   }
 };
 
+const renderErrors = (errorName, watchedState) => {
+  switch (errorName) {
+    case 'parser error':
+      console.log('PARSER ERROR WORKED');
+      watchedState.error = 'validation.invalid.noRSS';
+      break;
+    case 'network error':
+      watchedState.error = 'validation.invalid.networkError';
+      break;
+    case 'validation.invalid.nonvalidURL':
+      watchedState.error = 'validation.invalid.nonvalidURL';
+      break;
+    case 'validation.invalid.duplicate':
+      watchedState.error = 'validation.invalid.duplicate';
+      break;
+    default:
+      break;
+  }
+};
+
 const renderFrame = (elements, state) => {
   switch (true) {
     case (state.processState === 'loading'):
@@ -232,4 +252,5 @@ export {
   renderModals,
   handleFormAccessibility,
   updatePosts,
+  renderErrors,
 };
