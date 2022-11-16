@@ -5,6 +5,7 @@ const parseURL = (url) => axios
   .then((responce) => responce.data.contents)
   .catch((error) => {
     error.message = 'network error';
+    throw error;
   });
 
 const parseRSS = (data) => {
