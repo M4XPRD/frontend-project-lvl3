@@ -37,28 +37,21 @@ const renderFeedback = (elements, state, i18n) => {
   switch (true) {
     case (state.processState === 'loading'):
       elements.feedback.textContent = '';
-      renderFrame(elements, state);
-      break;
-    case (!state.valid && state.error === 'validation.invalid.noRSS'):
-      elements.feedback.textContent = i18n.t(`${state.error}`);
-      elements.feedback.setAttribute('data-link-message', `${state.error}`);
-      renderFrame(elements, state);
       break;
     case (!state.valid && !_.isEmpty(state.error)):
       elements.feedback.textContent = i18n.t(`${state.error}`);
       elements.feedback.setAttribute('data-link-message', `${state.error}`);
-      renderFrame(elements, state);
       break;
     case (state.processState === 'success'):
       state.error = '';
       elements.feedback.textContent = i18n.t('validation.valid.success');
       elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
-      renderFrame(elements, state);
       elements.form.reset();
       break;
     default:
       break;
   }
+  renderFrame(elements, state);
   elements.input.focus();
 };
 
