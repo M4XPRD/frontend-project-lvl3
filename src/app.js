@@ -4,7 +4,7 @@ import _ from 'lodash';
 import onChange from 'on-change';
 import i18next from 'i18next';
 import {
-  renderFeed, renderPosts, renderLanguage, renderFeedback, renderModals, handleFormAccessibility, updatePosts,
+  renderFeed, renderPosts, renderLanguage, renderFeedback, renderModals, handleFormAccessibility, updatePosts, renderErrors,
 } from './view.js';
 import resources from './locales/index.js';
 import { parseRSS, parseURL } from './parser.js';
@@ -116,9 +116,9 @@ export default () => {
             const posts = parseRSS(responce).loadedPosts;
 
             if (parserErrorCheck) {
-              watchedState.error = 'validation.invalid.noRSS'; // создание искуственной ошибки не помогло
-              watchedState.valid = false; // каждый раз throw new Error (разными методами) не переходит в последний catch
-              watchedState.processState = 'failed loading'; // поэтому решил оставить такую проверку
+              watchedState.valid = false;
+              watchedState.processState = 'failed loading';
+              renderErrors('parser error', watchedState);
             } else {
               posts.forEach((post) => {
                 post.postID = _.uniqueId();
@@ -129,26 +129,12 @@ export default () => {
               watchedState.parsedFeeds.unshift(feeds);
               watchedState.parsedPosts.unshift(...posts);
             }
-          }); // здесь раньше был ещё один catch, который передаёт ошибку в последний catch
+          });
         }).catch((error) => {
+          console.log(`FOUND ERROR: ${error.message}`);
           watchedState.valid = false;
           watchedState.processState = 'failed loading';
-          switch (error.message) {
-            // case 'parser error':  <---- вот сюда
-            //   watchedState.error = 'validation.invalid.noRSS'; <---- ошибка полностью игнорируется
-            //   break;
-            case 'network error':
-              watchedState.error = 'validation.invalid.networkError';
-              break;
-            case 'validation.invalid.nonvalidURL':
-              watchedState.error = 'validation.invalid.nonvalidURL';
-              break;
-            case 'validation.invalid.duplicate':
-              watchedState.error = 'validation.invalid.duplicate';
-              break;
-            default:
-              break;
-          }
+          renderErrors(error.message, watchedState);
         });
     });
 
