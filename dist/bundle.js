@@ -39398,6 +39398,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             watchedState.parsedFeeds.unshift(feeds);
             (_watchedState$parsedP = watchedState.parsedPosts).unshift.apply(_watchedState$parsedP, _toConsumableArray(posts));
           }
+        })["catch"](function (error) {
+          console.log('it worked!');
+          error.message = 'network error';
+          watchedState.valid = false;
+          watchedState.processState = 'failed loading';
+          (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderErrors)(error.message, watchedState);
         });
       })["catch"](function (error) {
         console.log("FOUND ERROR: ".concat(error.message));
@@ -39563,9 +39569,6 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 var parseURL = function parseURL(url) {
   return axios__WEBPACK_IMPORTED_MODULE_0__["default"].get("https://allorigins.hexlet.app/get?disableCache=true&url=".concat(encodeURIComponent(url))).then(function (responce) {
     return responce.data.contents;
-  })["catch"](function (error) {
-    console.log('NETWORK ERROR');
-    error.message = 'network error';
   });
 };
 var parseRSS = function parseRSS(data) {
