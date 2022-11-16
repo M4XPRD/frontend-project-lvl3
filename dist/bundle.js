@@ -39700,28 +39700,21 @@ var renderFeedback = function renderFeedback(elements, state, i18n) {
   switch (true) {
     case state.processState === 'loading':
       elements.feedback.textContent = '';
-      renderFrame(elements, state);
-      break;
-    case !state.valid && state.error === 'validation.invalid.noRSS':
-      elements.feedback.textContent = i18n.t("".concat(state.error));
-      elements.feedback.setAttribute('data-link-message', "".concat(state.error));
-      renderFrame(elements, state);
       break;
     case !state.valid && !lodash__WEBPACK_IMPORTED_MODULE_0__.isEmpty(state.error):
       elements.feedback.textContent = i18n.t("".concat(state.error));
       elements.feedback.setAttribute('data-link-message', "".concat(state.error));
-      renderFrame(elements, state);
       break;
     case state.processState === 'success':
       state.error = '';
       elements.feedback.textContent = i18n.t('validation.valid.success');
       elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
-      renderFrame(elements, state);
       elements.form.reset();
       break;
     default:
       break;
   }
+  renderFrame(elements, state);
   elements.input.focus();
 };
 var renderFeedsContainer = function renderFeedsContainer(elements, i18n) {
