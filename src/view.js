@@ -35,6 +35,7 @@ const renderFrame = (elements, state) => {
     case (state.processState === 'loading'):
       elements.input.classList.remove('is-invalid');
       break;
+    case (!state.valid && state.error === 'validation.invalid.networkError'):
     case (!state.valid && state.error === 'validation.invalid.noRSS'):
       elements.input.classList.remove('is-invalid');
       elements.feedback.classList.replace('text-success', 'text-danger');
