@@ -39399,14 +39399,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             (_watchedState$parsedP = watchedState.parsedPosts).unshift.apply(_watchedState$parsedP, _toConsumableArray(posts));
           }
         })["catch"](function (error) {
-          console.log('it worked!');
           error.message = 'network error';
           watchedState.valid = false;
           watchedState.processState = 'failed loading';
           (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderErrors)(error.message, watchedState);
         });
       })["catch"](function (error) {
-        console.log("FOUND ERROR: ".concat(error.message));
         watchedState.valid = false;
         watchedState.processState = 'failed loading';
         (0,_view_js__WEBPACK_IMPORTED_MODULE_4__.renderErrors)(error.message, watchedState);
@@ -39646,7 +39644,6 @@ var handleFormAccessibility = function handleFormAccessibility(elements, state) 
 var renderErrors = function renderErrors(errorName, watchedState) {
   switch (errorName) {
     case 'parser error':
-      console.log('PARSER ERROR WORKED');
       watchedState.error = 'validation.invalid.noRSS';
       break;
     case 'network error':
@@ -39663,10 +39660,13 @@ var renderErrors = function renderErrors(errorName, watchedState) {
   }
 };
 var renderFrame = function renderFrame(elements, state) {
+  console.log(state.processState);
+  console.log(state.error);
   switch (true) {
     case state.processState === 'loading':
       elements.input.classList.remove('is-invalid');
       break;
+    case !state.valid && state.error === 'validation.invalid.networkError':
     case !state.valid && state.error === 'validation.invalid.noRSS':
       elements.input.classList.remove('is-invalid');
       elements.feedback.classList.replace('text-success', 'text-danger');
