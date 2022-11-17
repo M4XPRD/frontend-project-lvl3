@@ -1,13 +1,18 @@
-/* eslint-disable max-len */
 import * as yup from 'yup';
 import _ from 'lodash';
 import onChange from 'on-change';
 import i18next from 'i18next';
-import {
-  renderFeed, renderPosts, renderLanguage, renderFeedback, renderModals, handleFormAccessibility, updatePosts, renderErrors,
-} from './view.js';
 import resources from './locales/index.js';
 import { parseRSS, parseURL } from './parser.js';
+import {
+  renderFeed,
+  renderPosts,
+  renderLanguage, renderFeedback,
+  renderModals,
+  handleFormAccessibility,
+  updatePosts,
+  renderErrors,
+} from './view.js';
 
 export default () => {
   const defaultLanguage = 'ru';
