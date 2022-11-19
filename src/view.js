@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { parseURL, parseRSS } from './parser.js';
 
 const handleFormAccessibility = (elements, state) => {
-  if (state.processState === 'loading') {
+  if (state.loadingProcess === 'loading') {
     elements.input.disabled = true;
     elements.button.disabled = true;
   } else {
@@ -32,7 +32,7 @@ const renderErrors = (errorName, watchedState) => {
 
 const renderFrame = (elements, state) => {
   switch (true) {
-    case (state.processState === 'loading'):
+    case (state.loadingProcess === 'loading'):
       elements.input.classList.remove('is-invalid');
       break;
     case (!state.valid && state.error === 'validation.invalid.networkError'):
@@ -44,7 +44,7 @@ const renderFrame = (elements, state) => {
       elements.input.classList.add('is-invalid');
       elements.feedback.classList.replace('text-success', 'text-danger');
       break;
-    case (state.processState === 'success'):
+    case (state.loadingProcess === 'success'):
       elements.input.classList.remove('is-invalid');
       elements.feedback.classList.replace('text-danger', 'text-success');
       break;
@@ -55,14 +55,14 @@ const renderFrame = (elements, state) => {
 
 const renderFeedback = (elements, state, i18n) => {
   switch (true) {
-    case (state.processState === 'loading'):
+    case (state.loadingProcess === 'loading'):
       elements.feedback.textContent = '';
       break;
     case (!state.valid && !_.isEmpty(state.error)):
       elements.feedback.textContent = i18n.t(`${state.error}`);
       elements.feedback.setAttribute('data-link-message', `${state.error}`);
       break;
-    case (state.processState === 'success'):
+    case (state.loadingProcess === 'success'):
       state.error = '';
       elements.feedback.textContent = i18n.t('validation.valid.success');
       elements.feedback.setAttribute('data-link-message', 'validation.valid.success');

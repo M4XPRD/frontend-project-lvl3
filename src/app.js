@@ -65,7 +65,7 @@ export default () => {
 
     const state = {
       lng: defaultLanguage,
-      processState: 'ready to load',
+      loadingProcess: 'ready to load feed',
       valid: '',
       error: '',
       field: {
@@ -82,7 +82,7 @@ export default () => {
 
     const watchedState = onChange(state, (path, value, previousValue) => {
       switch (path) {
-        case 'processState':
+        case 'loadingProcess':
         case 'error':
           handleFormAccessibility(elements, watchedState);
           renderFeedback(elements, state, i18n);
@@ -112,7 +112,7 @@ export default () => {
       const data = new FormData(e.target);
       const currentUrl = data.get('url').trim();
       watchedState.field.url = currentUrl;
-      watchedState.processState = 'loading';
+      watchedState.loadingProcess = 'loading';
       validateURL(currentUrl, watchedState)
         .then(() => {
           parseURL(watchedState.field.url).then((responce) => {
@@ -122,14 +122,14 @@ export default () => {
 
             if (parserErrorCheck) {
               watchedState.valid = false;
-              watchedState.processState = 'failed loading';
+              watchedState.loadingProcess = 'failed loading';
               renderErrors('parser error', watchedState);
             } else {
               posts.forEach((post) => {
                 post.postID = _.uniqueId();
               });
               watchedState.valid = true;
-              watchedState.processState = 'success';
+              watchedState.loadingProcess = 'success';
               watchedState.rssFeedLinks.push(watchedState.field.url);
               watchedState.parsedFeeds.unshift(feeds);
               watchedState.parsedPosts.unshift(...posts);
@@ -137,12 +137,12 @@ export default () => {
           }).catch((error) => {
             error.message = 'network error';
             watchedState.valid = false;
-            watchedState.processState = 'failed loading';
+            watchedState.loadingProcess = 'failed loading';
             renderErrors(error.message, watchedState);
           });
         }).catch((error) => {
           watchedState.valid = false;
-          watchedState.processState = 'failed loading';
+          watchedState.loadingProcess = 'failed loading';
           renderErrors(error.message, watchedState);
         });
     });
