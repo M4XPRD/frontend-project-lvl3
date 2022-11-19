@@ -1,10 +1,4 @@
-import axios from 'axios';
-
-const parseURL = (url) => axios
-  .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
-  .then((responce) => responce.data.contents);
-
-const parseRSS = (data) => {
+export default (data) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(data, 'application/xml');
   const isParseError = doc.querySelector('parsererror');
@@ -25,5 +19,3 @@ const parseRSS = (data) => {
     loadedFeeds, loadedPosts, isParseError,
   };
 };
-
-export { parseURL, parseRSS };
