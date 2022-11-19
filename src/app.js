@@ -24,10 +24,10 @@ export default () => {
   }).then(() => {
     yup.setLocale({
       mixed: {
-        notOneOf: 'validation.invalid.duplicate',
+        notOneOf: 'duplication error',
       },
       string: {
-        url: 'validation.invalid.nonvalidURL',
+        url: 'nonvalid url error',
       },
     });
 
@@ -82,6 +82,7 @@ export default () => {
         case 'loadingProcess':
         case 'error':
           handleFormAccessibility(elements, watchedState);
+          renderErrors(state.error, state);
           renderFeedback(elements, state, i18n);
           break;
         case 'parsedFeeds':
@@ -119,7 +120,7 @@ export default () => {
             if (parserErrorCheck) {
               watchedState.valid = false;
               watchedState.loadingProcess = 'failed loading';
-              renderErrors('parser error', watchedState);
+              watchedState.error = 'parser error';
             } else {
               posts.forEach((post) => {
                 post.postID = _.uniqueId();
@@ -134,12 +135,12 @@ export default () => {
             error.message = 'network error';
             watchedState.valid = false;
             watchedState.loadingProcess = 'failed loading';
-            renderErrors(error.message, watchedState);
+            watchedState.error = error.message;
           });
         }).catch((error) => {
           watchedState.valid = false;
           watchedState.loadingProcess = 'failed loading';
-          renderErrors(error.message, watchedState);
+          watchedState.error = error.message;
         });
     });
 

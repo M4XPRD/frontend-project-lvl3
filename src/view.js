@@ -19,10 +19,10 @@ const renderErrors = (errorName, watchedState) => {
     case 'network error':
       watchedState.error = 'validation.invalid.networkError';
       break;
-    case 'validation.invalid.nonvalidURL':
+    case 'nonvalid url error':
       watchedState.error = 'validation.invalid.nonvalidURL';
       break;
-    case 'validation.invalid.duplicate':
+    case 'duplication error':
       watchedState.error = 'validation.invalid.duplicate';
       break;
     default:
