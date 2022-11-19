@@ -12,16 +12,16 @@ const handleFormAccessibility = (elements, state) => {
 
 const renderErrors = (errorName, watchedState) => {
   switch (errorName) {
-    case 'parser error':
+    case 'Parser Error':
       watchedState.error = 'validation.invalid.noRSS';
       break;
-    case 'network error':
+    case 'Network Error':
       watchedState.error = 'validation.invalid.networkError';
       break;
-    case 'nonvalid url error':
+    case 'Nonvalid URL Error':
       watchedState.error = 'validation.invalid.nonvalidURL';
       break;
-    case 'duplication error':
+    case 'Duplication Error':
       watchedState.error = 'validation.invalid.duplicate';
       break;
     default:

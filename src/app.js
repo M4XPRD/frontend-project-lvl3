@@ -39,10 +39,10 @@ export default () => {
   }).then(() => {
     yup.setLocale({
       mixed: {
-        notOneOf: 'duplication error',
+        notOneOf: 'Duplication Error',
       },
       string: {
-        url: 'nonvalid url error',
+        url: 'Nonvalid URL Error',
       },
     });
 
@@ -106,7 +106,6 @@ export default () => {
         case 'parsedPosts':
         case 'uiState.viewedLinks':
           renderPosts(elements, state, i18n);
-          // updatePosts(elements, state, watchedState, i18n);
           break;
         case 'uiState.clickedPostLink':
           renderModals(elements, state);
@@ -126,39 +125,32 @@ export default () => {
       const currentUrl = data.get('url').trim();
       watchedState.loadingProcess = 'loading';
       validateURL(currentUrl, watchedState)
-        .then((responceLink) => {
-          parseURL(responceLink)
-            .then((responce) => {
-              const parsedResponce = parseRSS(responce);
-              const parserErrorCheck = parsedResponce.isParseError;
-              const feeds = parsedResponce.loadedFeeds;
-              const posts = parsedResponce.loadedPosts;
+        .then(() => parseURL(currentUrl))
+        .then((responce) => {
+          const parsedResponce = parseRSS(responce);
+          const parserErrorCheck = parsedResponce.isParseError;
+          const feeds = parsedResponce.loadedFeeds;
+          const posts = parsedResponce.loadedPosts;
 
-              if (parserErrorCheck) {
-                watchedState.valid = false;
-                watchedState.loadingProcess = 'failed loading';
-                watchedState.error = 'parser error';
-              } else {
-                posts.forEach((post) => {
-                  post.postID = _.uniqueId();
-                });
-                watchedState.valid = true;
-                watchedState.loadingProcess = 'success';
-                watchedState.rssFeedLinks.push(currentUrl);
-                watchedState.parsedFeeds.unshift(feeds);
-                watchedState.parsedPosts.unshift(...posts);
-                updatePosts(responceLink, state, watchedState, i18n);
-              }
-            }).catch((error) => {
-              error.message = 'network error';
-              watchedState.valid = false;
-              watchedState.loadingProcess = 'failed loading';
-              watchedState.error = error.message;
-            });
-        }).catch((error) => {
+          if (parserErrorCheck) {
+            const error = new Error();
+            error.message = 'Parser Error';
+            throw error;
+          }
+          posts.forEach((post) => {
+            post.postID = _.uniqueId();
+          });
+          watchedState.valid = true;
+          watchedState.loadingProcess = 'success';
+          watchedState.rssFeedLinks.push(currentUrl);
+          watchedState.parsedFeeds.unshift(feeds);
+          watchedState.parsedPosts.unshift(...posts);
+          updatePosts(currentUrl, state, watchedState, i18n);
+        })
+        .catch((error) => {
           watchedState.valid = false;
           watchedState.loadingProcess = 'failed loading';
-          watchedState.error = error.message;
+          renderErrors(error.message, watchedState);
         });
     });
 
