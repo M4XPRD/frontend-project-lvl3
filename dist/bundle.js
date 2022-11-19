@@ -39334,9 +39334,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       loadingProcess: 'ready to load feed',
       valid: false,
       error: '',
-      field: {
-        url: ''
-      },
       uiState: {
         viewedLinks: [],
         clickedPostLink: ''
@@ -39375,10 +39372,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       e.preventDefault();
       var data = new FormData(e.target);
       var currentUrl = data.get('url').trim();
-      watchedState.field.url = currentUrl;
       watchedState.loadingProcess = 'loading';
       validateURL(currentUrl, watchedState).then(function () {
-        (0,_parser_js__WEBPACK_IMPORTED_MODULE_5__.parseURL)(watchedState.field.url).then(function (responce) {
+        (0,_parser_js__WEBPACK_IMPORTED_MODULE_5__.parseURL)(currentUrl).then(function (responce) {
           var parserErrorCheck = (0,_parser_js__WEBPACK_IMPORTED_MODULE_5__.parseRSS)(responce).isParseError;
           var feeds = (0,_parser_js__WEBPACK_IMPORTED_MODULE_5__.parseRSS)(responce).loadedFeeds;
           var posts = (0,_parser_js__WEBPACK_IMPORTED_MODULE_5__.parseRSS)(responce).loadedPosts;
@@ -39393,7 +39389,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             });
             watchedState.valid = true;
             watchedState.loadingProcess = 'success';
-            watchedState.rssFeedLinks.push(watchedState.field.url);
+            watchedState.rssFeedLinks.push(currentUrl);
             watchedState.parsedFeeds.unshift(feeds);
             (_watchedState$parsedP = watchedState.parsedPosts).unshift.apply(_watchedState$parsedP, _toConsumableArray(posts));
           }
