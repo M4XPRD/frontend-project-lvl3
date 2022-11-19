@@ -39331,8 +39331,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     };
     var state = {
       lng: defaultLanguage,
-      processState: 'ready to load',
-      valid: '',
+      loadingProcess: 'ready to load feed',
+      valid: false,
       error: '',
       field: {
         url: ''
@@ -39347,7 +39347,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     };
     var watchedState = (0,on_change__WEBPACK_IMPORTED_MODULE_2__["default"])(state, function (path, value, previousValue) {
       switch (path) {
-        case 'processState':
+        case 'loadingProcess':
         case 'error':
           (0,_view_js__WEBPACK_IMPORTED_MODULE_6__.handleFormAccessibility)(elements, watchedState);
           (0,_view_js__WEBPACK_IMPORTED_MODULE_6__.renderFeedback)(elements, state, i18n);
@@ -39376,7 +39376,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var data = new FormData(e.target);
       var currentUrl = data.get('url').trim();
       watchedState.field.url = currentUrl;
-      watchedState.processState = 'loading';
+      watchedState.loadingProcess = 'loading';
       validateURL(currentUrl, watchedState).then(function () {
         (0,_parser_js__WEBPACK_IMPORTED_MODULE_5__.parseURL)(watchedState.field.url).then(function (responce) {
           var parserErrorCheck = (0,_parser_js__WEBPACK_IMPORTED_MODULE_5__.parseRSS)(responce).isParseError;
@@ -39384,7 +39384,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           var posts = (0,_parser_js__WEBPACK_IMPORTED_MODULE_5__.parseRSS)(responce).loadedPosts;
           if (parserErrorCheck) {
             watchedState.valid = false;
-            watchedState.processState = 'failed loading';
+            watchedState.loadingProcess = 'failed loading';
             (0,_view_js__WEBPACK_IMPORTED_MODULE_6__.renderErrors)('parser error', watchedState);
           } else {
             var _watchedState$parsedP;
@@ -39392,7 +39392,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               post.postID = lodash__WEBPACK_IMPORTED_MODULE_1__.uniqueId();
             });
             watchedState.valid = true;
-            watchedState.processState = 'success';
+            watchedState.loadingProcess = 'success';
             watchedState.rssFeedLinks.push(watchedState.field.url);
             watchedState.parsedFeeds.unshift(feeds);
             (_watchedState$parsedP = watchedState.parsedPosts).unshift.apply(_watchedState$parsedP, _toConsumableArray(posts));
@@ -39400,12 +39400,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         })["catch"](function (error) {
           error.message = 'network error';
           watchedState.valid = false;
-          watchedState.processState = 'failed loading';
+          watchedState.loadingProcess = 'failed loading';
           (0,_view_js__WEBPACK_IMPORTED_MODULE_6__.renderErrors)(error.message, watchedState);
         });
       })["catch"](function (error) {
         watchedState.valid = false;
-        watchedState.processState = 'failed loading';
+        watchedState.loadingProcess = 'failed loading';
         (0,_view_js__WEBPACK_IMPORTED_MODULE_6__.renderErrors)(error.message, watchedState);
       });
     });
@@ -39632,7 +39632,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 
 var handleFormAccessibility = function handleFormAccessibility(elements, state) {
-  if (state.processState === 'loading') {
+  if (state.loadingProcess === 'loading') {
     elements.input.disabled = true;
     elements.button.disabled = true;
   } else {
@@ -39660,7 +39660,7 @@ var renderErrors = function renderErrors(errorName, watchedState) {
 };
 var renderFrame = function renderFrame(elements, state) {
   switch (true) {
-    case state.processState === 'loading':
+    case state.loadingProcess === 'loading':
       elements.input.classList.remove('is-invalid');
       break;
     case !state.valid && state.error === 'validation.invalid.networkError':
@@ -39672,7 +39672,7 @@ var renderFrame = function renderFrame(elements, state) {
       elements.input.classList.add('is-invalid');
       elements.feedback.classList.replace('text-success', 'text-danger');
       break;
-    case state.processState === 'success':
+    case state.loadingProcess === 'success':
       elements.input.classList.remove('is-invalid');
       elements.feedback.classList.replace('text-danger', 'text-success');
       break;
@@ -39682,14 +39682,14 @@ var renderFrame = function renderFrame(elements, state) {
 };
 var renderFeedback = function renderFeedback(elements, state, i18n) {
   switch (true) {
-    case state.processState === 'loading':
+    case state.loadingProcess === 'loading':
       elements.feedback.textContent = '';
       break;
     case !state.valid && !lodash__WEBPACK_IMPORTED_MODULE_0__.isEmpty(state.error):
       elements.feedback.textContent = i18n.t("".concat(state.error));
       elements.feedback.setAttribute('data-link-message', "".concat(state.error));
       break;
-    case state.processState === 'success':
+    case state.loadingProcess === 'success':
       state.error = '';
       elements.feedback.textContent = i18n.t('validation.valid.success');
       elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
