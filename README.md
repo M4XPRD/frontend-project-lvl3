@@ -18,7 +18,7 @@
 
 • If you need to change the language, press `RU/EN` buttons in the upper-right corner
 
-• All downloaded feeds would constantly update every 5 seconds, so you won't miss anything
+• All downloaded feeds would constantly update every 5 seconds, so you won't miss anything 👀
 
 • That's it!
 
