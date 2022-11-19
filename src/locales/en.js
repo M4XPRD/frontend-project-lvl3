@@ -8,7 +8,7 @@ export default {
         nonvalidURL: 'The link must be a valid URL',
         noRSS: 'The resource does not contain valid RSS. Try again or replace with another link',
         duplicate: 'RSS already exists',
-        networkError: 'Network error',
+        networkError: 'Network error. Check your Internet connection',
       },
     },
     interface: {
