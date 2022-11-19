@@ -39281,10 +39281,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   }).then(function () {
     yup__WEBPACK_IMPORTED_MODULE_0__.setLocale({
       mixed: {
-        notOneOf: 'validation.invalid.duplicate'
+        notOneOf: 'duplication error'
       },
       string: {
-        url: 'validation.invalid.nonvalidURL'
+        url: 'nonvalid url error'
       }
     });
     var validateURL = /*#__PURE__*/function () {
@@ -39347,6 +39347,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         case 'loadingProcess':
         case 'error':
           (0,_view_js__WEBPACK_IMPORTED_MODULE_6__.handleFormAccessibility)(elements, watchedState);
+          (0,_view_js__WEBPACK_IMPORTED_MODULE_6__.renderErrors)(state.error, state);
           (0,_view_js__WEBPACK_IMPORTED_MODULE_6__.renderFeedback)(elements, state, i18n);
           break;
         case 'parsedFeeds':
@@ -39381,7 +39382,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           if (parserErrorCheck) {
             watchedState.valid = false;
             watchedState.loadingProcess = 'failed loading';
-            (0,_view_js__WEBPACK_IMPORTED_MODULE_6__.renderErrors)('parser error', watchedState);
+            watchedState.error = 'parser error';
           } else {
             var _watchedState$parsedP;
             posts.forEach(function (post) {
@@ -39397,12 +39398,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           error.message = 'network error';
           watchedState.valid = false;
           watchedState.loadingProcess = 'failed loading';
-          (0,_view_js__WEBPACK_IMPORTED_MODULE_6__.renderErrors)(error.message, watchedState);
+          watchedState.error = error.message;
         });
       })["catch"](function (error) {
         watchedState.valid = false;
         watchedState.loadingProcess = 'failed loading';
-        (0,_view_js__WEBPACK_IMPORTED_MODULE_6__.renderErrors)(error.message, watchedState);
+        watchedState.error = error.message;
       });
     });
     elements.languageButtons.forEach(function (languageButton) {
@@ -39450,7 +39451,7 @@ __webpack_require__.r(__webpack_exports__);
         nonvalidURL: 'The link must be a valid URL',
         noRSS: 'The resource does not contain valid RSS. Try again or replace with another link',
         duplicate: 'RSS already exists',
-        networkError: 'Network error'
+        networkError: 'Network error. Check your Internet connection'
       }
     },
     "interface": {
@@ -39516,7 +39517,7 @@ __webpack_require__.r(__webpack_exports__);
         nonvalidURL: 'Ссылка должна быть валидным URL',
         noRSS: 'Ресурс не содержит валидный RSS. Попробуйте ещё раз или загрузите другую ссылку',
         duplicate: 'RSS уже существует',
-        networkError: 'Ошибка сети'
+        networkError: 'Ошибка сети. Проверьте ваше соединение с Интернетом'
       }
     },
     "interface": {
@@ -39644,10 +39645,10 @@ var renderErrors = function renderErrors(errorName, watchedState) {
     case 'network error':
       watchedState.error = 'validation.invalid.networkError';
       break;
-    case 'validation.invalid.nonvalidURL':
+    case 'nonvalid url error':
       watchedState.error = 'validation.invalid.nonvalidURL';
       break;
-    case 'validation.invalid.duplicate':
+    case 'duplication error':
       watchedState.error = 'validation.invalid.duplicate';
       break;
     default:
