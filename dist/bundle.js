@@ -39278,18 +39278,16 @@ var parseURL = function parseURL(url) {
     return responce.data.contents;
   });
 };
-var updatePosts = function updatePosts(elements, state, watchedState, i18n) {
-  state.rssFeedLinks.forEach(function (rssLink) {
-    parseURL(rssLink).then(function (responce) {
-      var parsedData = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__["default"])(responce);
-      var newPosts = lodash__WEBPACK_IMPORTED_MODULE_2__.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
-      if (newPosts.length > 0) {
-        watchedState.parsedPosts = [].concat(_toConsumableArray(newPosts), _toConsumableArray(state.parsedPosts));
-      }
-    }).then(setTimeout(function () {
-      updatePosts(elements, state, watchedState, i18n);
-    }, 5000));
-  });
+var updatePosts = function updatePosts(rssLink, state, watchedState, i18n) {
+  parseURL(rssLink).then(function (responce) {
+    var parsedData = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__["default"])(responce);
+    var newPosts = lodash__WEBPACK_IMPORTED_MODULE_2__.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
+    if (newPosts.length > 0) {
+      watchedState.parsedPosts = [].concat(_toConsumableArray(newPosts), _toConsumableArray(state.parsedPosts));
+    }
+  }).then(setTimeout(function () {
+    updatePosts(rssLink, state, watchedState, i18n);
+  }, 5000));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (function () {
   var defaultLanguage = 'ru';
@@ -39376,7 +39374,7 @@ var updatePosts = function updatePosts(elements, state, watchedState, i18n) {
         case 'parsedPosts':
         case 'uiState.viewedLinks':
           (0,_view_js__WEBPACK_IMPORTED_MODULE_7__.renderPosts)(elements, state, i18n);
-          updatePosts(elements, state, watchedState, i18n);
+          // updatePosts(elements, state, watchedState, i18n);
           break;
         case 'uiState.clickedPostLink':
           (0,_view_js__WEBPACK_IMPORTED_MODULE_7__.renderModals)(elements, state);
@@ -39394,8 +39392,8 @@ var updatePosts = function updatePosts(elements, state, watchedState, i18n) {
       var data = new FormData(e.target);
       var currentUrl = data.get('url').trim();
       watchedState.loadingProcess = 'loading';
-      validateURL(currentUrl, watchedState).then(function () {
-        parseURL(currentUrl).then(function (responce) {
+      validateURL(currentUrl, watchedState).then(function (responceLink) {
+        parseURL(responceLink).then(function (responce) {
           var parsedResponce = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__["default"])(responce);
           var parserErrorCheck = parsedResponce.isParseError;
           var feeds = parsedResponce.loadedFeeds;
@@ -39414,6 +39412,7 @@ var updatePosts = function updatePosts(elements, state, watchedState, i18n) {
             watchedState.rssFeedLinks.push(currentUrl);
             watchedState.parsedFeeds.unshift(feeds);
             (_watchedState$parsedP = watchedState.parsedPosts).unshift.apply(_watchedState$parsedP, _toConsumableArray(posts));
+            updatePosts(responceLink, state, watchedState, i18n);
           }
         })["catch"](function (error) {
           error.message = 'network error';
