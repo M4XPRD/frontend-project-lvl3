@@ -1,5 +1,5 @@
 node_modules
-dist
+dist/
 .vscode
 fixes.txt
-/*.test.js
+test.js
