@@ -68,9 +68,6 @@ export default () => {
       loadingProcess: 'ready to load feed',
       valid: false,
       error: '',
-      field: {
-        url: '',
-      },
       uiState: {
         viewedLinks: [],
         clickedPostLink: '',
@@ -111,11 +108,10 @@ export default () => {
       e.preventDefault();
       const data = new FormData(e.target);
       const currentUrl = data.get('url').trim();
-      watchedState.field.url = currentUrl;
       watchedState.loadingProcess = 'loading';
       validateURL(currentUrl, watchedState)
         .then(() => {
-          parseURL(watchedState.field.url).then((responce) => {
+          parseURL(currentUrl).then((responce) => {
             const parserErrorCheck = parseRSS(responce).isParseError;
             const feeds = parseRSS(responce).loadedFeeds;
             const posts = parseRSS(responce).loadedPosts;
@@ -130,7 +126,7 @@ export default () => {
               });
               watchedState.valid = true;
               watchedState.loadingProcess = 'success';
-              watchedState.rssFeedLinks.push(watchedState.field.url);
+              watchedState.rssFeedLinks.push(currentUrl);
               watchedState.parsedFeeds.unshift(feeds);
               watchedState.parsedPosts.unshift(...posts);
             }
