@@ -18,17 +18,15 @@ const parseURL = (url) => axios
   .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
   .then((responce) => responce.data.contents);
 
-const updatePosts = (elements, state, watchedState, i18n) => {
-  state.rssFeedLinks.forEach((rssLink) => {
-    parseURL(rssLink)
-      .then((responce) => {
-        const parsedData = parseRSS(responce);
-        const newPosts = _.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
-        if (newPosts.length > 0) {
-          watchedState.parsedPosts = [...newPosts, ...state.parsedPosts];
-        }
-      }).then(setTimeout(() => { updatePosts(elements, state, watchedState, i18n); }, 5000));
-  });
+const updatePosts = (rssLink, state, watchedState, i18n) => {
+  parseURL(rssLink)
+    .then((responce) => {
+      const parsedData = parseRSS(responce);
+      const newPosts = _.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
+      if (newPosts.length > 0) {
+        watchedState.parsedPosts = [...newPosts, ...state.parsedPosts];
+      }
+    }).then(setTimeout(() => { updatePosts(rssLink, state, watchedState, i18n); }, 5000));
 };
 
 export default () => {
@@ -108,7 +106,7 @@ export default () => {
         case 'parsedPosts':
         case 'uiState.viewedLinks':
           renderPosts(elements, state, i18n);
-          updatePosts(elements, state, watchedState, i18n);
+          // updatePosts(elements, state, watchedState, i18n);
           break;
         case 'uiState.clickedPostLink':
           renderModals(elements, state);
@@ -128,33 +126,35 @@ export default () => {
       const currentUrl = data.get('url').trim();
       watchedState.loadingProcess = 'loading';
       validateURL(currentUrl, watchedState)
-        .then(() => {
-          parseURL(currentUrl).then((responce) => {
-            const parsedResponce = parseRSS(responce);
-            const parserErrorCheck = parsedResponce.isParseError;
-            const feeds = parsedResponce.loadedFeeds;
-            const posts = parsedResponce.loadedPosts;
+        .then((responceLink) => {
+          parseURL(responceLink)
+            .then((responce) => {
+              const parsedResponce = parseRSS(responce);
+              const parserErrorCheck = parsedResponce.isParseError;
+              const feeds = parsedResponce.loadedFeeds;
+              const posts = parsedResponce.loadedPosts;
 
-            if (parserErrorCheck) {
+              if (parserErrorCheck) {
+                watchedState.valid = false;
+                watchedState.loadingProcess = 'failed loading';
+                watchedState.error = 'parser error';
+              } else {
+                posts.forEach((post) => {
+                  post.postID = _.uniqueId();
+                });
+                watchedState.valid = true;
+                watchedState.loadingProcess = 'success';
+                watchedState.rssFeedLinks.push(currentUrl);
+                watchedState.parsedFeeds.unshift(feeds);
+                watchedState.parsedPosts.unshift(...posts);
+                updatePosts(responceLink, state, watchedState, i18n);
+              }
+            }).catch((error) => {
+              error.message = 'network error';
               watchedState.valid = false;
               watchedState.loadingProcess = 'failed loading';
-              watchedState.error = 'parser error';
-            } else {
-              posts.forEach((post) => {
-                post.postID = _.uniqueId();
-              });
-              watchedState.valid = true;
-              watchedState.loadingProcess = 'success';
-              watchedState.rssFeedLinks.push(currentUrl);
-              watchedState.parsedFeeds.unshift(feeds);
-              watchedState.parsedPosts.unshift(...posts);
-            }
-          }).catch((error) => {
-            error.message = 'network error';
-            watchedState.valid = false;
-            watchedState.loadingProcess = 'failed loading';
-            watchedState.error = error.message;
-          });
+              watchedState.error = error.message;
+            });
         }).catch((error) => {
           watchedState.valid = false;
           watchedState.loadingProcess = 'failed loading';
