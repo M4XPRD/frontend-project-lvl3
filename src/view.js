@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import { parseURL, parseRSS } from './parser.js';
 
 const handleFormAccessibility = (elements, state) => {
   if (state.loadingProcess === 'loading') {
@@ -184,19 +183,6 @@ const renderPosts = (elements, state, i18n) => {
   });
 };
 
-const updatePosts = (elements, state, watchedState, i18n) => {
-  state.rssFeedLinks.forEach((rssLink) => {
-    parseURL(rssLink)
-      .then((responce) => {
-        const parsedData = parseRSS(responce);
-        const newPosts = _.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
-        if (newPosts.length > 0) {
-          watchedState.parsedPosts = [...newPosts, ...state.parsedPosts];
-        }
-      }).then(setTimeout(() => { updatePosts(elements, state, watchedState, i18n); }, 5000));
-  });
-};
-
 const renderModals = (elements, state) => {
   const {
     modalTitle, modalBody, modalFullArticle,
@@ -251,6 +237,5 @@ export {
   renderFeed,
   renderModals,
   handleFormAccessibility,
-  updatePosts,
   renderErrors,
 };
