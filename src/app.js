@@ -66,7 +66,7 @@ export default () => {
     const state = {
       lng: defaultLanguage,
       loadingProcess: 'ready to load feed',
-      valid: '',
+      valid: false,
       error: '',
       field: {
         url: '',
