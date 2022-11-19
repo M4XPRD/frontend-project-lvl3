@@ -1,18 +1,35 @@
+import axios from 'axios';
 import * as yup from 'yup';
 import _ from 'lodash';
 import onChange from 'on-change';
 import i18next from 'i18next';
 import resources from './locales/index.js';
-import { parseRSS, parseURL } from './parser.js';
+import parseRSS from './parser.js';
 import {
   renderFeed,
   renderPosts,
   renderLanguage, renderFeedback,
   renderModals,
   handleFormAccessibility,
-  updatePosts,
   renderErrors,
 } from './view.js';
+
+const parseURL = (url) => axios
+  .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
+  .then((responce) => responce.data.contents);
+
+const updatePosts = (elements, state, watchedState, i18n) => {
+  state.rssFeedLinks.forEach((rssLink) => {
+    parseURL(rssLink)
+      .then((responce) => {
+        const parsedData = parseRSS(responce);
+        const newPosts = _.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
+        if (newPosts.length > 0) {
+          watchedState.parsedPosts = [...newPosts, ...state.parsedPosts];
+        }
+      }).then(setTimeout(() => { updatePosts(elements, state, watchedState, i18n); }, 5000));
+  });
+};
 
 export default () => {
   const defaultLanguage = 'ru';
@@ -113,9 +130,10 @@ export default () => {
       validateURL(currentUrl, watchedState)
         .then(() => {
           parseURL(currentUrl).then((responce) => {
-            const parserErrorCheck = parseRSS(responce).isParseError;
-            const feeds = parseRSS(responce).loadedFeeds;
-            const posts = parseRSS(responce).loadedPosts;
+            const parsedResponce = parseRSS(responce);
+            const parserErrorCheck = parsedResponce.isParseError;
+            const feeds = parsedResponce.loadedFeeds;
+            const posts = parsedResponce.loadedPosts;
 
             if (parserErrorCheck) {
               watchedState.valid = false;
