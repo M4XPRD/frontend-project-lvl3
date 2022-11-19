@@ -39299,10 +39299,10 @@ var updatePosts = function updatePosts(rssLink, state, watchedState, i18n) {
   }).then(function () {
     yup__WEBPACK_IMPORTED_MODULE_1__.setLocale({
       mixed: {
-        notOneOf: 'duplication error'
+        notOneOf: 'Duplication Error'
       },
       string: {
-        url: 'nonvalid url error'
+        url: 'Nonvalid URL Error'
       }
     });
     var validateURL = /*#__PURE__*/function () {
@@ -39374,7 +39374,6 @@ var updatePosts = function updatePosts(rssLink, state, watchedState, i18n) {
         case 'parsedPosts':
         case 'uiState.viewedLinks':
           (0,_view_js__WEBPACK_IMPORTED_MODULE_7__.renderPosts)(elements, state, i18n);
-          // updatePosts(elements, state, watchedState, i18n);
           break;
         case 'uiState.clickedPostLink':
           (0,_view_js__WEBPACK_IMPORTED_MODULE_7__.renderModals)(elements, state);
@@ -39392,38 +39391,32 @@ var updatePosts = function updatePosts(rssLink, state, watchedState, i18n) {
       var data = new FormData(e.target);
       var currentUrl = data.get('url').trim();
       watchedState.loadingProcess = 'loading';
-      validateURL(currentUrl, watchedState).then(function (responceLink) {
-        parseURL(responceLink).then(function (responce) {
-          var parsedResponce = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__["default"])(responce);
-          var parserErrorCheck = parsedResponce.isParseError;
-          var feeds = parsedResponce.loadedFeeds;
-          var posts = parsedResponce.loadedPosts;
-          if (parserErrorCheck) {
-            watchedState.valid = false;
-            watchedState.loadingProcess = 'failed loading';
-            watchedState.error = 'parser error';
-          } else {
-            var _watchedState$parsedP;
-            posts.forEach(function (post) {
-              post.postID = lodash__WEBPACK_IMPORTED_MODULE_2__.uniqueId();
-            });
-            watchedState.valid = true;
-            watchedState.loadingProcess = 'success';
-            watchedState.rssFeedLinks.push(currentUrl);
-            watchedState.parsedFeeds.unshift(feeds);
-            (_watchedState$parsedP = watchedState.parsedPosts).unshift.apply(_watchedState$parsedP, _toConsumableArray(posts));
-            updatePosts(responceLink, state, watchedState, i18n);
-          }
-        })["catch"](function (error) {
-          error.message = 'network error';
-          watchedState.valid = false;
-          watchedState.loadingProcess = 'failed loading';
-          watchedState.error = error.message;
+      validateURL(currentUrl, watchedState).then(function () {
+        return parseURL(currentUrl);
+      }).then(function (responce) {
+        var _watchedState$parsedP;
+        var parsedResponce = (0,_parser_js__WEBPACK_IMPORTED_MODULE_6__["default"])(responce);
+        var parserErrorCheck = parsedResponce.isParseError;
+        var feeds = parsedResponce.loadedFeeds;
+        var posts = parsedResponce.loadedPosts;
+        if (parserErrorCheck) {
+          var error = new Error();
+          error.message = 'Parser Error';
+          throw error;
+        }
+        posts.forEach(function (post) {
+          post.postID = lodash__WEBPACK_IMPORTED_MODULE_2__.uniqueId();
         });
+        watchedState.valid = true;
+        watchedState.loadingProcess = 'success';
+        watchedState.rssFeedLinks.push(currentUrl);
+        watchedState.parsedFeeds.unshift(feeds);
+        (_watchedState$parsedP = watchedState.parsedPosts).unshift.apply(_watchedState$parsedP, _toConsumableArray(posts));
+        updatePosts(currentUrl, state, watchedState, i18n);
       })["catch"](function (error) {
         watchedState.valid = false;
         watchedState.loadingProcess = 'failed loading';
-        watchedState.error = error.message;
+        (0,_view_js__WEBPACK_IMPORTED_MODULE_7__.renderErrors)(error.message, watchedState);
       });
     });
     elements.languageButtons.forEach(function (languageButton) {
@@ -39643,16 +39636,16 @@ var handleFormAccessibility = function handleFormAccessibility(elements, state) 
 };
 var renderErrors = function renderErrors(errorName, watchedState) {
   switch (errorName) {
-    case 'parser error':
+    case 'Parser Error':
       watchedState.error = 'validation.invalid.noRSS';
       break;
-    case 'network error':
+    case 'Network Error':
       watchedState.error = 'validation.invalid.networkError';
       break;
-    case 'nonvalid url error':
+    case 'Nonvalid URL Error':
       watchedState.error = 'validation.invalid.nonvalidURL';
       break;
-    case 'duplication error':
+    case 'Duplication Error':
       watchedState.error = 'validation.invalid.duplicate';
       break;
     default:
