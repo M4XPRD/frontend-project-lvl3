@@ -39312,7 +39312,7 @@ var updatePosts = function updatePosts(rssLink, state, watchedState, i18n) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                schema = yup__WEBPACK_IMPORTED_MODULE_1__.string().url().notOneOf(_toConsumableArray(watchedState.rssFeedLinks)).required();
+                schema = yup__WEBPACK_IMPORTED_MODULE_1__.string().url().notOneOf(watchedState.loadedURLs).required();
                 return _context.abrupt("return", schema.validate(url));
               case 2:
               case "end":
@@ -39356,7 +39356,7 @@ var updatePosts = function updatePosts(rssLink, state, watchedState, i18n) {
         viewedLinks: [],
         clickedPostLink: ''
       },
-      rssFeedLinks: [],
+      loadedURLs: [],
       parsedFeeds: [],
       parsedPosts: []
     };
@@ -39409,7 +39409,7 @@ var updatePosts = function updatePosts(rssLink, state, watchedState, i18n) {
         });
         watchedState.valid = true;
         watchedState.loadingProcess = 'success';
-        watchedState.rssFeedLinks.push(currentUrl);
+        watchedState.loadedURLs.push(currentUrl);
         watchedState.parsedFeeds.unshift(feeds);
         (_watchedState$parsedP = watchedState.parsedPosts).unshift.apply(_watchedState$parsedP, _toConsumableArray(posts));
         updatePosts(currentUrl, state, watchedState, i18n);
