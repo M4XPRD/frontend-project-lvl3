@@ -50,7 +50,7 @@ export default () => {
       const schema = yup
         .string()
         .url()
-        .notOneOf([...watchedState.rssFeedLinks])
+        .notOneOf(watchedState.loadedURLs)
         .required();
       return schema.validate(url);
     };
@@ -87,7 +87,7 @@ export default () => {
         viewedLinks: [],
         clickedPostLink: '',
       },
-      rssFeedLinks: [],
+      loadedURLs: [],
       parsedFeeds: [],
       parsedPosts: [],
     };
@@ -142,7 +142,7 @@ export default () => {
           });
           watchedState.valid = true;
           watchedState.loadingProcess = 'success';
-          watchedState.rssFeedLinks.push(currentUrl);
+          watchedState.loadedURLs.push(currentUrl);
           watchedState.parsedFeeds.unshift(feeds);
           watchedState.parsedPosts.unshift(...posts);
           updatePosts(currentUrl, state, watchedState, i18n);
