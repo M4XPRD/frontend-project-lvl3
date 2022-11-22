@@ -62,7 +62,6 @@ const renderFeedback = (elements, state, i18n) => {
       elements.feedback.setAttribute('data-link-message', `${state.error}`);
       break;
     case (state.loadingProcess === 'success'):
-      state.error = '';
       elements.feedback.textContent = i18n.t('validation.valid.success');
       elements.feedback.setAttribute('data-link-message', 'validation.valid.success');
       elements.form.reset();
