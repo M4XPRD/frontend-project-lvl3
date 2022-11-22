@@ -1,7 +1,14 @@
 export default (data) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(data, 'application/xml');
-  const isParseError = doc.querySelector('parsererror');
+  const parserErrorCheck = doc.querySelector('parsererror');
+
+  if (parserErrorCheck) {
+    const error = new Error();
+    error.message = 'Parser Error';
+    throw error;
+  }
+
   const feedsTitle = doc.querySelector('title');
   const feedsDescription = doc.querySelector('description');
   const loadedFeeds = {
@@ -16,6 +23,6 @@ export default (data) => {
   });
 
   return {
-    loadedFeeds, loadedPosts, isParseError,
+    loadedFeeds, loadedPosts,
   };
 };

@@ -128,15 +128,9 @@ export default () => {
         .then(() => parseURL(currentUrl))
         .then((responce) => {
           const parsedResponce = parseRSS(responce);
-          const parserErrorCheck = parsedResponce.isParseError;
           const feeds = parsedResponce.loadedFeeds;
           const posts = parsedResponce.loadedPosts;
 
-          if (parserErrorCheck) {
-            const error = new Error();
-            error.message = 'Parser Error';
-            throw error;
-          }
           posts.forEach((post) => {
             post.postID = _.uniqueId();
           });
