@@ -1,4 +1,4 @@
-export default (data, currentUrl) => {
+export default (data, currentURL) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(data, 'application/xml');
   const parserErrorCheck = doc.querySelector('parsererror');
@@ -12,7 +12,7 @@ export default (data, currentUrl) => {
   const feedsTitle = doc.querySelector('title');
   const feedsDescription = doc.querySelector('description');
   const loadedFeeds = {
-    feedsTitle, feedsDescription, feedsURL: currentUrl,
+    feedsTitle, feedsDescription, feedsURL: currentURL,
   };
   const posts = doc.querySelectorAll('item');
   const loadedPosts = [...posts].map((item) => {
