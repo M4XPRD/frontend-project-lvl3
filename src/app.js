@@ -14,12 +14,12 @@ import {
   renderErrors,
 } from './view.js';
 
-const parseURL = (url) => axios
+const downloadFeed = (url) => axios
   .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
   .then((responce) => responce.data.contents);
 
 const updatePosts = (rssLink, state, watchedState, i18n) => {
-  parseURL(rssLink)
+  downloadFeed(rssLink)
     .then((responce) => {
       const parsedData = parseRSS(responce);
       const newPosts = _.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
@@ -125,7 +125,7 @@ export default () => {
       const currentUrl = data.get('url').trim();
       watchedState.loadingProcess = 'loading';
       validateURL(currentUrl, watchedState)
-        .then(() => parseURL(currentUrl))
+        .then(() => downloadFeed(currentUrl))
         .then((responce) => {
           const parsedResponce = parseRSS(responce);
           const feeds = parsedResponce.loadedFeeds;
