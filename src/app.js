@@ -18,16 +18,35 @@ const downloadFeed = (url) => axios
   .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
   .then((responce) => responce.data.contents);
 
-const updatePosts = (rssLink, state, watchedState, i18n) => {
-  downloadFeed(rssLink)
+const updatePosts = (state, watchedState, currentURL) => {
+  const links = state.parsedFeeds.map((feed) => feed.feedsURL);
+  const downloadPromises = links.map((link) => downloadFeed(link)
     .then((responce) => {
-      const parsedData = parseRSS(responce);
+      const parsedData = parseRSS(responce, currentURL);
       const newPosts = _.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
       if (newPosts.length > 0) {
         watchedState.parsedPosts = [...newPosts, ...state.parsedPosts];
       }
-    }).then(setTimeout(() => { updatePosts(rssLink, state, watchedState, i18n); }, 5000));
+    }).catch(() => {
+      updatePosts(state, watchedState, currentURL);
+      // console.log('Failed Download');
+    }));
+  Promise.all(downloadPromises)
+    .then(setTimeout(() => { updatePosts(state, watchedState, currentURL); }, 5000));
 };
+
+/*
+validateURL(currentURL, parsedLinks)
+        .then(() => downloadFeed(currentURL))
+        .then((responce) => {
+          const parsedResponce = parseRSS(responce, currentURL);
+          const feeds = parsedResponce.loadedFeeds;
+          const posts = parsedResponce.loadedPosts;
+
+.catch(() => {
+      console.log('Failed Download');
+    });
+*/
 
 export default () => {
   const defaultLanguage = 'ru';
@@ -121,13 +140,13 @@ export default () => {
     elements.form.addEventListener('submit', (e) => {
       e.preventDefault();
       const data = new FormData(e.target);
-      const currentUrl = data.get('url').trim();
+      const currentURL = data.get('url').trim();
       watchedState.loadingProcess = 'loading';
       const parsedLinks = watchedState.parsedFeeds.map((feed) => feed.feedsURL);
-      validateURL(currentUrl, parsedLinks)
-        .then(() => downloadFeed(currentUrl))
+      validateURL(currentURL, parsedLinks)
+        .then(() => downloadFeed(currentURL))
         .then((responce) => {
-          const parsedResponce = parseRSS(responce, currentUrl);
+          const parsedResponce = parseRSS(responce, currentURL);
           const feeds = parsedResponce.loadedFeeds;
           const posts = parsedResponce.loadedPosts;
 
@@ -137,9 +156,8 @@ export default () => {
           watchedState.valid = true;
           watchedState.loadingProcess = 'success';
           watchedState.parsedFeeds.unshift(feeds);
-          console.log(state.parsedFeeds);
           watchedState.parsedPosts.unshift(...posts);
-          updatePosts(currentUrl, state, watchedState, i18n);
+          updatePosts(state, watchedState, currentURL);
         })
         .catch((error) => {
           watchedState.valid = false;
