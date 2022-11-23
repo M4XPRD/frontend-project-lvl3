@@ -46,11 +46,11 @@ export default () => {
       },
     });
 
-    const validateURL = async (url, watchedState) => {
+    const validateURL = async (url, parsedLinks) => {
       const schema = yup
         .string()
         .url()
-        .notOneOf(watchedState.loadedURLs)
+        .notOneOf(parsedLinks)
         .required();
       return schema.validate(url);
     };
@@ -87,7 +87,6 @@ export default () => {
         viewedLinks: [],
         clickedPostLink: '',
       },
-      loadedURLs: [],
       parsedFeeds: [],
       parsedPosts: [],
     };
@@ -124,10 +123,11 @@ export default () => {
       const data = new FormData(e.target);
       const currentUrl = data.get('url').trim();
       watchedState.loadingProcess = 'loading';
-      validateURL(currentUrl, watchedState)
+      const parsedLinks = watchedState.parsedFeeds.map((feed) => feed.feedsURL);
+      validateURL(currentUrl, parsedLinks)
         .then(() => downloadFeed(currentUrl))
         .then((responce) => {
-          const parsedResponce = parseRSS(responce);
+          const parsedResponce = parseRSS(responce, currentUrl);
           const feeds = parsedResponce.loadedFeeds;
           const posts = parsedResponce.loadedPosts;
 
@@ -136,8 +136,8 @@ export default () => {
           });
           watchedState.valid = true;
           watchedState.loadingProcess = 'success';
-          watchedState.loadedURLs.push(currentUrl);
           watchedState.parsedFeeds.unshift(feeds);
+          console.log(state.parsedFeeds);
           watchedState.parsedPosts.unshift(...posts);
           updatePosts(currentUrl, state, watchedState, i18n);
         })
