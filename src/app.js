@@ -27,26 +27,10 @@ const updatePosts = (state, watchedState, currentURL) => {
       if (newPosts.length > 0) {
         watchedState.parsedPosts = [...newPosts, ...state.parsedPosts];
       }
-    }).catch(() => {
-      updatePosts(state, watchedState, currentURL);
-      // console.log('Failed Download');
     }));
   Promise.all(downloadPromises)
-    .then(setTimeout(() => { updatePosts(state, watchedState, currentURL); }, 5000));
+    .finally(setTimeout(() => { updatePosts(state, watchedState, currentURL); }, 5000));
 };
-
-/*
-validateURL(currentURL, parsedLinks)
-        .then(() => downloadFeed(currentURL))
-        .then((responce) => {
-          const parsedResponce = parseRSS(responce, currentURL);
-          const feeds = parsedResponce.loadedFeeds;
-          const posts = parsedResponce.loadedPosts;
-
-.catch(() => {
-      console.log('Failed Download');
-    });
-*/
 
 export default () => {
   const defaultLanguage = 'ru';
