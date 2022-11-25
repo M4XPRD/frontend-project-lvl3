@@ -18,18 +18,18 @@ const downloadFeed = (url) => axios
   .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(url)}`)
   .then((responce) => responce.data.contents);
 
-const updatePosts = (state, watchedState, currentURL) => {
-  const links = state.parsedFeeds.map((feed) => feed.feedsURL);
+const updatePosts = (watchedState) => {
+  const links = watchedState.parsedFeeds.map((feed) => feed.feedsURL);
   const downloadPromises = links.map((link) => downloadFeed(link)
     .then((responce) => {
-      const parsedData = parseRSS(responce, currentURL);
-      const newPosts = _.differenceBy(parsedData.loadedPosts, state.parsedPosts, 'postTitle');
+      const parsedData = parseRSS(responce);
+      const newPosts = _.differenceBy(parsedData.loadedPosts, watchedState.parsedPosts, 'postTitle');
       if (newPosts.length > 0) {
-        watchedState.parsedPosts = [...newPosts, ...state.parsedPosts];
+        watchedState.parsedPosts = [...newPosts, ...watchedState.parsedPosts];
       }
     }));
   Promise.all(downloadPromises)
-    .finally(setTimeout(() => { updatePosts(state, watchedState, currentURL); }, 5000));
+    .finally(setTimeout(() => updatePosts(watchedState), 5000));
 };
 
 export default () => {
@@ -141,7 +141,6 @@ export default () => {
           watchedState.loadingProcess = 'success';
           watchedState.parsedFeeds.unshift(feeds);
           watchedState.parsedPosts.unshift(...posts);
-          updatePosts(state, watchedState, currentURL);
         })
         .catch((error) => {
           watchedState.valid = false;
@@ -149,6 +148,8 @@ export default () => {
           handleErrors(error.message, watchedState);
         });
     });
+
+    updatePosts(watchedState);
 
     elements.languageButtons.forEach((languageButton) => {
       languageButton.addEventListener('click', () => {
