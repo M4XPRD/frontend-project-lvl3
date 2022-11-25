@@ -115,7 +115,7 @@ const renderFeedsList = (feed) => {
 
 const renderFeed = (elements, state, i18n) => {
   renderFeedsContainer(elements, i18n);
-  _.uniqBy(state.parsedFeeds, 'feedsTitle').forEach((feed) => {
+  state.parsedFeeds.forEach((feed) => {
     renderFeedsList(feed);
   });
 };
@@ -177,7 +177,7 @@ const renderPostsList = (state, post, i18n) => {
 
 const renderPosts = (elements, state, i18n) => {
   renderPostsContainer(elements, i18n);
-  _.uniq(state.parsedPosts).forEach((post) => {
+  state.parsedPosts.forEach((post) => {
     renderPostsList(state, post, i18n);
   });
 };
