@@ -11,7 +11,7 @@ import {
   renderLanguage, renderFeedback,
   renderModals,
   handleFormAccessibility,
-  renderErrors,
+  handleErrors,
 } from './view.js';
 
 const downloadFeed = (url) => axios
@@ -99,7 +99,7 @@ export default () => {
         case 'loadingProcess':
         case 'error':
           handleFormAccessibility(elements, watchedState);
-          renderErrors(state.error, state);
+          handleErrors(state.error, state);
           renderFeedback(elements, state, i18n);
           break;
         case 'parsedFeeds':
@@ -146,7 +146,7 @@ export default () => {
         .catch((error) => {
           watchedState.valid = false;
           watchedState.loadingProcess = 'failed loading';
-          renderErrors(error.message, watchedState);
+          handleErrors(error.message, watchedState);
         });
     });
 

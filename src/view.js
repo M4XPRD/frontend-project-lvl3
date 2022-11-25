@@ -10,7 +10,7 @@ const handleFormAccessibility = (elements, state) => {
   }
 };
 
-const renderErrors = (errorName, watchedState) => {
+const handleErrors = (errorName, watchedState) => {
   switch (errorName) {
     case 'Parser Error':
       watchedState.error = 'validation.invalid.noRSS';
@@ -236,5 +236,5 @@ export {
   renderFeed,
   renderModals,
   handleFormAccessibility,
-  renderErrors,
+  handleErrors,
 };
