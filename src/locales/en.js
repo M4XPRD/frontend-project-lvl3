@@ -15,7 +15,7 @@ export default {
       title: 'RSS Reader',
       subtitle: "Start reading RSS today! It's easy, it's pretty.",
       placeholder: 'RSS link',
-      example: 'Examples: https://ru.hexlet.io/lessons.rss, http://lorem-rss.herokuapp.com/feed?unit=second&interval=5',
+      example: 'Examples: https://ru.hexlet.io/lessons.rss, https://lorem-rss.hexlet.app/feed?unit=second&interval=5',
       button: 'Add',
       hexlet: 'created by ',
       feeds: 'Feeds',

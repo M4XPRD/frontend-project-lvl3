@@ -15,7 +15,7 @@ export default {
       title: 'RSS-агрегатор',
       subtitle: 'Начните читать RSS сегодня! Это легко, это красиво.',
       placeholder: 'Ссылка RSS',
-      example: 'Примеры: https://ru.hexlet.io/lessons.rss, http://lorem-rss.herokuapp.com/feed?unit=second&interval=5',
+      example: 'Примеры: https://ru.hexlet.io/lessons.rss, https://lorem-rss.hexlet.app/feed?unit=second&interval=5',
       button: 'Добавить',
       hexlet: 'создано в ',
       feeds: 'Фиды',
